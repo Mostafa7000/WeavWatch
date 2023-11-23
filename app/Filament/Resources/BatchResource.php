@@ -32,7 +32,7 @@ class BatchResource extends Resource
                         Forms\Components\TextInput::make('model_number')
                             ->label('اسم الموديل')
                     ])->columns(3),
-                Forms\Components\Section::make('الكميات المكلوبة')
+                Forms\Components\Section::make('الكميات المطلوبة')
                     ->schema([
                         Forms\Components\TextInput::make('required_quantity')
                             ->numeric()
@@ -81,6 +81,7 @@ class BatchResource extends Resource
     {
         return [
             DressesRelationManager::class,
+            PiecesRelationManager::class,
         ];
     }
 

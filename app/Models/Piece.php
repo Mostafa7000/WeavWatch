@@ -11,11 +11,14 @@ class Piece extends Model
 {
     use HasFactory;
 
+    public function batch(): BelongsTo
+    {
+        return $this->belongsTo(Batch::class);
+    }
     public function dress(): BelongsTo
     {
         return $this->belongsTo(Dress::class);
     }
-
     public function size(): BelongsTo
     {
         return $this->belongsTo(Size::class);

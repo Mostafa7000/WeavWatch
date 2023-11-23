@@ -12,6 +12,7 @@ return new class extends Migration {
     {
         Schema::create('pieces', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('batch_id')->constrained('batches')->cascadeOnDelete();
             $table->foreignId('dress_id')->constrained('dresses')->cascadeOnDelete();
             $table->foreignId('size_id')->constrained('sizes')->cascadeOnDelete();
             $table->integer('value');

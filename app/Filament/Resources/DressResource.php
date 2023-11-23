@@ -56,7 +56,6 @@ class DressResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\PiecesRelationManager::class
         ];
     }
 
@@ -68,6 +67,7 @@ class DressResource extends Resource
             'edit' => Pages\EditDress::route('/{record}/edit'),
         ];
     }
+
     public static function canCreate(): bool
     {
         return false;

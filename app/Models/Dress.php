@@ -25,4 +25,11 @@ class Dress extends Model
     {
         return $this->hasMany(Piece::class);
     }
+
+    public function sizes()
+    {
+        return $this->belongsToMany(Size::class, 'pieces', 'dress_id', 'size_id')
+            ->withTimestamps()
+            ->withPivot('value');
+    }
 }
