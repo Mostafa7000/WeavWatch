@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class PackagingDefect extends Model
 {
     use HasFactory;
+
+    public function dress() {
+        return $this->belongsTo(Dress::class);
+    }
+    public function size() {
+        return $this->belongsTo(Size::class);
+    }
 }
