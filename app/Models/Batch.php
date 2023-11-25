@@ -30,4 +30,8 @@ class Batch extends Model
     {
         return $this->hasMany(clothDefect::class);
     }
+    public function preparation_defects()
+    {
+        return $this->hasMany(PreparationDefect::class);
+    }
 }

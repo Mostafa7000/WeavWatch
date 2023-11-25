@@ -6,7 +6,9 @@ use App\Filament\Resources\BatchResource\Pages;
 use App\Filament\Resources\BatchResource\RelationManagers\ClothDefectsRelationManager;
 use App\Filament\Resources\BatchResource\RelationManagers\DressesRelationManager;
 use App\Filament\Resources\BatchResource\RelationManagers\PiecesRelationManager;
+use App\Filament\Resources\BatchResource\RelationManagers\PreparationDefectsRelationManager;
 use App\Models\Batch;
+use App\Models\PreparationDefect;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -84,6 +86,8 @@ class BatchResource extends Resource
             DressesRelationManager::class,
             PiecesRelationManager::class,
             ClothDefectsRelationManager::class,
+            PreparationDefectsRelationManager::class,
+
         ];
     }
 
