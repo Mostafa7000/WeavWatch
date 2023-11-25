@@ -193,9 +193,9 @@ class DatabaseSeeder extends Seeder
         //DB::table('cloth_defects')->insert(self::CLOTH_DEFECTS);
         //DB::table('preparation_defects')->insert(self::PREPARATION_DEFECTS);
         DB::table('cutting_defects')->insert(self::CUTTING_DEFECTS);
-        DB::table('needle_defects')->insert(self::NEEDLE_DEFECTS);
+        //DB::table('needle_defects')->insert(self::NEEDLE_DEFECTS);
         DB::table('operation_defects')->insert(self::OPERATION_DEFECTS);
-        DB::table('iron_defects')->insert(self::IRON_DEFECTS);
-        DB::table('packaging_defects')->insert(self::PACKAGING_DEFECTS);
+        //DB::table('iron_defects')->insert(self::IRON_DEFECTS);
+        //DB::table('packaging_defects')->insert(self::PACKAGING_DEFECTS);
     }
 }
