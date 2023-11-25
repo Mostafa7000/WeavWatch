@@ -46,4 +46,12 @@ class Batch extends Model
     {
         return $this->hasMany(PackagingDefect::class);
     }
+    public function cutting_defects()
+    {
+        return $this->hasMany(CuttingDefect::class);
+    }
+    public function operation_defects()
+    {
+        return $this->hasMany(OperationDefect::class);
+    }
 }

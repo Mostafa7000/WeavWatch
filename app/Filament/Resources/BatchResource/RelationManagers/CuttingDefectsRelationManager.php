@@ -3,26 +3,34 @@
 namespace App\Filament\Resources\BatchResource\RelationManagers;
 
 use App\Models\Dress;
-use App\Models\IronDefect;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Forms\Get;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class IronDefectsRelationManager extends RelationManager
+class CuttingDefectsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'iron_defects';
+    protected static string $relationship = 'cutting_defects';
 
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('الثوب - اللون')
-                    ->description('اختر الثوب والمقاس المطلوبين')
+                Forms\Components\Section::make('الثوب-اللون')
+                    ->description('اختر الثوب المطلوب')
                     ->schema([
                         Forms\Components\Select::make('dress_id')
+                            ->disableOptionWhen(function (string $value) {
+                                if (isset($this->cachedMountedTableActionRecord) && $this->cachedMountedTableActionRecord->dress_id == $value) {
+                                    return false;
+                                }
+
+                                $entered = $this->ownerRecord->cutting_defects;
+                                $entered = $entered->flatMap(fn($defect) => $defect->pluck('id'))->toArray();
+
+                                return in_array($value, $entered);
+                            })
                             ->options(
                                 Dress::with('color')
                                     ->where('batch_id', $this->ownerRecord->id)
@@ -33,53 +41,32 @@ class IronDefectsRelationManager extends RelationManager
                                         })
                                     ->toArray()
                             )
-                            ->live()
+                            ->unique(ignoreRecord: true)
                             ->required(),
-                        Forms\Components\Select::make('size_id')
-                            ->options(function () {
-                                return $this->ownerRecord->sizes->pluck('title', 'id')->toArray();
-                            })
-                            ->disableOptionWhen(function (string $value, string $operation, Get $get) {
-                                if (isset($this->cachedMountedTableActionRecord) && $this->cachedMountedTableActionRecord->size_id == $value) {
-                                    return false;
-                                }
-
-                                $builder = IronDefect::query()->where('batch_id', $this->ownerRecord->id)
-                                    ->where('dress_id', $get('dress_id'));
-                                $entered = $builder->get()->pluck('size_id')->toArray();
-
-                                return in_array($value, $entered);
-                            })
-                            ->disabled(fn(Get $get) => empty($get('dress_id')))
-                            ->required()
-                    ])->columns(2),
+                    ])->columns(1),
                 Forms\Components\Section::make('العيوب')
                     ->description('أدخل العيوب')
                     ->schema([
                         Forms\Components\TextInput::make('a1')
-                            ->label('اتساخ'),
+                            ->label('شرشرة'),
                         Forms\Components\TextInput::make('a2')
-                            ->label('لسعة'),
+                            ->label('عدم تماثل'),
                         Forms\Components\TextInput::make('a3')
-                            ->label('حرق'),
+                            ->label('اعوجاج في شكل القص'),
                         Forms\Components\TextInput::make('a4')
-                            ->label('كرمشة'),
+                            ->label('قطع تالفة'),
                         Forms\Components\TextInput::make('a5')
-                            ->label('بقع معدنية'),
+                            ->label('عيب في البرسل'),
                         Forms\Components\TextInput::make('a6')
-                            ->label('لمعان'),
+                            ->label('فورت غير موجود'),
                         Forms\Components\TextInput::make('a7')
-                            ->label('تكسير'),
+                            ->label('فورت عميق'),
                         Forms\Components\TextInput::make('a8')
-                            ->label('بخار زيادة'),
+                            ->label('نقص طول أو عرض'),
                         Forms\Components\TextInput::make('a9')
-                            ->label('بلل'),
+                            ->label('قطع هربانة'),
                         Forms\Components\TextInput::make('a10')
-                            ->label('عدم ضبط المظهرية'),
-                        Forms\Components\TextInput::make('a11')
-                            ->label('علامات ضغط'),
-                        Forms\Components\TextInput::make('a12')
-                            ->label('انكماش'),
+                            ->label('قص غير جيد'),
                     ])->columns(5),
             ]);
     }
@@ -87,39 +74,33 @@ class IronDefectsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->recordTitleAttribute('batch_id')
             ->columns([
                 Tables\Columns\TextColumn::make('dress.code')
                     ->label('كود الثوب')
                     ->color('info'),
                 Tables\Columns\TextColumn::make('dress.color.title')
                     ->label('لون الثوب'),
-                Tables\Columns\TextColumn::make('size.title')
-                    ->label('المقاس'),
                 Tables\Columns\TextColumn::make('a1')
-                    ->label('اتساخ'),
+                    ->label('شرشرة'),
                 Tables\Columns\TextColumn::make('a2')
-                    ->label('لسعة'),
+                    ->label('عدم تماثل'),
                 Tables\Columns\TextColumn::make('a3')
-                    ->label('حرق'),
+                    ->label('اعوجاج في شكل القص'),
                 Tables\Columns\TextColumn::make('a4')
-                    ->label('كرمشة'),
+                    ->label('قطع تالفة'),
                 Tables\Columns\TextColumn::make('a5')
-                    ->label('بقع معدنية'),
+                    ->label('عيب في البرسل'),
                 Tables\Columns\TextColumn::make('a6')
-                    ->label('لمعان'),
+                    ->label('فورت غير موجود'),
                 Tables\Columns\TextColumn::make('a7')
-                    ->label('تكسير'),
+                    ->label('فورت عميق'),
                 Tables\Columns\TextColumn::make('a8')
-                    ->label('بخار زيادة'),
+                    ->label('نقص طول أو عرض'),
                 Tables\Columns\TextColumn::make('a9')
-                    ->label('بلل'),
+                    ->label('قطع هربانة'),
                 Tables\Columns\TextColumn::make('a10')
-                    ->label('عدم ضبط المظهرية'),
-                Tables\Columns\TextColumn::make('a11')
-                    ->label('علامات ضغط'),
-                Tables\Columns\TextColumn::make('a12')
-                    ->label('انكماش'),
-
+                    ->label('قص غير جيد'),
             ])
             ->filters([
                 //

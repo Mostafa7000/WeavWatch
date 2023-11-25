@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class CuttingDefect extends Model
 {
     use HasFactory;
+    public function dress()
+    {
+        return $this->belongsTo(Dress::class);
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\BatchResource\Pages;
 use App\Filament\Resources\BatchResource\RelationManagers\ClothDefectsRelationManager;
+use App\Filament\Resources\BatchResource\RelationManagers\CuttingDefectsRelationManager;
 use App\Filament\Resources\BatchResource\RelationManagers\DressesRelationManager;
 use App\Filament\Resources\BatchResource\RelationManagers\IronDefectsRelationManager;
 use App\Filament\Resources\BatchResource\RelationManagers\NeedleDefectsRelationManager;
@@ -11,6 +12,7 @@ use App\Filament\Resources\BatchResource\RelationManagers\PackagingDefectsRelati
 use App\Filament\Resources\BatchResource\RelationManagers\PiecesRelationManager;
 use App\Filament\Resources\BatchResource\RelationManagers\PreparationDefectsRelationManager;
 use App\Models\Batch;
+use App\Models\CuttingDefect;
 use App\Models\PreparationDefect;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
@@ -90,6 +92,7 @@ class BatchResource extends Resource
             PiecesRelationManager::class,
             ClothDefectsRelationManager::class,
             PreparationDefectsRelationManager::class,
+            CuttingDefectsRelationManager::class,
             NeedleDefectsRelationManager::class,
             IronDefectsRelationManager::class,
             PackagingDefectsRelationManager::class,
