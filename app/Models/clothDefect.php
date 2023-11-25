@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class clothDefect extends Model
 {
     use HasFactory;
+
+    public function dress()
+    {
+        return $this->belongsTo(Dress::class);
+    }
 }

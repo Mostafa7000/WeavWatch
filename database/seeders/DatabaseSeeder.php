@@ -190,7 +190,7 @@ class DatabaseSeeder extends Seeder
 
         DB::table('colors')->insert(self::COLORS);
         DB::table('sizes')->insert(self::SIZES);
-        DB::table('cloth_defects')->insert(self::CLOTH_DEFECTS);
+        //DB::table('cloth_defects')->insert(self::CLOTH_DEFECTS);
         DB::table('preparation_defects')->insert(self::PREPARATION_DEFECTS);
         DB::table('cutting_defects')->insert(self::CUTTING_DEFECTS);
         DB::table('needle_defects')->insert(self::NEEDLE_DEFECTS);

@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\BatchResource\RelationManagers;
 
+use App\Models\Batch;
 use App\Models\Dress;
+use App\Models\Piece;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -10,8 +12,7 @@ use Filament\Forms\Set;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Eloquent\Collection;
 
 class PiecesRelationManager extends RelationManager
 {
@@ -39,32 +40,51 @@ class PiecesRelationManager extends RelationManager
                     ->afterStateUpdated(fn(Set $set) => $set('size_id', null)),
                 Forms\Components\Select::make('size_id')
                     ->options(
-                        function (Get $get, $operation) {
-                            $sizesInBatch = $this->ownerRecord->sizes->pluck('title', 'id')->toArray();
-                            if ($operation == 'create') {
-                                $sizesInDresses = $this->ownerRecord->dresses
-                                    ->flatMap(function ($dress) {
-                                        return $dress->sizes->pluck('title', 'id');
-                                    })->toArray();
-                            } else {
-                                $dressId = $get('dress_id');
-                                $sizesInDresses = $this->ownerRecord->dresses
-                                    ->where('id', '!=', $dressId)
-                                    ->flatMap(function ($dress) {
-                                        return $dress->sizes->pluck('title', 'id');
-                                    })->toArray();
-                            }
-                            return array_diff($sizesInBatch, $sizesInDresses);
+                        function () {
+                            return $this->ownerRecord->sizes->pluck('title', 'id')->toArray();
                         }
                     )
+                    ->disableOptionWhen(function (string $value, Get $get) {
+                        /** @var Collection $dresses */
+                        $dresses = Dress::query()->where('id', $get('dress_id'))->get();
+                        if (isset($this->cachedMountedTableActionRecord)) {
+                            $dresses = $dresses
+                                ->where('id', '!=', $this->cachedMountedTableActionRecord->dress_id);
+                        }
+
+                        $sizeIds = $dresses->flatMap(function ($dress) {
+                            return $dress->sizes->pluck('id');
+                        })->all();
+
+                        if (in_array($value, $sizeIds)) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    })
                     ->label('Size')
                     ->live()
                     ->required()
                     ->disabled(fn(Get $get) => empty($get('dress_id'))),
                 Forms\Components\TextInput::make('value')
                     ->numeric()
-                    ->required()
+                    ->hint('The remaining Pieces = ' . $this->getRemainingPieces())
+                    ->maxValue($this->getRemainingPieces())
+                    ->required(),
             ])->columns(3);
+    }
+
+    private function getRemainingPieces()
+    {
+        $required = Batch::query()
+            ->where('id', $this->ownerRecord->id)
+            ->get()
+            ->sum('required_quantity');
+        $made = Piece::query()
+            ->where('batch_id', $this->ownerRecord->id)
+            ->get()
+            ->sum('value');
+        return ($required - $made) > 0 ? $required - $made : 0;
     }
 
     public function table(Table $table): Table

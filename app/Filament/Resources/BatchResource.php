@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\BatchResource\Pages;
+use App\Filament\Resources\BatchResource\RelationManagers\ClothDefectsRelationManager;
 use App\Filament\Resources\BatchResource\RelationManagers\DressesRelationManager;
 use App\Filament\Resources\BatchResource\RelationManagers\PiecesRelationManager;
 use App\Models\Batch;
@@ -82,6 +83,7 @@ class BatchResource extends Resource
         return [
             DressesRelationManager::class,
             PiecesRelationManager::class,
+            ClothDefectsRelationManager::class,
         ];
     }
 

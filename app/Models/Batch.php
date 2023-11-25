@@ -25,4 +25,9 @@ class Batch extends Model
     {
         return $this->hasMany(Piece::class);
     }
+
+    public function cloth_defects()
+    {
+        return $this->hasMany(clothDefect::class);
+    }
 }
