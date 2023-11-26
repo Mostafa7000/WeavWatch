@@ -119,7 +119,6 @@ class IronDefectsRelationManager extends RelationManager
                     ->label('علامات ضغط'),
                 Tables\Columns\TextColumn::make('a12')
                     ->label('انكماش'),
-
             ])
             ->filters([
                 //

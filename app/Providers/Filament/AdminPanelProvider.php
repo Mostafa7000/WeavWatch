@@ -28,12 +28,11 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->colors([
-                'danger' => Color::Rose,
-                'gray' => Color::Gray,
-                'info' => Color::Blue,
-                'primary' => Color::Green,
-                'success' => Color::Emerald,
-                'warning' => Color::Orange,
+                'danger' => Color::Red,
+                'info' => Color::Orange,
+                'primary' => Color::Yellow,
+                'success' => Color::Amber,
+                'warning' => Color::Zinc
             ])
             ->font('Poppins')
             ->brandName('WeaveWatch')
@@ -41,7 +40,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                // Pages\Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([

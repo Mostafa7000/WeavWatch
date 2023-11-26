@@ -8,9 +8,11 @@ use App\Filament\Resources\BatchResource\RelationManagers\CuttingDefectsRelation
 use App\Filament\Resources\BatchResource\RelationManagers\DressesRelationManager;
 use App\Filament\Resources\BatchResource\RelationManagers\IronDefectsRelationManager;
 use App\Filament\Resources\BatchResource\RelationManagers\NeedleDefectsRelationManager;
+use App\Filament\Resources\BatchResource\RelationManagers\OperationDefectsRelationManager;
 use App\Filament\Resources\BatchResource\RelationManagers\PackagingDefectsRelationManager;
 use App\Filament\Resources\BatchResource\RelationManagers\PiecesRelationManager;
 use App\Filament\Resources\BatchResource\RelationManagers\PreparationDefectsRelationManager;
+use App\Filament\Resources\BatchResource\Widgets\ClothDefectsReport;
 use App\Models\Batch;
 use App\Models\CuttingDefect;
 use App\Models\PreparationDefect;
@@ -31,7 +33,7 @@ class BatchResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('بيانات الشحنة')
+                Forms\Components\Section::make('بيانات الطلبية')
                     ->schema([
                         Forms\Components\TextInput::make('message_number')
                             ->label('رقم الرسالة'),
@@ -94,6 +96,7 @@ class BatchResource extends Resource
             PreparationDefectsRelationManager::class,
             CuttingDefectsRelationManager::class,
             NeedleDefectsRelationManager::class,
+            OperationDefectsRelationManager::class,
             IronDefectsRelationManager::class,
             PackagingDefectsRelationManager::class,
         ];
@@ -105,7 +108,7 @@ class BatchResource extends Resource
             'index' => Pages\ListBatches::route('/'),
             'create' => Pages\CreateBatch::route('/create'),
             'edit' => Pages\EditBatch::route('/{record}/edit'),
-            //'view' => Pages\ViewBatch::route('/{record}'),
+            'view' => Pages\ViewBatch::route('/{record}'),
         ];
     }
 }

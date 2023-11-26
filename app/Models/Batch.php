@@ -52,6 +52,7 @@ class Batch extends Model
     }
     public function operation_defects()
     {
-        return $this->hasMany(OperationDefect::class);
+        return $this->hasMany(OperationDefectReport::class);
     }
+
 }
