@@ -60,16 +60,18 @@ class PreparationDefectsReport extends Widget
 
     public function getDress(bool $max)
     {
-        $statement = DB::table(self::TABLE)
-            ->where('batch_id', $this->record->id)
+        $statement = DB::table('cloth_defects')
+            ->where('cloth_defects.batch_id', $this->record->id)
+            ->join('dresses', 'cloth_defects.dress_id', '=', 'dresses.id')
+            ->join('colors', 'dresses.color_id', '=', 'colors.id')
             ->groupBy('dress_id');
         if ($max) {
-            $statement->select(DB::raw('MAX(a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9 + a10 + a11 + a12 + a13 + a14 + a15 + a16 + a17 + a18 + a19 + a20 + a21) as number, dress_id'));
+            $statement->select(DB::raw('MAX(a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9 + a10 + a11 + a12 + a13 + a14 + a15 + a16 + a17 + a18 + a19) as number, code, title'));
         } else {
-            $statement->select(DB::raw('MIN(a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9 + a10 + a11 + a12 + a13 + a14 + a15 + a16 + a17 + a18 + a19 + a20 + a21) as number, dress_id'));
+            $statement->select(DB::raw('MIN(a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9 + a10 + a11 + a12 + a13 + a14 + a15 + a16 + a17 + a18 + a19) as number, code, title'));
         }
         if ($statement->first() !== null) {
-            return ['value' => $statement->first()->number, 'dress' => $statement->first()->dress_id];
+            return ['value' => $statement->first()->number, 'dress' => $statement->first()->code, 'color' => $statement->first()->title];
         } else {
             return [];
         }

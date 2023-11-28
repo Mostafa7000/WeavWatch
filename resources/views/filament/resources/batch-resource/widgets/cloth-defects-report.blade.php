@@ -1,31 +1,41 @@
 <x-filament-widgets::widget>
     <x-filament::section>
-        <div dir="rtl">
-            @php
-                $minResult = $this->getDress(0);
-                $minDressId = $minResult['dress'] ?? null;
-                if ($minDressId) {
-                    $minColor = \App\Models\Dress::query()->where('id', $minDressId)->first()->color->title;
-                }
+        <style>
+            table.report {
+                border-collapse: separate;
+                border-spacing: 10px;
+            }
+            table.report tr td {
+                border: 2px solid burlywood;
+                border-radius: 5px;
+                padding: 10px;
+            }
+        </style>
+        @php
+            $minDress = $this->getDress(0);
+            $maxDress = $this->getDress(1);
 
-                $maxResult = $this->getDress(1);
-                $maxDressId = $maxResult['dress'] ?? null;
-                if ($maxDressId) {
-                    $maxColor = \App\Models\Dress::query()->where('id', $maxDressId)->first()->color->title;
-                }
-
-                $maxDefect = $this->getDefect(1);
-                $minDefect = $this->getDefect(0);
-            @endphp
-
-            <h1 class="text-center font-medium mb-2">تقرير عيوب القماش</h1>
-            @if(isset($minDressId))
-                <div>- أعلى ثوب في العيوب : {{$maxDressId}} - {{$maxColor}}  -  {{$maxResult['value']}} مرة </div>
-                <div>- أقل ثوب في العيوب : {{$minDressId}} - {{$minColor}}  -  {{$minResult['value']}} مرة </div>
-                <hr class="mt-2 mb-2">
-                <div>- أعلى عيب ظهورا : {{$maxDefect['defect']}}  -  {{$maxDefect['value']}} مرة </div>
-                <div>- أقل عيب ظهورا : {{$minDefect['defect']}}  -  {{$minDefect['value']}} مرة </div>
-            @endif
-        </div>
+            $minDefect = $this->getDefect(0);
+            $maxDefect = $this->getDefect(1);
+        @endphp
+        <h1 class="text-center font-medium mb-2">تقرير عيوب القماش</h1>
+        <table dir="rtl" class="report mx-auto">
+            <thead>
+            <tr>
+                <th>أفضل لون</th>
+                <th>أسوأ لون</th>
+                <th>أعلى عيب</th>
+                <th>أقل عيب</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{$maxDress['dress']}} - {{$maxDress['color']}} <br> {{$maxDress['value']}} مرة</td>
+                    <td>{{$minDress['dress']}} - {{$minDress['color']}} <br> {{$minDress['value']}} مرة</td>
+                    <td>{{$maxDefect['defect']}} <br> {{$maxDefect['value']}} مرة</td>
+                    <td>{{$minDefect['defect']}} <br> {{$minDefect['value']}} مرة</td>
+                </tr>
+            </tbody>
+        </table>
     </x-filament::section>
 </x-filament-widgets::widget>
