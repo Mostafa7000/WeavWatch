@@ -23,6 +23,7 @@ class PiecesRelationManager extends RelationManager
         return $form
             ->schema([
                 Forms\Components\Select::make('dress_id')
+                    ->label("Dress")
                     ->options(
                         Dress::with('color')
                             ->where('batch_id', $this->ownerRecord->id)
@@ -70,7 +71,8 @@ class PiecesRelationManager extends RelationManager
                     ->numeric()
                     ->hint('The remaining Pieces = ' . $this->getRemainingPieces())
                     ->maxValue($this->getRemainingPieces())
-                    ->required(),
+                    ->required()
+                    ->live(),
             ])->columns(3);
     }
 

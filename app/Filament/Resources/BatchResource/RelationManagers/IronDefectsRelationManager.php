@@ -23,6 +23,7 @@ class IronDefectsRelationManager extends RelationManager
                     ->description('اختر الثوب والمقاس المطلوبين')
                     ->schema([
                         Forms\Components\Select::make('dress_id')
+                            ->label('dress')
                             ->options(
                                 Dress::with('color')
                                     ->where('batch_id', $this->ownerRecord->id)
@@ -36,6 +37,7 @@ class IronDefectsRelationManager extends RelationManager
                             ->live()
                             ->required(),
                         Forms\Components\Select::make('size_id')
+                            ->label('size')
                             ->options(function () {
                                 return $this->ownerRecord->sizes->pluck('title', 'id')->toArray();
                             })
@@ -57,29 +59,29 @@ class IronDefectsRelationManager extends RelationManager
                     ->description('أدخل العيوب')
                     ->schema([
                         Forms\Components\TextInput::make('a1')
-                            ->label('اتساخ'),
+                            ->label('اتساخ')->default(0),
                         Forms\Components\TextInput::make('a2')
-                            ->label('لسعة'),
+                            ->label('لسعة')->default(0),
                         Forms\Components\TextInput::make('a3')
-                            ->label('حرق'),
+                            ->label('حرق')->default(0),
                         Forms\Components\TextInput::make('a4')
-                            ->label('كرمشة'),
+                            ->label('كرمشة')->default(0),
                         Forms\Components\TextInput::make('a5')
-                            ->label('بقع معدنية'),
+                            ->label('بقع معدنية')->default(0),
                         Forms\Components\TextInput::make('a6')
-                            ->label('لمعان'),
+                            ->label('لمعان')->default(0),
                         Forms\Components\TextInput::make('a7')
-                            ->label('تكسير'),
+                            ->label('تكسير')->default(0),
                         Forms\Components\TextInput::make('a8')
-                            ->label('بخار زيادة'),
+                            ->label('بخار زيادة')->default(0),
                         Forms\Components\TextInput::make('a9')
-                            ->label('بلل'),
+                            ->label('بلل')->default(0),
                         Forms\Components\TextInput::make('a10')
-                            ->label('عدم ضبط المظهرية'),
+                            ->label('عدم ضبط المظهرية')->default(0),
                         Forms\Components\TextInput::make('a11')
-                            ->label('علامات ضغط'),
+                            ->label('علامات ضغط')->default(0),
                         Forms\Components\TextInput::make('a12')
-                            ->label('انكماش'),
+                            ->label('انكماش')->default(0),
                     ])->columns(5),
             ]);
     }

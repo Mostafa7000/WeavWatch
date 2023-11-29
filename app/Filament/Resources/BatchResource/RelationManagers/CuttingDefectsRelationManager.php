@@ -21,6 +21,7 @@ class CuttingDefectsRelationManager extends RelationManager
                     ->description('اختر الثوب المطلوب')
                     ->schema([
                         Forms\Components\Select::make('dress_id')
+                            ->label('label')
                             ->disableOptionWhen(function (string $value) {
                                 if (isset($this->cachedMountedTableActionRecord) && $this->cachedMountedTableActionRecord->dress_id == $value) {
                                     return false;
@@ -48,25 +49,25 @@ class CuttingDefectsRelationManager extends RelationManager
                     ->description('أدخل العيوب')
                     ->schema([
                         Forms\Components\TextInput::make('a1')
-                            ->label('شرشرة'),
+                            ->label('شرشرة')->default(0),
                         Forms\Components\TextInput::make('a2')
-                            ->label('عدم تماثل'),
+                            ->label('عدم تماثل')->default(0),
                         Forms\Components\TextInput::make('a3')
-                            ->label('اعوجاج في شكل القص'),
+                            ->label('اعوجاج في شكل القص')->default(0),
                         Forms\Components\TextInput::make('a4')
-                            ->label('قطع تالفة'),
+                            ->label('قطع تالفة')->default(0),
                         Forms\Components\TextInput::make('a5')
-                            ->label('عيب في البرسل'),
+                            ->label('عيب في البرسل')->default(0),
                         Forms\Components\TextInput::make('a6')
-                            ->label('فورت غير موجود'),
+                            ->label('فورت غير موجود')->default(0),
                         Forms\Components\TextInput::make('a7')
-                            ->label('فورت عميق'),
+                            ->label('فورت عميق')->default(0),
                         Forms\Components\TextInput::make('a8')
-                            ->label('نقص طول أو عرض'),
+                            ->label('نقص طول أو عرض')->default(0),
                         Forms\Components\TextInput::make('a9')
-                            ->label('قطع هربانة'),
+                            ->label('قطع هربانة')->default(0),
                         Forms\Components\TextInput::make('a10')
-                            ->label('قص غير جيد'),
+                            ->label('قص غير جيد')->default(0),
                     ])->columns(5),
             ]);
     }

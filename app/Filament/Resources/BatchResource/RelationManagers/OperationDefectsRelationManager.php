@@ -27,6 +27,7 @@ class OperationDefectsRelationManager extends RelationManager
                     ->description('اختر الثوب والمقاس و العيب المطلوبين')
                     ->schema([
                         Forms\Components\Select::make('dress_id')
+                            ->label('Dress')
                             ->options(
                                 Dress::with('color')
                                     ->where('batch_id', $this->ownerRecord->id)
@@ -40,6 +41,7 @@ class OperationDefectsRelationManager extends RelationManager
                             ->live()
                             ->required(),
                         Forms\Components\Select::make('size_id')
+                            ->label('Size')
                             ->options(function () {
                                 return $this->ownerRecord->sizes->pluck('title', 'id')->toArray();
                             })
@@ -65,16 +67,16 @@ class OperationDefectsRelationManager extends RelationManager
                 Forms\Components\Section::make('العيوب')
                     ->description('أدخل العيوب')
                     ->schema([
-                        Forms\Components\TextInput::make('08:10')->numeric(),
-                        Forms\Components\TextInput::make('09:10')->numeric(),
-                        Forms\Components\TextInput::make('10:10')->numeric(),
-                        Forms\Components\TextInput::make('11:10')->numeric(),
-                        Forms\Components\TextInput::make('12:00')->numeric(),
-                        Forms\Components\TextInput::make('01:30')->numeric(),
-                        Forms\Components\TextInput::make('02:10')->numeric(),
-                        Forms\Components\TextInput::make('03:10')->numeric(),
-                        Forms\Components\TextInput::make('04:10')->numeric(),
-                        Forms\Components\TextInput::make('05:10')->numeric(),
+                        Forms\Components\TextInput::make('08:10')->numeric()->default(0),
+                        Forms\Components\TextInput::make('09:10')->numeric()->default(0),
+                        Forms\Components\TextInput::make('10:10')->numeric()->default(0),
+                        Forms\Components\TextInput::make('11:10')->numeric()->default(0),
+                        Forms\Components\TextInput::make('12:00')->numeric()->default(0),
+                        Forms\Components\TextInput::make('01:30')->numeric()->default(0),
+                        Forms\Components\TextInput::make('02:10')->numeric()->default(0),
+                        Forms\Components\TextInput::make('03:10')->numeric()->default(0),
+                        Forms\Components\TextInput::make('04:10')->numeric()->default(0),
+                        Forms\Components\TextInput::make('05:10')->numeric()->default(0),
                     ])->columns(7),
             ]);
     }

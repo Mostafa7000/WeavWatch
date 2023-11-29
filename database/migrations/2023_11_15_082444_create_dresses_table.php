@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('dresses', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->unique();
+            $table->string('code');
             $table->foreignId('color_id')->constrained('colors')->cascadeOnDelete();
             $table->foreignId('batch_id')->constrained('batches')->cascadeOnDelete();
             $table->timestamps();

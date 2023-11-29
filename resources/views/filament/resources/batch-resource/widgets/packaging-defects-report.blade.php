@@ -19,6 +19,10 @@
             $maxDefect = $this->getDefect(1);
         @endphp
         <h1 class="text-center font-medium mb-2">تقرير عيوب التعبئة</h1>
+        @if(isset($date))
+            <h2 class="text-center font-light text-xl mb-2" style="color: #c44e47">{{$date}}</h2>
+        @endif
+        @if(!empty($minDress))
         <table dir="rtl" class="report mx-auto">
             <thead>
             <tr>
@@ -33,13 +37,14 @@
             @foreach($minDress as $size => $data)
                 <tr>
                     <td>{{ $size }}</td>
-                    <td>{{$maxDress[$size]['dress']}} - {{$maxDress[$size]['color']}} <br> {{$maxDress[$size]['value']}} مرة</td>
-                    <td>{{$data['dress']}} - {{$data['color']}} <br> {{$data['value']}} مرة</td>
+                    <td>{{$data['dress']}} - {{$data['color']}} <br> {{$data['value']}} عيب</td>
+                    <td>{{$maxDress[$size]['dress']}} - {{$maxDress[$size]['color']}} <br> {{$maxDress[$size]['value']}} عيب</td>
                     <td>{{$maxDefect[$size]['defect']}} <br> {{$maxDefect[$size]['value']}} مرة</td>
                     <td>{{$minDefect[$size]['defect']}} <br> {{$minDefect[$size]['value']}} مرة</td>
                 </tr>
             @endforeach
             </tbody>
         </table>
+        @endif
     </x-filament::section>
 </x-filament-widgets::widget>

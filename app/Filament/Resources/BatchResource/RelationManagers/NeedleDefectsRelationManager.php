@@ -26,6 +26,7 @@ class NeedleDefectsRelationManager extends RelationManager
                     ->description('اختر الثوب والمقاس المطلوبين')
                     ->schema([
                         Forms\Components\Select::make('dress_id')
+                            ->label('dress')
                             ->options(
                                 Dress::with('color')
                                     ->where('batch_id', $this->ownerRecord->id)
@@ -39,6 +40,7 @@ class NeedleDefectsRelationManager extends RelationManager
                             ->live()
                             ->required(),
                         Forms\Components\Select::make('size_id')
+                            ->label('size')
                             ->options(function () {
                                 return $this->ownerRecord->sizes->pluck('title', 'id')->toArray();
                             })
@@ -60,27 +62,27 @@ class NeedleDefectsRelationManager extends RelationManager
                     ->description('أدخل العيوب')
                     ->schema([
                         Forms\Components\TextInput::make('a1')
-                            ->label('تفويت غرزة'),
+                            ->label('تفويت غرزة')->default(0),
                         Forms\Components\TextInput::make('a2')
-                            ->label('ظهور خيط المكوك على خيط الحرير'),
+                            ->label('ظهور خيط المكوك على خيط الحرير')->default(0),
                         Forms\Components\TextInput::make('a3')
-                            ->label('بقع زيت'),
+                            ->label('بقع زيت')->default(0),
                         Forms\Components\TextInput::make('a4')
-                            ->label('ترحيل الرسمة'),
+                            ->label('ترحيل الرسمة')->default(0),
                         Forms\Components\TextInput::make('a5')
-                            ->label('ترحيل الأبليك'),
+                            ->label('ترحيل الأبليك')->default(0),
                         Forms\Components\TextInput::make('a6')
-                            ->label('تنسيل'),
+                            ->label('تنسيل')->default(0),
                         Forms\Components\TextInput::make('a7')
-                            ->label('عدم ضبط الشد'),
+                            ->label('عدم ضبط الشد')->default(0),
                         Forms\Components\TextInput::make('a8')
-                            ->label('عدم ضبط ألوان الفيلم'),
+                            ->label('عدم ضبط ألوان الفيلم')->default(0),
                         Forms\Components\TextInput::make('a9')
-                            ->label('كثافة الغرز'),
+                            ->label('كثافة الغرز')->default(0),
                         Forms\Components\TextInput::make('a10')
-                            ->label('ترحيل في مكان التطريز'),
+                            ->label('ترحيل في مكان التطريز')->default(0),
                         Forms\Components\TextInput::make('a11')
-                            ->label('تشطيب أبليك سيء'),
+                            ->label('تشطيب أبليك سيء')->default(0),
                     ])->columns(5),
             ]);
     }

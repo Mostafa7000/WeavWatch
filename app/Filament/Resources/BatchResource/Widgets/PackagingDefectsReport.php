@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BatchResource\Widgets;
 
+use DateTime;
 use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -55,23 +56,16 @@ class PackagingDefectsReport extends Widget
             }
         }
 
+        $func = $max ? "max" : "min";
+
         $result = [];
-        if ($max) {
-            foreach ($sums as $size => $sum) {
-                $maxValue = max($sum);
-                $maxDefect = array_keys($sum, $maxValue)[0];
-                $result[$size] = ['value' => $maxValue, 'defect' => $maxDefect];
-            }
-        } else {
-            foreach ($sums as $size => $sum) {
-                $minValue = min($sum);
-                $minDefect = array_keys($sum, $minValue)[0];
-                $result[$size] = ['value' => $minValue, 'defect' => $minDefect];
-            }
+        foreach ($sums as $size => $sum) {
+            $maxValue = $func($sum);
+            $maxDefect = array_keys($sum, $maxValue)[0];
+            $result[$size] = ['value' => $maxValue, 'defect' => $maxDefect];
         }
         return $result;
     }
-
 
     public function getDress(bool $max)
     {
@@ -79,18 +73,36 @@ class PackagingDefectsReport extends Widget
             ->where('packaging_defects.batch_id', $this->record->id)
             ->join('dresses', 'packaging_defects.dress_id', '=', 'dresses.id')
             ->join('colors', 'dresses.color_id', '=', 'colors.id')
-            ->groupBy('size_id', 'dress_id');
-        if ($max) {
-            $statement->select(DB::raw('MAX(a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9 + a10 + a11 + a12 + a13 + a14 + a15 + a16 + a17 + a18) as number, code, title, size_id'));
-        } else {
-            $statement->select(DB::raw('MIN(a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9 + a10 + a11 + a12 + a13 + a14 + a15 + a16 + a17 + a18) as number, code, title, size_id'));
-        }
+            ->groupBy('size_id', 'dress_id')
+            ->select(DB::raw('SUM(a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9 + a10 + a11 + a12 + a13 + a14 + a15 + a16 + a17 + a18) as number, code, title, size_id'));
+
+        $func = $max ? "max" : "min";
 
         $result = [];
         foreach ($statement->get() as $row) {
-            $result[self::SIZES[$row->size_id]] = ['value' => $row->number, 'dress' => $row->code, 'color' => $row->title];
+            // Check if the size already exists in the result array
+            if (isset($result[self::SIZES[$row->size_id]])) {
+                // Compare the current value with the existing value and keep the smaller one
+                $min_value = $func($result[self::SIZES[$row->size_id]]['value'], $row->number);
+                // If the current value is smaller, update all the attributes
+                if ($min_value < $result[self::SIZES[$row->size_id]]['value']) {
+                    $result[self::SIZES[$row->size_id]] = ['value' => $min_value, 'dress' => $row->code, 'color' => $row->title];
+                }
+            } else {
+                // Add the size and the attributes to the result array
+                $result[self::SIZES[$row->size_id]] = ['value' => $row->number, 'dress' => $row->code, 'color' => $row->title];
+            }
         }
         return $result;
     }
-
+    public function getDate()
+    {
+        $date = DB::table('packaging_defects')->min('created_at');
+        if ($date) {
+            $oDate = new DateTime($date);
+            return $oDate->format("Y-m-d");
+        } else {
+            return null;
+        }
+    }
 }

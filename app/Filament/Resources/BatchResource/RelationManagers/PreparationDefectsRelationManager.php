@@ -22,19 +22,16 @@ class PreparationDefectsRelationManager extends RelationManager
                     ->description('اختر الثوب المطلوب')
                     ->schema([
                         Forms\Components\Select::make('dress_id')
+                            ->label('dress')
                             ->disableOptionWhen(function (string $value) {
                                 $entered = $this->ownerRecord->preparation_defects;
                                 if (isset($this->cachedMountedTableActionRecord)) {
                                     /** @var Collection $entered */
                                     $entered = $entered->where('id', '!=', $this->cachedMountedTableActionRecordKey);
                                 }
-                                $entered = $entered->flatMap(fn($defect) => $defect->pluck('id'))->toArray();
+                                $entered = $entered->flatMap(fn($defect) => $defect->pluck('dress_id'))->toArray();
 
-                                if (in_array($value, $entered)) {
-                                    return true;
-                                } else {
-                                    return false;
-                                }
+                                return in_array($value, $entered);
                             })
                             ->options(
                                 Dress::with('color')
@@ -53,47 +50,47 @@ class PreparationDefectsRelationManager extends RelationManager
                     ->description('أدخل العيوب')
                     ->schema([
                         Forms\Components\TextInput::make('a1')
-                            ->label('خطأ نمرة رفيعة'),
+                            ->label('خطأ نمرة رفيعة')->default(0),
                         Forms\Components\TextInput::make('a2')
-                            ->label('خطأ نمرة سميكة'),
+                            ->label('خطأ نمرة سميكة')->default(0),
                         Forms\Components\TextInput::make('a3')
-                            ->label('فتلة مخلوطة'),
+                            ->label('فتلة مخلوطة')->default(0),
                         Forms\Components\TextInput::make('a4')
-                            ->label('فتلة محلولة'),
+                            ->label('فتلة محلولة')->default(0),
                         Forms\Components\TextInput::make('a5')
-                            ->label('عقد تراجي'),
+                            ->label('عقد تراجي')->default(0),
                         Forms\Components\TextInput::make('a6')
-                            ->label('نقط سواء في الفتل'),
+                            ->label('نقط سواء في الفتل')->default(0),
                         Forms\Components\TextInput::make('a7')
-                            ->label('نسبة الخلط غير منتظمة'),
+                            ->label('نسبة الخلط غير منتظمة')->default(0),
                         Forms\Components\TextInput::make('a8')
-                            ->label('لحمة متباعدة'),
+                            ->label('لحمة متباعدة')->default(0),
                         Forms\Components\TextInput::make('a9')
-                            ->label('حدفات غير منتظمة المسافات بين الخطوط'),
+                            ->label('حدفات غير منتظمة المسافات بين الخطوط')->default(0),
                         Forms\Components\TextInput::make('a10')
-                            ->label('فراغ خال من اللحمات'),
+                            ->label('فراغ خال من اللحمات')->default(0),
                         Forms\Components\TextInput::make('a11')
-                            ->label('دقات'),
+                            ->label('دقات')->default(0),
                         Forms\Components\TextInput::make('a12')
-                            ->label('اختلاف لحمة'),
+                            ->label('اختلاف لحمة')->default(0),
                         Forms\Components\TextInput::make('a13')
-                            ->label('ثقوب'),
+                            ->label('ثقوب')->default(0),
                         Forms\Components\TextInput::make('a14')
-                            ->label('عقد لحمة'),
+                            ->label('عقد لحمة')->default(0),
                         Forms\Components\TextInput::make('a15')
-                            ->label('قطع وصل'),
+                            ->label('قطع وصل')->default(0),
                         Forms\Components\TextInput::make('a16')
-                            ->label('لحمة مقوسة'),
+                            ->label('لحمة مقوسة')->default(0),
                         Forms\Components\TextInput::make('a17')
-                            ->label('لحمة ليست على استقامة واحدة في طريق البرسل'),
+                            ->label('لحمة ليست على استقامة واحدة في طريق البرسل')->default(0),
                         Forms\Components\TextInput::make('a18')
-                            ->label('اختلاف الشد على الخيوط'),
+                            ->label('اختلاف الشد على الخيوط')->default(0),
                         Forms\Components\TextInput::make('a19')
-                            ->label('فتل زائدة'),
+                            ->label('فتل زائدة')->default(0),
                         Forms\Components\TextInput::make('a20')
-                            ->label('خطأ لقي'),
+                            ->label('خطأ لقي')->default(0),
                         Forms\Components\TextInput::make('a21')
-                            ->label('خطأ تطريح'),
+                            ->label('خطأ تطريح')->default(0),
                     ])->columns(5),
             ]);
     }

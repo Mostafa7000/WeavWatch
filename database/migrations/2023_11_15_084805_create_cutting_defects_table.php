@@ -14,16 +14,16 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('batch_id')->constrained('batches')->cascadeOnDelete();
             $table->foreignId('dress_id')->constrained('dresses')->cascadeOnDelete();
-            $table->integer('a1')->default(0);
-            $table->integer('a2')->default(0);
-            $table->integer('a3')->default(0);
-            $table->integer('a4')->default(0);
-            $table->integer('a5')->default(0);
-            $table->integer('a6')->default(0);
-            $table->integer('a7')->default(0);
-            $table->integer('a8')->default(0);
-            $table->integer('a9')->default(0);
-            $table->integer('a10')->default(0);
+            $table->integer('a1')->default(0)->nullable();
+            $table->integer('a2')->default(0)->nullable();
+            $table->integer('a3')->default(0)->nullable();
+            $table->integer('a4')->default(0)->nullable();
+            $table->integer('a5')->default(0)->nullable();
+            $table->integer('a6')->default(0)->nullable();
+            $table->integer('a7')->default(0)->nullable();
+            $table->integer('a8')->default(0)->nullable();
+            $table->integer('a9')->default(0)->nullable();
+            $table->integer('a10')->default(0)->nullable();
             $table->timestamps();
         });
     }

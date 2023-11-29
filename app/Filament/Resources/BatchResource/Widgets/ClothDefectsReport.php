@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\BatchResource\Widgets;
 
+use DateTime;
 use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use function Laravel\Prompts\select;
 
 class ClothDefectsReport extends Widget
 {
@@ -42,17 +44,11 @@ class ClothDefectsReport extends Widget
             $sums[self::CLOTH_DEFECTS[$i]] = $sum;
         }
 
-        if ($max) {
-            $maxValue = max($sums);
-            $maxDefect = array_keys($sums, $maxValue)[0];
-            return ['value' => $maxValue, 'defect' => $maxDefect];
-        } else {
-            $minValue = min($sums);
-            $minDefect = array_keys($sums, $minValue)[0];
-            return ['value' => $minValue, 'defect' => $minDefect];
-        }
+        $func = $max ? "max" : "min";
+        $maxValue = $func($sums);
+        $maxDefect = array_keys($sums, $maxValue)[0];
+        return ['value' => $maxValue, 'defect' => $maxDefect];
     }
-
 
     public function getDress(bool $max)
     {
@@ -60,17 +56,34 @@ class ClothDefectsReport extends Widget
             ->where('cloth_defects.batch_id', $this->record->id)
             ->join('dresses', 'cloth_defects.dress_id', '=', 'dresses.id')
             ->join('colors', 'dresses.color_id', '=', 'colors.id')
-            ->groupBy('dress_id');
+            ->groupBy('dress_id')
+            ->select(DB::raw('SUM(a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9 + a10 + a11 + a12 + a13 + a14 + a15 + a16 + a17 + a18 + a19) as number, code, title'));
         if ($max) {
-            $statement->select(DB::raw('MAX(a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9 + a10 + a11 + a12 + a13 + a14 + a15 + a16 + a17 + a18 + a19) as number, code, title'));
+            $statement->orderBy('number', 'DESC');
         } else {
-            $statement->select(DB::raw('MIN(a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9 + a10 + a11 + a12 + a13 + a14 + a15 + a16 + a17 + a18 + a19) as number, code, title'));
+            $statement->orderBy('number', 'ASC');
         }
-        if ($statement->first() !== null) {
-            return ['value' => $statement->first()->number, 'dress' => $statement->first()->code, 'color' => $statement->first()->title];
+
+        $row = $statement->first();
+
+        if ($row !== null) {
+            return ['value' => $row->number, 'dress' => $row->code, 'color' => $row->title];
         } else {
             return [];
         }
     }
 
+    /**
+     * @throws \Exception
+     */
+    public function getDate()
+    {
+        $date = DB::table('cloth_defects')->min('created_at');
+        if ($date) {
+            $oDate = new DateTime($date);
+            return $oDate->format("Y-m-d");
+        } else {
+            return null;
+        }
+    }
 }
