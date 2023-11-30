@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\BatchResource\Pages;
 
 use App\Filament\Resources\BatchResource;
+use App\Models\OperationDefectReport;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -19,7 +20,7 @@ class ViewBatch extends ViewRecord
             BatchResource\Widgets\NeedleDefectsReport::class,
             BatchResource\Widgets\IronDefectsReport::class,
             BatchResource\Widgets\PackagingDefectsReport::class,
-
+            BatchResource\Widgets\OperationDefectsReport::class,
         ];
     }
 

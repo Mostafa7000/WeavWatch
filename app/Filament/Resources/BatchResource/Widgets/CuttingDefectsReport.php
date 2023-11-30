@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\BatchResource\Widgets;
 
-use App\Models\CuttingDefect;
+use DateTime;
 use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;

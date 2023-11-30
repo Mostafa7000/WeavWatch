@@ -19,12 +19,15 @@ use App\Models\PreparationDefect;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Resources\Pages\Concerns\HasRelationManagers;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
 class BatchResource extends Resource
 {
+    use HasRelationManagers;
+
     protected static ?string $model = Batch::class;
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
     protected static ?string $activeNavigationIcon = 'heroicon-s-archive-box';
@@ -111,4 +114,5 @@ class BatchResource extends Resource
             'view' => Pages\ViewBatch::route('/{record}'),
         ];
     }
+
 }

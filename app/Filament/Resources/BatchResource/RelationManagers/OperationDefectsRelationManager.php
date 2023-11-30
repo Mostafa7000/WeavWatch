@@ -67,16 +67,67 @@ class OperationDefectsRelationManager extends RelationManager
                 Forms\Components\Section::make('العيوب')
                     ->description('أدخل العيوب')
                     ->schema([
-                        Forms\Components\TextInput::make('08:10')->numeric()->default(0),
-                        Forms\Components\TextInput::make('09:10')->numeric()->default(0),
-                        Forms\Components\TextInput::make('10:10')->numeric()->default(0),
-                        Forms\Components\TextInput::make('11:10')->numeric()->default(0),
-                        Forms\Components\TextInput::make('12:00')->numeric()->default(0),
-                        Forms\Components\TextInput::make('01:30')->numeric()->default(0),
-                        Forms\Components\TextInput::make('02:10')->numeric()->default(0),
-                        Forms\Components\TextInput::make('03:10')->numeric()->default(0),
-                        Forms\Components\TextInput::make('04:10')->numeric()->default(0),
-                        Forms\Components\TextInput::make('05:10')->numeric()->default(0),
+                        Forms\Components\TextInput::make('a1')
+                            ->label('08:10')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
+
+                        Forms\Components\TextInput::make('a2')
+                            ->label('09:10')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
+
+                        Forms\Components\TextInput::make('a3')
+                            ->label('10:10')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
+
+                        Forms\Components\TextInput::make('a4')
+                            ->label('11:10')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
+
+                        Forms\Components\TextInput::make('a5')
+                            ->label('12:00')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
+
+                        Forms\Components\TextInput::make('a6')
+                            ->label('01:30')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
+
+                        Forms\Components\TextInput::make('a7')
+                            ->label('02:10')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
+
+                        Forms\Components\TextInput::make('a8')
+                            ->label('03:10')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
+
+                        Forms\Components\TextInput::make('a9')
+                            ->label('04:10')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
+
+                        Forms\Components\TextInput::make('a10')
+                            ->label('05:10')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
+
+
                     ])->columns(7),
             ]);
     }
@@ -95,17 +146,16 @@ class OperationDefectsRelationManager extends RelationManager
                     ->label('المقاس'),
                 Tables\Columns\TextColumn::make('defect.title')
                     ->label('العيب'),
-                Tables\Columns\TextColumn::make('08:10'),
-                Tables\Columns\TextColumn::make('09:10'),
-                Tables\Columns\TextColumn::make('10:10'),
-                Tables\Columns\TextColumn::make('11:10'),
-                Tables\Columns\TextColumn::make('12:00'),
-                Tables\Columns\TextColumn::make('01:30'),
-                Tables\Columns\TextColumn::make('02:10'),
-                Tables\Columns\TextColumn::make('03:10'),
-                Tables\Columns\TextColumn::make('04:10'),
-                Tables\Columns\TextColumn::make('05:10'),
-
+                Tables\Columns\TextColumn::make('a1')->label('08:10'),
+                Tables\Columns\TextColumn::make('a2')->label('09:10'),
+                Tables\Columns\TextColumn::make('a3')->label('10:10'),
+                Tables\Columns\TextColumn::make('a4')->label('11:10'),
+                Tables\Columns\TextColumn::make('a5')->label('12:00'),
+                Tables\Columns\TextColumn::make('a6')->label('01:30'),
+                Tables\Columns\TextColumn::make('a7')->label('02:10'),
+                Tables\Columns\TextColumn::make('a8')->label('03:10'),
+                Tables\Columns\TextColumn::make('a9')->label('04:10'),
+                Tables\Columns\TextColumn::make('a10')->label('05:10'),
             ])
             ->filters([
                 //

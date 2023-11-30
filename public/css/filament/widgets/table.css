@@ -1,0 +1,50 @@
+.report-container {
+    min-height: 200px;
+}
+/* Scrollable table container */
+.scrollable-table {
+    max-height: 190px;
+    overflow-y: auto;
+    border-collapse: collapse; /* Collapse borders between cells */
+    font-family: Arial, sans-serif;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle shadow for depth */
+    position: relative; /* Set position relative for the container */
+    border-radius: 15px;
+}
+
+/* Table */
+.scrollable-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Table header */
+.scrollable-table th {
+    background-color: #f2f2f2; /* Header background color */
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    border: 1px solid #ddd; /* Header border */
+    top: 0; /* Stick the header to the top */
+    z-index: 1; /* Ensure the header stays above content */
+}
+
+/* Table body */
+.scrollable-table td {
+    padding: 8px;
+    text-align: center;
+    border: 1px solid #ddd; /* Cell border */
+}
+
+/* Alternate row background color */
+.scrollable-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9; /* Alternate row color */
+}
+
+/* Make the table header sticky */
+.scrollable-table table thead th {
+    position: sticky;
+    top: 0;
+    margin: 0;
+    background-color: #d5bb50; /* Adjust the background color as needed */
+}

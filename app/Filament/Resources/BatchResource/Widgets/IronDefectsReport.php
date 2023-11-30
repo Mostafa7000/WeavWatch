@@ -72,17 +72,14 @@ class IronDefectsReport extends Widget
             ->groupBy('size_id', 'dress_id')
             ->select(DB::raw('SUM(a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9 + a10 + a11 + a12) as number, code, title, size_id'));
 
-        $func = $max ? "max" : "min";
-
         $result = [];
         foreach ($statement->get() as $row) {
             // Check if the size already exists in the result array
             if (isset($result[self::SIZES[$row->size_id]])) {
-                // Compare the current value with the existing value and keep the smaller one
-                $min_value = $func($result[self::SIZES[$row->size_id]]['value'], $row->number);
-                // If the current value is smaller, update all the attributes
-                if ($min_value < $result[self::SIZES[$row->size_id]]['value']) {
-                    $result[self::SIZES[$row->size_id]] = ['value' => $min_value, 'dress' => $row->code, 'color' => $row->title];
+                if ($max && $row->number > $result[self::SIZES[$row->size_id]]['value']) {
+                    $result[self::SIZES[$row->size_id]] = ['value' => $row->number, 'dress' => $row->code, 'color' => $row->title];
+                } elseif (!$max && $row->number < $result[self::SIZES[$row->size_id]]['value']) {
+                    $result[self::SIZES[$row->size_id]] = ['value' => $row->number, 'dress' => $row->code, 'color' => $row->title];
                 }
             } else {
                 // Add the size and the attributes to the result array
@@ -92,6 +89,7 @@ class IronDefectsReport extends Widget
 
         return $result;
     }
+
     public function getDate()
     {
         $date = DB::table('iron_defects')->min('created_at');

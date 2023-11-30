@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 class ClothDefectsRelationManager extends RelationManager
 {
+    protected $__id = '12';
     protected static string $relationship = 'cloth_defects';
 
     public function form(Form $form): Form
@@ -23,14 +24,14 @@ class ClothDefectsRelationManager extends RelationManager
                     ->description('اختر الثوب المطلوب')
                     ->schema([
                         Forms\Components\Select::make('dress_id')
-                            ->label('dress')
+                            ->label('Dress')
                             ->disableOptionWhen(function (string $value) {
                                 $entered = $this->ownerRecord->cloth_defects;
                                 if (isset($this->cachedMountedTableActionRecord)) {
                                     /** @var Collection $entered */
                                     $entered = $entered->where('id', '!=', $this->cachedMountedTableActionRecordKey);
                                 }
-                                $entered = $entered->flatMap(fn($defect)=>$defect->pluck('dress_id'))->toArray();
+                                $entered = $entered->flatMap(fn($defect) => $defect->pluck('dress_id'))->toArray();
 
                                 if (in_array($value, $entered)) {
                                     return true;
@@ -54,25 +55,25 @@ class ClothDefectsRelationManager extends RelationManager
                 Forms\Components\Section::make('العيوب')
                     ->description('أدخل العيوب')
                     ->schema([
-                        Forms\Components\TextInput::make('a1')->label('الريجة')->numeric()->default(0),
-                        Forms\Components\TextInput::make('a2')->label('البانشر')->numeric()->default(0),
-                        Forms\Components\TextInput::make('a3')->label('العقدة')->numeric()->default(0),
-                        Forms\Components\TextInput::make('a4')->label('الطيرة')->numeric()->default(0),
-                        Forms\Components\TextInput::make('a5')->label('الثقوب')->numeric()->default(0),
-                        Forms\Components\TextInput::make('a6')->label('تسقيط')->numeric()->default(0),
-                        Forms\Components\TextInput::make('a7')->label('تنسيل')->numeric()->default(0),
-                        Forms\Components\TextInput::make('a8')->label('ثبوت اللون')->numeric()->default(0),
-                        Forms\Components\TextInput::make('a9')->label('الوصلات')->numeric()->default(0),
-                        Forms\Components\TextInput::make('a10')->label('الاتساخ')->numeric()->default(0),
-                        Forms\Components\TextInput::make('a11')->label('فلوك')->numeric()->default(0),
-                        Forms\Components\TextInput::make('a12')->label('عرض البرسل')->numeric()->default(0),
-                        Forms\Components\TextInput::make('a13')->label('الزيت')->numeric()->default(0),
-                        Forms\Components\TextInput::make('a14')->label('التيك الأسود')->numeric()->default(0),
-                        Forms\Components\TextInput::make('a15')->label('عروض مختلفة')->numeric()->default(0),
-                        Forms\Components\TextInput::make('a16')->label('الصدأ')->numeric()->default(0),
-                        Forms\Components\TextInput::make('a17')->label('تنميل الصبغة')->numeric()->default(0),
-                        Forms\Components\TextInput::make('a18')->label('اختلاف اللون العرضي')->numeric()->default(0),
-                        Forms\Components\TextInput::make('a19')->label('اختلاف اللون الطولي')->numeric()->default(0),
+                        Forms\Components\TextInput::make('a1')->label('الريجة')->numeric()->rules('min:0')->default(0),
+                        Forms\Components\TextInput::make('a2')->label('البانشر')->numeric()->rules('min:0')->default(0),
+                        Forms\Components\TextInput::make('a3')->label('العقدة')->numeric()->rules('min:0')->default(0),
+                        Forms\Components\TextInput::make('a4')->label('الطيرة')->numeric()->rules('min:0')->default(0),
+                        Forms\Components\TextInput::make('a5')->label('الثقوب')->numeric()->rules('min:0')->default(0),
+                        Forms\Components\TextInput::make('a6')->label('تسقيط')->numeric()->rules('min:0')->default(0),
+                        Forms\Components\TextInput::make('a7')->label('تنسيل')->numeric()->rules('min:0')->default(0),
+                        Forms\Components\TextInput::make('a8')->label('ثبوت اللون')->numeric()->rules('min:0')->default(0),
+                        Forms\Components\TextInput::make('a9')->label('الوصلات')->numeric()->rules('min:0')->default(0),
+                        Forms\Components\TextInput::make('a10')->label('الاتساخ')->numeric()->rules('min:0')->default(0),
+                        Forms\Components\TextInput::make('a11')->label('فلوك')->numeric()->rules('min:0')->default(0),
+                        Forms\Components\TextInput::make('a12')->label('عرض البرسل')->numeric()->rules('min:0')->default(0),
+                        Forms\Components\TextInput::make('a13')->label('الزيت')->numeric()->rules('min:0')->default(0),
+                        Forms\Components\TextInput::make('a14')->label('التيك الأسود')->numeric()->rules('min:0')->default(0),
+                        Forms\Components\TextInput::make('a15')->label('عروض مختلفة')->numeric()->rules('min:0')->default(0),
+                        Forms\Components\TextInput::make('a16')->label('الصدأ')->numeric()->rules('min:0')->default(0),
+                        Forms\Components\TextInput::make('a17')->label('تنميل الصبغة')->numeric()->rules('min:0')->default(0),
+                        Forms\Components\TextInput::make('a18')->label('اختلاف اللون العرضي')->numeric()->rules('min:0')->default(0),
+                        Forms\Components\TextInput::make('a19')->label('اختلاف اللون الطولي')->numeric()->rules('min:0')->default(0),
                     ])->columns(5),
             ]);
     }
@@ -146,4 +147,5 @@ class ClothDefectsRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make(),
             ]);
     }
+
 }

@@ -13,6 +13,7 @@ use Filament\Tables\Table;
 
 class IronDefectsRelationManager extends RelationManager
 {
+    protected $__id = '13';
     protected static string $relationship = 'iron_defects';
 
     public function form(Form $form): Form
@@ -23,7 +24,7 @@ class IronDefectsRelationManager extends RelationManager
                     ->description('اختر الثوب والمقاس المطلوبين')
                     ->schema([
                         Forms\Components\Select::make('dress_id')
-                            ->label('dress')
+                            ->label('Dress')
                             ->options(
                                 Dress::with('color')
                                     ->where('batch_id', $this->ownerRecord->id)
@@ -37,7 +38,7 @@ class IronDefectsRelationManager extends RelationManager
                             ->live()
                             ->required(),
                         Forms\Components\Select::make('size_id')
-                            ->label('size')
+                            ->label('Size')
                             ->options(function () {
                                 return $this->ownerRecord->sizes->pluck('title', 'id')->toArray();
                             })
@@ -59,29 +60,65 @@ class IronDefectsRelationManager extends RelationManager
                     ->description('أدخل العيوب')
                     ->schema([
                         Forms\Components\TextInput::make('a1')
-                            ->label('اتساخ')->default(0),
+                            ->label('اتساخ')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a2')
-                            ->label('لسعة')->default(0),
+                            ->label('لسعة')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a3')
-                            ->label('حرق')->default(0),
+                            ->label('حرق')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a4')
-                            ->label('كرمشة')->default(0),
+                            ->label('كرمشة')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a5')
-                            ->label('بقع معدنية')->default(0),
+                            ->label('بقع معدنية')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a6')
-                            ->label('لمعان')->default(0),
+                            ->label('لمعان')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a7')
-                            ->label('تكسير')->default(0),
+                            ->label('تكسير')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a8')
-                            ->label('بخار زيادة')->default(0),
+                            ->label('بخار زيادة')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a9')
-                            ->label('بلل')->default(0),
+                            ->label('بلل')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a10')
-                            ->label('عدم ضبط المظهرية')->default(0),
+                            ->label('عدم ضبط المظهرية')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a11')
-                            ->label('علامات ضغط')->default(0),
+                            ->label('علامات ضغط')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a12')
-                            ->label('انكماش')->default(0),
+                            ->label('انكماش')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                     ])->columns(5),
             ]);
     }

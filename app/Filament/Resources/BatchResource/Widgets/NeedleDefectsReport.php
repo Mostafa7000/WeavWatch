@@ -78,11 +78,10 @@ class NeedleDefectsReport extends Widget
         foreach ($statement->get() as $row) {
             // Check if the size already exists in the result array
             if (isset($result[self::SIZES[$row->size_id]])) {
-                // Compare the current value with the existing value and keep the smaller one
-                $min_value = $func($result[self::SIZES[$row->size_id]]['value'], $row->number);
-                // If the current value is smaller, update all the attributes
-                if ($min_value < $result[self::SIZES[$row->size_id]]['value']) {
-                    $result[self::SIZES[$row->size_id]] = ['value' => $min_value, 'dress' => $row->code, 'color' => $row->title];
+                if ($max && $row->number > $result[self::SIZES[$row->size_id]]['value']) {
+                    $result[self::SIZES[$row->size_id]] = ['value' => $row->number, 'dress' => $row->code, 'color' => $row->title];
+                } elseif (!$max && $row->number < $result[self::SIZES[$row->size_id]]['value']) {
+                    $result[self::SIZES[$row->size_id]] = ['value' => $row->number, 'dress' => $row->code, 'color' => $row->title];
                 }
             } else {
                 // Add the size and the attributes to the result array

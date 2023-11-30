@@ -21,7 +21,7 @@ class CuttingDefectsRelationManager extends RelationManager
                     ->description('اختر الثوب المطلوب')
                     ->schema([
                         Forms\Components\Select::make('dress_id')
-                            ->label('label')
+                            ->label('Dress')
                             ->disableOptionWhen(function (string $value) {
                                 if (isset($this->cachedMountedTableActionRecord) && $this->cachedMountedTableActionRecord->dress_id == $value) {
                                     return false;
@@ -49,25 +49,56 @@ class CuttingDefectsRelationManager extends RelationManager
                     ->description('أدخل العيوب')
                     ->schema([
                         Forms\Components\TextInput::make('a1')
-                            ->label('شرشرة')->default(0),
+                            ->label('شرشرة')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a2')
-                            ->label('عدم تماثل')->default(0),
+                            ->label('عدم تماثل')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a3')
-                            ->label('اعوجاج في شكل القص')->default(0),
+                            ->label('اعوجاج في شكل القص')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a4')
-                            ->label('قطع تالفة')->default(0),
+                            ->label('قطع تالفة')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a5')
-                            ->label('عيب في البرسل')->default(0),
+                            ->label('عيب في البرسل')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a6')
-                            ->label('فورت غير موجود')->default(0),
+                            ->label('فورت غير موجود')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a7')
-                            ->label('فورت عميق')->default(0),
+                            ->label('فورت عميق')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a8')
-                            ->label('نقص طول أو عرض')->default(0),
+                            ->label('نقص طول أو عرض')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a9')
-                            ->label('قطع هربانة')->default(0),
+                            ->label('قطع هربانة')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a10')
-                            ->label('قص غير جيد')->default(0),
+                            ->label('قص غير جيد')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
+
                     ])->columns(5),
             ]);
     }

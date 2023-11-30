@@ -23,7 +23,7 @@ class PackagingDefectsRelationManager extends RelationManager
                     ->description('اختر الثوب والمقاس المطلوبين')
                     ->schema([
                         Forms\Components\Select::make('dress_id')
-                            ->label('dress')
+                            ->label('Dress')
                             ->options(
                                 Dress::with('color')
                                     ->where('batch_id', $this->ownerRecord->id)
@@ -37,7 +37,7 @@ class PackagingDefectsRelationManager extends RelationManager
                             ->live()
                             ->required(),
                         Forms\Components\Select::make('size_id')
-                            ->label('size')
+                            ->label('Size')
                             ->options(function () {
                                 return $this->ownerRecord->sizes->pluck('title', 'id')->toArray();
                             })
@@ -59,41 +59,95 @@ class PackagingDefectsRelationManager extends RelationManager
                     ->description('أدخل العيوب')
                     ->schema([
                         Forms\Components\TextInput::make('a1')
-                            ->label('مظهرية سيئة')->default(0),
+                            ->label('مظهرية سيئة')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a2')
-                            ->label('عدم وجود نكت عناية')->default(0),
+                            ->label('عدم وجود نكت عناية')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a3')
-                            ->label('عدم وجود نكت مقاس')->default(0),
+                            ->label('عدم وجود نكت مقاس')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a4')
-                            ->label('عدم وجود نكت أساسي عميل')->default(0),
+                            ->label('عدم وجود نكت أساسي عميل')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a5')
-                            ->label('نسبة رشيو خطأ')->default(0),
+                            ->label('نسبة رشيو خطأ')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a6')
-                            ->label('زيادة أو نقص في العدد الكلي للمقاس')->default(0),
+                            ->label('زيادة أو نقص في العدد الكلي للمقاس')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a7')
-                            ->label('مكواه سيئة')->default(0),
+                            ->label('مكواه سيئة')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a8')
-                            ->label('تطبيق سيئ')->default(0),
+                            ->label('تطبيق سيئ')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a9')
-                            ->label('اكسسوار مفقود')->default(0),
+                            ->label('اكسسوار مفقود')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a10')
-                            ->label('دبوس ناقص')->default(0),
+                            ->label('دبوس ناقص')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a11')
-                            ->label('بقعة زيت أو عرق أو اتساخ')->default(0),
+                            ->label('بقعة زيت أو عرق أو اتساخ')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a12')
-                            ->label('قطع مبللة داخل الكيس')->default(0),
+                            ->label('قطع مبللة داخل الكيس')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a13')
-                            ->label('زيادة او نقص فى العدد الكلى للون')->default(0),
+                            ->label('زيادة او نقص فى العدد الكلى للون')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a14')
-                            ->label('تعبئة خطأ')->default(0),
+                            ->label('تعبئة خطأ')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a15')
-                            ->label('كارت علامة تجارية خطأ')->default(0),
+                            ->label('كارت علامة تجارية خطأ')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a16')
-                            ->label('كارت سعر خطأ')->default(0),
+                            ->label('كارت سعر خطأ')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a17')
-                            ->label('عدم توافق المقاسات')->default(0),
+                            ->label('عدم توافق المقاسات')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                         Forms\Components\TextInput::make('a18')
-                            ->label('شماعة خطأ')->default(0),
+                            ->label('شماعة خطأ')
+                            ->numeric()
+                            ->rules('min:0')
+                            ->default(0),
                     ])->columns(5),
             ]);
     }
