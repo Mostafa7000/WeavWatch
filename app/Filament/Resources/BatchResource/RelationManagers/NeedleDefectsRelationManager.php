@@ -124,36 +124,45 @@ class NeedleDefectsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->groups(
+                ['size.title']
+            )
             ->columns([
                 Tables\Columns\TextColumn::make('dress.code')
+                    ->sortable()
+                    ->searchable()
                     ->label('كود الثوب')
                     ->color('info'),
                 Tables\Columns\TextColumn::make('dress.color.title')
+                    ->sortable()
+                    ->searchable()
                     ->label('لون الثوب'),
                 Tables\Columns\TextColumn::make('size.title')
+                    ->sortable()
+                    ->searchable()
                     ->label('المقاس'),
                 Tables\Columns\TextColumn::make('a1')
-                    ->label('تفويت غرزة'),
+                    ->label('تفويت غرزة')->sortable(),
                 Tables\Columns\TextColumn::make('a3')
-                    ->label('بقع زيت'),
+                    ->label('بقع زيت')->sortable(),
                 Tables\Columns\TextColumn::make('a4')
-                    ->label('ترحيل الرسمة'),
+                    ->label('ترحيل الرسمة')->sortable(),
                 Tables\Columns\TextColumn::make('a5')
-                    ->label('ترحيل الأبليك'),
+                    ->label('ترحيل الأبليك')->sortable(),
                 Tables\Columns\TextColumn::make('a6')
-                    ->label('تنسيل'),
+                    ->label('تنسيل')->sortable(),
                 Tables\Columns\TextColumn::make('a7')
-                    ->label('عدم ضبط الشد'),
+                    ->label('عدم ضبط الشد')->sortable(),
                 Tables\Columns\TextColumn::make('a8')
-                    ->label('عدم ضبط ألوان الفيلم'),
+                    ->label('عدم ضبط ألوان الفيلم')->sortable(),
                 Tables\Columns\TextColumn::make('a9')
-                    ->label('كثافة الغرز'),
+                    ->label('كثافة الغرز')->sortable(),
                 Tables\Columns\TextColumn::make('a10')
-                    ->label('ترحيل في مكان التطريز'),
+                    ->label('ترحيل في مكان التطريز')->sortable(),
                 Tables\Columns\TextColumn::make('a11')
-                    ->label('تشطيب أبليك سيء'),
+                    ->label('تشطيب أبليك سيء')->sortable(),
                 Tables\Columns\TextColumn::make('a2')
-                    ->label('ظهور خيط المكوك على خيط الحرير'),
+                    ->label('ظهور خيط المكوك على خيط الحرير')->sortable(),
             ])
             ->filters([
                 //

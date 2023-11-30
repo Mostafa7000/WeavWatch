@@ -155,51 +155,60 @@ class PackagingDefectsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->groups(
+                ['size.title']
+            )
             ->recordTitleAttribute('batch_id')
             ->columns([
                 Tables\Columns\TextColumn::make('dress.code')
+                    ->sortable()
+                    ->searchable()
                     ->label('كود الثوب')
                     ->color('info'),
                 Tables\Columns\TextColumn::make('dress.color.title')
+                    ->sortable()
+                    ->searchable()
                     ->label('لون الثوب'),
                 Tables\Columns\TextColumn::make('size.title')
+                    ->sortable()
+                    ->searchable()
                     ->label('المقاس'),
                 Tables\Columns\TextColumn::make('a1')
-                    ->label('مظهرية سيئة'),
+                    ->label('مظهرية سيئة')->sortable(),
                 Tables\Columns\TextColumn::make('a2')
-                    ->label('عدم وجود نكت عناية'),
+                    ->label('عدم وجود نكت عناية')->sortable(),
                 Tables\Columns\TextColumn::make('a3')
-                    ->label('عدم وجود نكت مقاس'),
+                    ->label('عدم وجود نكت مقاس')->sortable(),
                 Tables\Columns\TextColumn::make('a4')
-                    ->label('عدم وجود نكت أساسي عميل'),
+                    ->label('عدم وجود نكت أساسي عميل')->sortable(),
                 Tables\Columns\TextColumn::make('a5')
-                    ->label('نسبة رشيو خطأ'),
+                    ->label('نسبة رشيو خطأ')->sortable(),
                 Tables\Columns\TextColumn::make('a6')
-                    ->label('زيادة أو نقص في العدد الكلي للمقاس'),
+                    ->label('زيادة أو نقص في العدد الكلي للمقاس')->sortable(),
                 Tables\Columns\TextColumn::make('a7')
-                    ->label('مكواه سيئة'),
+                    ->label('مكواه سيئة')->sortable(),
                 Tables\Columns\TextColumn::make('a8')
-                    ->label('تطبيق سيئ'),
+                    ->label('تطبيق سيئ')->sortable(),
                 Tables\Columns\TextColumn::make('a9')
-                    ->label('اكسسوار مفقود'),
+                    ->label('اكسسوار مفقود')->sortable(),
                 Tables\Columns\TextColumn::make('a10')
-                    ->label('دبوس ناقص'),
+                    ->label('دبوس ناقص')->sortable(),
                 Tables\Columns\TextColumn::make('a11')
-                    ->label('بقعة زيت أو عرق أو اتساخ'),
+                    ->label('بقعة زيت أو عرق أو اتساخ')->sortable(),
                 Tables\Columns\TextColumn::make('a12')
-                    ->label('قطع مبللة داخل الكيس'),
+                    ->label('قطع مبللة داخل الكيس')->sortable(),
                 Tables\Columns\TextColumn::make('a13')
-                    ->label('زيادة او نقص فى العدد الكلى للون'),
+                    ->label('زيادة او نقص فى العدد الكلى للون')->sortable(),
                 Tables\Columns\TextColumn::make('a14')
-                    ->label('تعبئة خطأ'),
+                    ->label('تعبئة خطأ')->sortable(),
                 Tables\Columns\TextColumn::make('a15')
-                    ->label('كارت علامة تجارية خطأ'),
+                    ->label('كارت علامة تجارية خطأ')->sortable(),
                 Tables\Columns\TextColumn::make('a16')
-                    ->label('كارت سعر خطأ'),
+                    ->label('كارت سعر خطأ')->sortable(),
                 Tables\Columns\TextColumn::make('a17')
-                    ->label('عدم توافق المقاسات'),
+                    ->label('عدم توافق المقاسات')->sortable(),
                 Tables\Columns\TextColumn::make('a18')
-                    ->label('شماعة خطأ'),
+                    ->label('شماعة خطأ')->sortable(),
             ])
             ->filters([
                 //

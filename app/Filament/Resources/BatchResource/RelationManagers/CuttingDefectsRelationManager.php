@@ -109,30 +109,34 @@ class CuttingDefectsRelationManager extends RelationManager
             ->recordTitleAttribute('batch_id')
             ->columns([
                 Tables\Columns\TextColumn::make('dress.code')
+                    ->sortable()
+                    ->searchable()
                     ->label('كود الثوب')
                     ->color('info'),
                 Tables\Columns\TextColumn::make('dress.color.title')
+                    ->sortable()
+                    ->searchable()
                     ->label('لون الثوب'),
                 Tables\Columns\TextColumn::make('a1')
-                    ->label('شرشرة'),
+                    ->label('شرشرة')->sortable(),
                 Tables\Columns\TextColumn::make('a2')
-                    ->label('عدم تماثل'),
+                    ->label('عدم تماثل')->sortable(),
                 Tables\Columns\TextColumn::make('a3')
-                    ->label('اعوجاج في شكل القص'),
+                    ->label('اعوجاج في شكل القص')->sortable(),
                 Tables\Columns\TextColumn::make('a4')
-                    ->label('قطع تالفة'),
+                    ->label('قطع تالفة')->sortable(),
                 Tables\Columns\TextColumn::make('a5')
-                    ->label('عيب في البرسل'),
+                    ->label('عيب في البرسل')->sortable(),
                 Tables\Columns\TextColumn::make('a6')
-                    ->label('فورت غير موجود'),
+                    ->label('فورت غير موجود')->sortable(),
                 Tables\Columns\TextColumn::make('a7')
-                    ->label('فورت عميق'),
+                    ->label('فورت عميق')->sortable(),
                 Tables\Columns\TextColumn::make('a8')
-                    ->label('نقص طول أو عرض'),
+                    ->label('نقص طول أو عرض')->sortable(),
                 Tables\Columns\TextColumn::make('a9')
-                    ->label('قطع هربانة'),
+                    ->label('قطع هربانة')->sortable(),
                 Tables\Columns\TextColumn::make('a10')
-                    ->label('قص غير جيد'),
+                    ->label('قص غير جيد')->sortable(),
             ])
             ->filters([
                 //

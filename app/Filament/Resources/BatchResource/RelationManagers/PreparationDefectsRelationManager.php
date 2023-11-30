@@ -164,53 +164,56 @@ class PreparationDefectsRelationManager extends RelationManager
             ->recordTitleAttribute('batch_id')
             ->columns([
                 Tables\Columns\TextColumn::make('dress.code')
+                    ->sortable()
+                    ->searchable()
                     ->label('كود الثوب')
                     ->color('info'),
                 Tables\Columns\TextColumn::make('dress.color.title')
+                    ->sortable()
+                    ->searchable()
                     ->label('لون الثوب'),
                 Tables\Columns\TextColumn::make('a1')
-                    ->label('خطأ نمرة رفيعة'),
+                    ->label('خطأ نمرة رفيعة')->sortable(),
                 Tables\Columns\TextColumn::make('a2')
-                    ->label('خطأ نمرة سميكة'),
+                    ->label('خطأ نمرة سميكة')->sortable(),
                 Tables\Columns\TextColumn::make('a3')
-                    ->label('فتلة مخلوطة'),
+                    ->label('فتلة مخلوطة')->sortable(),
                 Tables\Columns\TextColumn::make('a4')
-                    ->label('فتلة محلولة'),
+                    ->label('فتلة محلولة')->sortable(),
                 Tables\Columns\TextColumn::make('a5')
-                    ->label('عقد تراجي'),
+                    ->label('عقد تراجي')->sortable(),
                 Tables\Columns\TextColumn::make('a6')
-                    ->label('نقط سواء في الفتل'),
+                    ->label('نقط سواء في الفتل')->sortable(),
                 Tables\Columns\TextColumn::make('a7')
-                    ->label('نسبة الخلط غير منتظمة'),
+                    ->label('نسبة الخلط غير منتظمة')->sortable(),
                 Tables\Columns\TextColumn::make('a8')
-                    ->label('لحمة متباعدة'),
+                    ->label('لحمة متباعدة')->sortable(),
                 Tables\Columns\TextColumn::make('a9')
-                    ->label('حدفات غير منتظمة المسافات بين الخطوط'),
+                    ->label('حدفات غير منتظمة المسافات بين الخطوط')->sortable(),
                 Tables\Columns\TextColumn::make('a10')
-                    ->label('فراغ خال من اللحمات'),
+                    ->label('فراغ خال من اللحمات')->sortable(),
                 Tables\Columns\TextColumn::make('a11')
-                    ->label('دقات'),
+                    ->label('دقات')->sortable(),
                 Tables\Columns\TextColumn::make('a12')
-                    ->label('اختلاف لحمة'),
+                    ->label('اختلاف لحمة')->sortable(),
                 Tables\Columns\TextColumn::make('a13')
-                    ->label('ثقوب'),
+                    ->label('ثقوب')->sortable(),
                 Tables\Columns\TextColumn::make('a14')
-                    ->label('عقد لحمة'),
+                    ->label('عقد لحمة')->sortable(),
                 Tables\Columns\TextColumn::make('a15')
-                    ->label('قطع وصل'),
+                    ->label('قطع وصل')->sortable(),
                 Tables\Columns\TextColumn::make('a16')
-                    ->label('لحمة مقوسة'),
+                    ->label('لحمة مقوسة')->sortable(),
                 Tables\Columns\TextColumn::make('a17')
-                    ->label('لحمة ليست على استقامة واحدة في طريق البرسل'),
+                    ->label('لحمة ليست على استقامة واحدة في طريق البرسل')->sortable(),
                 Tables\Columns\TextColumn::make('a18')
-                    ->label('اختلاف الشد على الخيوط'),
+                    ->label('اختلاف الشد على الخيوط')->sortable(),
                 Tables\Columns\TextColumn::make('a19')
-                    ->label('فتل زائدة'),
+                    ->label('فتل زائدة')->sortable(),
                 Tables\Columns\TextColumn::make('a20')
-                    ->label('خطأ لقي'),
+                    ->label('خطأ لقي')->sortable(),
                 Tables\Columns\TextColumn::make('a21')
-                    ->label('خطأ تطريح'),
-
+                    ->label('خطأ تطريح')->sortable(),
             ])
             ->filters([
                 //

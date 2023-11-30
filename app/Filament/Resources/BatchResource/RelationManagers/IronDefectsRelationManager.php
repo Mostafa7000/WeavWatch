@@ -126,38 +126,47 @@ class IronDefectsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->groups(
+                ['size.title']
+            )
             ->columns([
                 Tables\Columns\TextColumn::make('dress.code')
+                    ->sortable()
+                    ->searchable()
                     ->label('كود الثوب')
                     ->color('info'),
                 Tables\Columns\TextColumn::make('dress.color.title')
+                    ->sortable()
+                    ->searchable()
                     ->label('لون الثوب'),
                 Tables\Columns\TextColumn::make('size.title')
+                    ->sortable()
+                    ->searchable()
                     ->label('المقاس'),
                 Tables\Columns\TextColumn::make('a1')
-                    ->label('اتساخ'),
+                    ->label('اتساخ')->sortable(),
                 Tables\Columns\TextColumn::make('a2')
-                    ->label('لسعة'),
+                    ->label('لسعة')->sortable(),
                 Tables\Columns\TextColumn::make('a3')
-                    ->label('حرق'),
+                    ->label('حرق')->sortable(),
                 Tables\Columns\TextColumn::make('a4')
-                    ->label('كرمشة'),
+                    ->label('كرمشة')->sortable(),
                 Tables\Columns\TextColumn::make('a5')
-                    ->label('بقع معدنية'),
+                    ->label('بقع معدنية')->sortable(),
                 Tables\Columns\TextColumn::make('a6')
-                    ->label('لمعان'),
+                    ->label('لمعان')->sortable(),
                 Tables\Columns\TextColumn::make('a7')
-                    ->label('تكسير'),
+                    ->label('تكسير')->sortable(),
                 Tables\Columns\TextColumn::make('a8')
-                    ->label('بخار زيادة'),
+                    ->label('بخار زيادة')->sortable(),
                 Tables\Columns\TextColumn::make('a9')
-                    ->label('بلل'),
+                    ->label('بلل')->sortable(),
                 Tables\Columns\TextColumn::make('a10')
-                    ->label('عدم ضبط المظهرية'),
+                    ->label('عدم ضبط المظهرية')->sortable(),
                 Tables\Columns\TextColumn::make('a11')
-                    ->label('علامات ضغط'),
+                    ->label('علامات ضغط')->sortable(),
                 Tables\Columns\TextColumn::make('a12')
-                    ->label('انكماش'),
+                    ->label('انكماش')->sortable(),
             ])
             ->filters([
                 //

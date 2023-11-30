@@ -94,10 +94,16 @@ class PiecesRelationManager extends RelationManager
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('dress.color.title')
+                    ->sortable()
+                    ->searchable()
                     ->label('اللون'),
                 Tables\Columns\TextColumn::make('size.title')
+                    ->sortable()
+                    ->searchable()
                     ->label('المقاس'),
                 Tables\Columns\TextColumn::make('value')
+                    ->sortable()
+                    ->searchable()
                     ->label('الكمية المطلوبة')
 
             ])

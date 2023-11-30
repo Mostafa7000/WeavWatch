@@ -84,49 +84,52 @@ class ClothDefectsRelationManager extends RelationManager
             ->recordTitleAttribute('batch_id')
             ->columns([
                 Tables\Columns\TextColumn::make('dress.code')
+                    ->sortable()
+                    ->searchable()
                     ->label('كود الثوب')
                     ->color('info'),
                 Tables\Columns\TextColumn::make('dress.color.title')
+                    ->sortable()
+                    ->searchable()
                     ->label('لون الثوب'),
                 Tables\Columns\TextColumn::make('a1')
-                    ->label('الريجة'),
+                    ->label('الريجة')->sortable(),
                 Tables\Columns\TextColumn::make('a2')
-                    ->label('البانشر'),
+                    ->label('البانشر')->sortable(),
                 Tables\Columns\TextColumn::make('a3')
-                    ->label('العقدة'),
+                    ->label('العقدة')->sortable(),
                 Tables\Columns\TextColumn::make('a4')
-                    ->label('الطيرة'),
+                    ->label('الطيرة')->sortable(),
                 Tables\Columns\TextColumn::make('a5')
-                    ->label('الثقوب'),
+                    ->label('الثقوب')->sortable(),
                 Tables\Columns\TextColumn::make('a6')
-                    ->label('تسقيط'),
+                    ->label('تسقيط')->sortable(),
                 Tables\Columns\TextColumn::make('a7')
-                    ->label('تنسيل'),
+                    ->label('تنسيل')->sortable(),
                 Tables\Columns\TextColumn::make('a8')
-                    ->label('ثبوت اللون'),
+                    ->label('ثبوت اللون')->sortable(),
                 Tables\Columns\TextColumn::make('a9')
-                    ->label('الوصلات'),
+                    ->label('الوصلات')->sortable(),
                 Tables\Columns\TextColumn::make('a10')
-                    ->label('الاتساخ'),
+                    ->label('الاتساخ')->sortable(),
                 Tables\Columns\TextColumn::make('a11')
-                    ->label('فلوك'),
+                    ->label('فلوك')->sortable(),
                 Tables\Columns\TextColumn::make('a12')
-                    ->label('عرض البرسل'),
+                    ->label('عرض البرسل')->sortable(),
                 Tables\Columns\TextColumn::make('a13')
-                    ->label('الزيت'),
+                    ->label('الزيت')->sortable(),
                 Tables\Columns\TextColumn::make('a14')
-                    ->label('التيك الأسود'),
+                    ->label('التيك الأسود')->sortable(),
                 Tables\Columns\TextColumn::make('a15')
-                    ->label('عروض مختلفة'),
+                    ->label('عروض مختلفة')->sortable(),
                 Tables\Columns\TextColumn::make('a16')
-                    ->label('الصدأ'),
+                    ->label('الصدأ')->sortable(),
                 Tables\Columns\TextColumn::make('a17')
-                    ->label('تنميل الصبغة'),
+                    ->label('تنميل الصبغة')->sortable(),
                 Tables\Columns\TextColumn::make('a18')
-                    ->label('اختلاف اللون العرضي'),
+                    ->label('اختلاف اللون العرضي')->sortable(),
                 Tables\Columns\TextColumn::make('a19')
-                    ->label('اختلاف اللون الطولي'),
-
+                    ->label('اختلاف اللون الطولي')->sortable(),
             ])
             ->filters([
                 //

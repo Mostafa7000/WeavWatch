@@ -34,11 +34,18 @@ class DressesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->groups(
+                ['color.title']
+            )
             ->recordTitleAttribute('code')
             ->columns([
                 Tables\Columns\TextColumn::make('code')
+                    ->sortable()
+                    ->searchable()
                     ->label('الكود'),
                 Tables\Columns\TextColumn::make('color.title')
+                    ->sortable()
+                    ->searchable()
                     ->label('اللون')
             ])
             ->filters([
