@@ -26,7 +26,7 @@ class ViewBatch extends ViewRecord
 
     public function getHeaderWidgetsColumns(): int|string|array
     {
-        return 2;
+        return 1;
     }
 
     public function getRelationManagers(): array

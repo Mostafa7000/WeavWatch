@@ -77,8 +77,8 @@ class BatchResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\ViewAction::make()
+                Tables\Actions\EditAction::make()->label('تعديل'),
+                Tables\Actions\ViewAction::make()->label('التقارير')
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -114,5 +114,4 @@ class BatchResource extends Resource
             'view' => Pages\ViewBatch::route('/{record}'),
         ];
     }
-
 }
