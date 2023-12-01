@@ -28,4 +28,9 @@ class ViewBatch extends ViewRecord
     {
         return 2;
     }
+
+    public function getRelationManagers(): array
+    {
+        return [];
+    }
 }

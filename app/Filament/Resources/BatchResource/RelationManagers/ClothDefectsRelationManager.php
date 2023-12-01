@@ -5,15 +5,16 @@ namespace App\Filament\Resources\BatchResource\RelationManagers;
 use App\Models\Dress;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Resources\Pages\Concerns\HasRelationManagers;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 
 class ClothDefectsRelationManager extends RelationManager
 {
-    protected $__id = '12';
     protected static string $relationship = 'cloth_defects';
 
     public function form(Form $form): Form
@@ -151,4 +152,8 @@ class ClothDefectsRelationManager extends RelationManager
             ]);
     }
 
+    public function hidden(): bool
+    {
+        return true; // This will hide the posts from the user's view page
+    }
 }
