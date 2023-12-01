@@ -136,6 +136,7 @@ class OperationDefectsRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('batch_id')
+            ->groups(['dress.color.title','size.title'])
             ->columns([
                 Tables\Columns\TextColumn::make('dress.code')
                     ->sortable()
