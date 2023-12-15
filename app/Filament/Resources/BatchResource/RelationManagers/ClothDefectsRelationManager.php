@@ -51,7 +51,8 @@ class ClothDefectsRelationManager extends RelationManager
                                     ->toArray()
                             )
                             ->unique(ignoreRecord: true)
-                            ->required(),
+                            ->required()
+                        ->reactive(),
                     ])->columns(1),
                 Forms\Components\Section::make('العيوب')
                     ->description('أدخل العيوب')
