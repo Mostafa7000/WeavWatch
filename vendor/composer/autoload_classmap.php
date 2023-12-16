@@ -27,6 +27,7 @@ return array(
     'App\\Filament\\Resources\\BatchResource\\Widgets\\CuttingDefectsReport' => $baseDir . '/app/Filament/Resources/BatchResource/Widgets/CuttingDefectsReport.php',
     'App\\Filament\\Resources\\BatchResource\\Widgets\\IronDefectsReport' => $baseDir . '/app/Filament/Resources/BatchResource/Widgets/IronDefectsReport.php',
     'App\\Filament\\Resources\\BatchResource\\Widgets\\NeedleDefectsReport' => $baseDir . '/app/Filament/Resources/BatchResource/Widgets/NeedleDefectsReport.php',
+    'App\\Filament\\Resources\\BatchResource\\Widgets\\OperationDefectsReport' => $baseDir . '/app/Filament/Resources/BatchResource/Widgets/OperationDefectsReport.php',
     'App\\Filament\\Resources\\BatchResource\\Widgets\\PackagingDefectsReport' => $baseDir . '/app/Filament/Resources/BatchResource/Widgets/PackagingDefectsReport.php',
     'App\\Filament\\Resources\\BatchResource\\Widgets\\PreparationDefectsReport' => $baseDir . '/app/Filament/Resources/BatchResource/Widgets/PreparationDefectsReport.php',
     'App\\Filament\\Resources\\DressResource' => $baseDir . '/app/Filament/Resources/DressResource.php',

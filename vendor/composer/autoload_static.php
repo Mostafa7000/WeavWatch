@@ -693,6 +693,7 @@ class ComposerStaticInit1af234d0a0094212b7eae5de7c9de669
         'App\\Filament\\Resources\\BatchResource\\Widgets\\CuttingDefectsReport' => __DIR__ . '/../..' . '/app/Filament/Resources/BatchResource/Widgets/CuttingDefectsReport.php',
         'App\\Filament\\Resources\\BatchResource\\Widgets\\IronDefectsReport' => __DIR__ . '/../..' . '/app/Filament/Resources/BatchResource/Widgets/IronDefectsReport.php',
         'App\\Filament\\Resources\\BatchResource\\Widgets\\NeedleDefectsReport' => __DIR__ . '/../..' . '/app/Filament/Resources/BatchResource/Widgets/NeedleDefectsReport.php',
+        'App\\Filament\\Resources\\BatchResource\\Widgets\\OperationDefectsReport' => __DIR__ . '/../..' . '/app/Filament/Resources/BatchResource/Widgets/OperationDefectsReport.php',
         'App\\Filament\\Resources\\BatchResource\\Widgets\\PackagingDefectsReport' => __DIR__ . '/../..' . '/app/Filament/Resources/BatchResource/Widgets/PackagingDefectsReport.php',
         'App\\Filament\\Resources\\BatchResource\\Widgets\\PreparationDefectsReport' => __DIR__ . '/../..' . '/app/Filament/Resources/BatchResource/Widgets/PreparationDefectsReport.php',
         'App\\Filament\\Resources\\DressResource' => __DIR__ . '/../..' . '/app/Filament/Resources/DressResource.php',
