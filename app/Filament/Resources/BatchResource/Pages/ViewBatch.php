@@ -18,9 +18,9 @@ class ViewBatch extends ViewRecord
             BatchResource\Widgets\PreparationDefectsReport::class,
             BatchResource\Widgets\CuttingDefectsReport::class,
             BatchResource\Widgets\NeedleDefectsReport::class,
+            BatchResource\Widgets\OperationDefectsReport::class,
             BatchResource\Widgets\IronDefectsReport::class,
             BatchResource\Widgets\PackagingDefectsReport::class,
-            BatchResource\Widgets\OperationDefectsReport::class,
         ];
     }
 

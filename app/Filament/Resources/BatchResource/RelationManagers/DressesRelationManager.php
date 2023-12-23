@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BatchResource\RelationManagers;
 
+use App\Rules\UniqueCodeInBatch;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -18,7 +19,7 @@ class DressesRelationManager extends RelationManager
     protected static ?string $modelLabel = 'فستان';
     protected static ?string $pluralModelLabel = self::PLURAL_NAME;
     protected static ?string $title = self::PLURAL_NAME;
-    private const PLURAL_NAME= 'الفساتين';
+    private const PLURAL_NAME = 'الفساتين';
 
     public function form(Form $form): Form
     {
@@ -27,7 +28,8 @@ class DressesRelationManager extends RelationManager
                 Forms\Components\TextInput::make('code')
                     ->label('الكود')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->rule(new UniqueCodeInBatch($this->ownerRecord->id)),
                 Forms\Components\Select::make('color_id')
                     ->relationship('color', 'title')
                     ->required()
