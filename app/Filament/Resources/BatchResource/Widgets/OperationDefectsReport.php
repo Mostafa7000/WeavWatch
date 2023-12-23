@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BatchResource\Widgets;
 
+use App\Service\ConstantData;
 use DateTime;
 use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Model;
@@ -13,28 +14,9 @@ class OperationDefectsReport extends Widget
 
     public ?Model $record = null;
 
-    const SIZES = [
-        1 => 'S',
-        2 => 'M',
-        3 => 'L',
-        4 => 'XL',
-        5 => '2XL',
-        6 => '3XL',
-        7 => '4XL',
-    ];
+    private const SIZES = ConstantData::SIZES;
 
-    const HOURS = [
-        1 => '08:10',
-        2 => '09:10',
-        3 => '10:10',
-        4 => '11:10',
-        5 => '12:00',
-        6 => '01:30',
-        7 => '02:10',
-        8 => '03:10',
-        9 => '04:10',
-        10 => '05:10'
-    ];
+    private const HOURS = ConstantData::HOURS;
 
     public function getHour(bool $max)
     {

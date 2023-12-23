@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BatchResource\Widgets;
 
+use App\Service\ConstantData;
 use DateTime;
 use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Model;
@@ -13,28 +14,8 @@ class NeedleDefectsReport extends Widget
 
     public ?Model $record = null;
 
-    const NEEDLE_DEFECTS = [
-        1 => 'تفويت غرزة',
-        2 => 'ظهور خيط المكوك على خيط الحرير',
-        3 => 'بقع زيت',
-        4 => 'ترحيل الرسمة',
-        5 => 'ترحيل الأبليك',
-        6 => 'تنسيل',
-        7 => 'عدم ضبط الشد',
-        8 => 'عدم ضبط ألوان الفيلم',
-        9 => 'كثافة الغرز',
-        10 => 'ترحيل في مكان التطريز',
-        11 => 'تشطيب أبليك سيء',
-    ];
-    const SIZES = [
-        1 => 'S',
-        2 => 'M',
-        3 => 'L',
-        4 => 'XL',
-        5 => '2XL',
-        6 => '3XL',
-        7 => '4XL',
-    ];
+    private const NEEDLE_DEFECTS = ConstantData::NEEDLE_DEFECTS;
+    private const SIZES = ConstantData::SIZES;
 
 
     public function getDefect(bool $max)

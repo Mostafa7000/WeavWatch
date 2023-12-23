@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BatchResource\Widgets;
 
+use App\Service\ConstantData;
 use DateTime;
 use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Model;
@@ -12,19 +13,7 @@ class CuttingDefectsReport extends Widget
     protected static string $view = 'filament.resources.batch-resource.widgets.cutting-defects-report';
 
     public ?Model $record = null;
-    const CUTTING_DEFECTS = [
-        1 => 'شرشرة',
-        2 => 'عدم تماثل',
-        3 => 'اعوجاج في شكل القص',
-        4 => 'قطع تالفة',
-        5 => 'عيب في البرسل',
-        6 => 'فورت غير موجود',
-        7 => 'فورت عميق',
-        8 => 'نقص طول أو عرض',
-        9 => 'قطع هربانة',
-        10 => 'قص غير جيد',
-    ];
-
+    const CUTTING_DEFECTS = ConstantData::CUTTING_DEFECTS;
 
     public function getDefect(bool $max)
     {

@@ -1,0 +1,1 @@
+<img alt="Logo" src="{{asset('images/Weave Watch.jpg')}}" class="h-16"/>

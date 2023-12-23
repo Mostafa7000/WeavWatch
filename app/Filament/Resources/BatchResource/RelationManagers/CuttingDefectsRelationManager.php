@@ -12,7 +12,10 @@ use Filament\Tables\Table;
 class CuttingDefectsRelationManager extends RelationManager
 {
     protected static string $relationship = 'cutting_defects';
-
+    protected static ?string $modelLabel = 'عيب';
+    protected static ?string $pluralModelLabel = self::PLURAL_NAME;
+    protected static ?string $title = self::PLURAL_NAME;
+    private const PLURAL_NAME= 'عيوب القص';
     public function form(Form $form): Form
     {
         return $form
@@ -21,7 +24,7 @@ class CuttingDefectsRelationManager extends RelationManager
                     ->description('اختر الثوب المطلوب')
                     ->schema([
                         Forms\Components\Select::make('dress_id')
-                            ->label('Dress')
+                            ->label('الثوب')
                             ->disableOptionWhen(function (string $value) {
                                 if (isset($this->cachedMountedTableActionRecord) && $this->cachedMountedTableActionRecord->dress_id == $value) {
                                     return false;

@@ -20,6 +20,7 @@ use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\Concerns\HasRelationManagers;
+use Filament\Resources\RelationManagers\RelationGroup;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -31,6 +32,8 @@ class BatchResource extends Resource
     protected static ?string $model = Batch::class;
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
     protected static ?string $activeNavigationIcon = 'heroicon-s-archive-box';
+    protected static ?string $modelLabel = 'طلبية';
+    protected static ?string $pluralModelLabel = 'الطلبيات';
 
     public static function form(Form $form): Form
     {
@@ -52,12 +55,14 @@ class BatchResource extends Resource
                             ->required()
                             ->label('الكمية المطلوبة'),
                         Forms\Components\Select::make('sizes')
-                            ->relationship('sizes', 'title')
+                            ->relationship('sizes', 'title', function ($query) {
+                                $query->orderBy('id');
+                            })
                             ->label('المقاسات')
                             ->multiple()
                             ->preload()
-                            ->required(),
-                    ]),
+                            ->required()
+        ]),
             ]);
     }
 
@@ -77,7 +82,7 @@ class BatchResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make()->label('تعديل'),
+                Tables\Actions\EditAction::make()->label('عرض وتعديل'),
                 Tables\Actions\ViewAction::make()->label('التقارير')
             ])
             ->bulkActions([

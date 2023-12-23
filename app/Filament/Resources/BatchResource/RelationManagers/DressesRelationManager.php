@@ -8,12 +8,17 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class DressesRelationManager extends RelationManager
 {
     protected static string $relationship = 'dresses';
     protected static ?string $recordTitleAttribute = 'code';
+    protected static ?string $modelLabel = 'فستان';
+    protected static ?string $pluralModelLabel = self::PLURAL_NAME;
+    protected static ?string $title = self::PLURAL_NAME;
+    private const PLURAL_NAME= 'الفساتين';
 
     public function form(Form $form): Form
     {

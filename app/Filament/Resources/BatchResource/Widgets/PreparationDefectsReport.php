@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BatchResource\Widgets;
 
+use App\Service\ConstantData;
 use DateTime;
 use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Model;
@@ -14,29 +15,7 @@ class PreparationDefectsReport extends Widget
     public ?Model $record = null;
 
     public const TABLE = 'preparation_defects';
-    const PREPARATION_DEFECTS = [
-        1 => 'خطأ نمرة رفيعة',
-        2 => 'خطأ نمرة سميكة',
-        3 => 'فتلة مخلوطة',
-        4 => 'فتلة محلولة',
-        5 => 'عقد تراجي',
-        6 => 'نقط سواء في الفتل',
-        7 => 'نسبة الخلط غير منتظمة',
-        8 => 'لحمة متباعدة',
-        9 => 'حدفات غير منتظمة المسافات بين الخطوط',
-        10 => 'فراغ خال من اللحمات',
-        11 => 'دقات',
-        12 => 'اختلاف لحمة',
-        13 => 'ثقوب',
-        14 => 'عقد لحمة',
-        15 => 'قطع وصل',
-        16 => 'لحمة مقوسة',
-        17 => 'لحمة ليست على استقامة واحدة في طريق البرسل',
-        18 => 'اختلاف الشد على الخيوط',
-        19 => 'فتل زائدة',
-        20 => 'خطأ لقي',
-        21 => 'خطأ تطريح',
-    ];
+    const PREPARATION_DEFECTS = ConstantData::PREPARATION_DEFECTS;
 
     public function getDefect(bool $max)
     {
@@ -76,6 +55,7 @@ class PreparationDefectsReport extends Widget
             return [];
         }
     }
+
     public function getDate()
     {
         $date = DB::table('preparation_defects')->min('created_at');

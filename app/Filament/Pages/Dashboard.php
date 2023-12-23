@@ -14,8 +14,12 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
-            DashboardPhoto::class,
             DashboardText::class,
+            DashboardPhoto::class,
         ];
+    }
+    public function getColumns(): int|string|array
+    {
+        return 1;
     }
 }

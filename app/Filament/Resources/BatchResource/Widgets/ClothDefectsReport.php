@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BatchResource\Widgets;
 
+use App\Service\ConstantData;
 use DateTime;
 use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Model;
@@ -12,27 +13,7 @@ class ClothDefectsReport extends Widget
 {
     protected static string $view = 'filament.resources.batch-resource.widgets.cloth-defects-report';
     public ?Model $record = null;
-    const CLOTH_DEFECTS = [
-        1 => 'الريجة',
-        2 => 'البانشر',
-        3 => 'العقدة',
-        4 => 'الطيرة',
-        5 => 'الثقوب',
-        6 => 'تسقيط',
-        7 => 'تنسيل',
-        8 => 'ثبوت اللون',
-        9 => 'الوصلات',
-        10 => 'الاتساخ',
-        11 => 'فلوك',
-        12 => 'عرض البرسل',
-        13 => 'الزيت',
-        14 => 'التيك الأسود',
-        15 => 'عروض مختلفة',
-        16 => 'الصداء',
-        17 => 'تنميل الصبغة',
-        18 => 'اختلاف اللون العرضي',
-        19 => 'اختلاف اللون الطولي',
-    ];
+    private const CLOTH_DEFECTS = ConstantData::CLOTH_DEFECTS;
 
     public function getDefect(bool $max)
     {

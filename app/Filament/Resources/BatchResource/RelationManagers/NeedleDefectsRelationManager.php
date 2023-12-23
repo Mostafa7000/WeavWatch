@@ -16,8 +16,11 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class NeedleDefectsRelationManager extends RelationManager
 {
-    protected $__id = '14';
     protected static string $relationship = 'needle_defects';
+    protected static ?string $modelLabel = 'عيب';
+    protected static ?string $pluralModelLabel = self::PLURAL_NAME;
+    protected static ?string $title = self::PLURAL_NAME;
+    private const PLURAL_NAME= 'عيوب التطريز';
 
     public function form(Form $form): Form
     {
@@ -27,7 +30,7 @@ class NeedleDefectsRelationManager extends RelationManager
                     ->description('اختر الثوب والمقاس المطلوبين')
                     ->schema([
                         Forms\Components\Select::make('dress_id')
-                            ->label('Dress')
+                            ->label('الثوب')
                             ->options(
                                 Dress::with('color')
                                     ->where('batch_id', $this->ownerRecord->id)
@@ -41,7 +44,7 @@ class NeedleDefectsRelationManager extends RelationManager
                             ->live()
                             ->required(),
                         Forms\Components\Select::make('size_id')
-                            ->label('Size')
+                            ->label('المقاس')
                             ->options(function () {
                                 return $this->ownerRecord->sizes->pluck('title', 'id')->toArray();
                             })

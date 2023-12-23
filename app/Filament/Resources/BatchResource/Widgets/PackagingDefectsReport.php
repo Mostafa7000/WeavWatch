@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BatchResource\Widgets;
 
+use App\Service\ConstantData;
 use DateTime;
 use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Model;
@@ -12,36 +13,9 @@ class PackagingDefectsReport extends Widget
     protected static string $view = 'filament.resources.batch-resource.widgets.packaging-defects-report';
 
     public ?Model $record = null;
-    const PACKAGING_DEFECTS = [
-        1 => 'مظهرية سيئة',
-        2 => 'عدم وجود نكت عناية',
-        3 => 'عدم وجود نكت مقاس',
-        4 => 'عدم وجود نكت أساسي عميل',
-        5 => 'نسبة رشيو خطأ',
-        6 => 'زيادة أو نقص في العدد الكلي للمقاس',
-        7 => 'مكواه سيئة',
-        8 => 'تطبيق سيئ',
-        9 => 'اكسسوار مفقود',
-        10 => 'دبوس ناقص',
-        11 => 'بقعة زيت أو عرق أو اتساخ',
-        12 => 'قطع مبللة داخل الكيس',
-        13 => 'زيادة او نقص فى العدد الكلى للون',
-        14 => 'تعبئة خطأ',
-        15 => 'كارت علامة تجارية خطأ',
-        16 => 'كارت سعر خطأ',
-        17 => 'عدم توافق المقاسات',
-        18 => 'شماعة خطأ',
-    ];
+    private const PACKAGING_DEFECTS = ConstantData::PACKAGING_DEFECTS;
 
-    const SIZES = [
-        1 => 'S',
-        2 => 'M',
-        3 => 'L',
-        4 => 'XL',
-        5 => '2XL',
-        6 => '3XL',
-        7 => '4XL',
-    ];
+    private const SIZES = ConstantData::SIZES;
     public function getDefect(bool $max)
     {
         $sums = [];

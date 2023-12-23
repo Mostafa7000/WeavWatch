@@ -13,7 +13,10 @@ use Illuminate\Database\Eloquent\Collection;
 class PreparationDefectsRelationManager extends RelationManager
 {
     protected static string $relationship = 'preparation_defects';
-
+    protected static ?string $modelLabel = 'عيب';
+    protected static ?string $pluralModelLabel = self::PLURAL_NAME;
+    protected static ?string $title = self::PLURAL_NAME;
+    private const PLURAL_NAME= 'عيوب التجهيز';
     public function form(Form $form): Form
     {
         return $form
@@ -22,7 +25,7 @@ class PreparationDefectsRelationManager extends RelationManager
                     ->description('اختر الثوب المطلوب')
                     ->schema([
                         Forms\Components\Select::make('dress_id')
-                            ->label('Dress')
+                            ->label('الثوب')
                             ->disableOptionWhen(function (string $value) {
                                 $entered = $this->ownerRecord->preparation_defects;
                                 if (isset($this->cachedMountedTableActionRecord)) {

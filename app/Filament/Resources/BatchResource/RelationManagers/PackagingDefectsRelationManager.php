@@ -14,7 +14,10 @@ use Filament\Tables\Table;
 class PackagingDefectsRelationManager extends RelationManager
 {
     protected static string $relationship = 'packaging_defects';
-
+    protected static ?string $modelLabel = 'عيب';
+    protected static ?string $pluralModelLabel = self::PLURAL_NAME;
+    protected static ?string $title = self::PLURAL_NAME;
+    private const PLURAL_NAME= 'عيوب التعبئة';
     public function form(Form $form): Form
     {
         return $form
@@ -23,7 +26,7 @@ class PackagingDefectsRelationManager extends RelationManager
                     ->description('اختر الثوب والمقاس المطلوبين')
                     ->schema([
                         Forms\Components\Select::make('dress_id')
-                            ->label('Dress')
+                            ->label('الثوب')
                             ->options(
                                 Dress::with('color')
                                     ->where('batch_id', $this->ownerRecord->id)
@@ -37,7 +40,7 @@ class PackagingDefectsRelationManager extends RelationManager
                             ->live()
                             ->required(),
                         Forms\Components\Select::make('size_id')
-                            ->label('Size')
+                            ->label('المقاس')
                             ->options(function () {
                                 return $this->ownerRecord->sizes->pluck('title', 'id')->toArray();
                             })

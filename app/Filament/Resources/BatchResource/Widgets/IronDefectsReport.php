@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BatchResource\Widgets;
 
+use App\Service\ConstantData;
 use DateTime;
 use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Model;
@@ -12,32 +13,10 @@ class IronDefectsReport extends Widget
     protected static string $view = 'filament.resources.batch-resource.widgets.iron-defects-report';
 
     public ?Model $record = null;
-    const IRON_DEFECTS = [
-        1 => 'اتساخ',
-        2 => 'لسعة',
-        3 => 'حرق',
-        4 => 'كرمشة',
-        5 => 'بقع معدنية',
-        6 => 'لمعان',
-        7 => 'تكسير',
-        8 => 'بخار زيادة',
-        9 => 'بلل',
-        10 => 'عدم ضبط المظهرية',
-        11 => 'علامات ضغط',
-        12 => 'انكماش',
-    ];
+    private const IRON_DEFECTS = ConstantData::IRON_DEFECTS;
+    private const SIZES = ConstantData::SIZES;
 
-    const SIZES = [
-        1 => 'S',
-        2 => 'M',
-        3 => 'L',
-        4 => 'XL',
-        5 => '2XL',
-        6 => '3XL',
-        7 => '4XL',
-    ];
-
-    public function getDefect(bool $max)
+    public function getDefect(bool $max): array
     {
         $sums = [];
         for ($i = 1; $i <= 12; $i++) {

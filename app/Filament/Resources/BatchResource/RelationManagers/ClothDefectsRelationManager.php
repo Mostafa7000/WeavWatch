@@ -5,18 +5,18 @@ namespace App\Filament\Resources\BatchResource\RelationManagers;
 use App\Models\Dress;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\Pages\Concerns\HasRelationManagers;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
-
 
 class ClothDefectsRelationManager extends RelationManager
 {
     protected static string $relationship = 'cloth_defects';
-
+    protected static ?string $modelLabel = 'عيب';
+    protected static ?string $pluralModelLabel = self::PLURAL_NAME;
+    protected static ?string $title = self::PLURAL_NAME;
+    private const PLURAL_NAME= 'عيوب القماش';
     public function form(Form $form): Form
     {
         return $form
@@ -25,7 +25,7 @@ class ClothDefectsRelationManager extends RelationManager
                     ->description('اختر الثوب المطلوب')
                     ->schema([
                         Forms\Components\Select::make('dress_id')
-                            ->label('Dress')
+                            ->label('الثوب')
                             ->disableOptionWhen(function (string $value) {
                                 $entered = $this->ownerRecord->cloth_defects;
                                 if (isset($this->cachedMountedTableActionRecord)) {

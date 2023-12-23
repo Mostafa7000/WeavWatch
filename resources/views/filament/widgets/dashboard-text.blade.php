@@ -1,12 +1,15 @@
 <x-filament-widgets::widget>
     <x-filament::section>
         <p>
-            In the realm where threads intertwine, Under the artisan’s watchful eye, so divine.<br>
-            Silk, velvet, and satin in a line, Speak of a quality, oh so fine.
+            برنامج مقترح لقياس وتحسين معايير الجودة الشاملة داخل مصانع الملابس الجاهزة.
         </p>
         <br>
         <p>
-            So here’s to fabrics, rich and prime, A world of elegance, truly sublime. 🎶
+            .A proposed program to measure and improve the standards of universal access in ready-to-wear factories
+        </p>
+        <br>
+        <p class="font-medium">
+            إعداد: د. مروة رفعت حسن
         </p>
     </x-filament::section>
 </x-filament-widgets::widget>

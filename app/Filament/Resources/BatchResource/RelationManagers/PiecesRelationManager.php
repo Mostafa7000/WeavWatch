@@ -17,13 +17,16 @@ use Illuminate\Database\Eloquent\Collection;
 class PiecesRelationManager extends RelationManager
 {
     protected static string $relationship = 'pieces';
-
+    protected static ?string $modelLabel = 'قطعة';
+    protected static ?string $pluralModelLabel = self::PLURAL_NAME;
+    protected static ?string $title = self::PLURAL_NAME;
+    private const PLURAL_NAME= 'القطع';
     public function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Select::make('dress_id')
-                    ->label("Dress")
+                    ->label("الثوب")
                     ->options(
                         Dress::with('color')
                             ->where('batch_id', $this->ownerRecord->id)
@@ -34,7 +37,7 @@ class PiecesRelationManager extends RelationManager
                                 })
                             ->toArray()
                     )
-                    ->label('Color')
+                    ->label('اللون')
                     ->preload()
                     ->live()
                     ->required()
@@ -63,13 +66,14 @@ class PiecesRelationManager extends RelationManager
                             return false;
                         }
                     })
-                    ->label('Size')
+                    ->label('المقاس')
                     ->live()
                     ->required()
                     ->disabled(fn(Get $get) => empty($get('dress_id'))),
                 Forms\Components\TextInput::make('value')
+                    ->label('العدد')
                     ->numeric()
-                    ->hint('The remaining Pieces = ' . $this->getRemainingPieces())
+                    ->hint('العدد المطلوب المتبقي = ' . $this->getRemainingPieces())
                     ->maxValue($this->getRemainingPieces())
                     ->required()
                     ->live(),
