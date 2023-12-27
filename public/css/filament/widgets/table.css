@@ -1,9 +1,9 @@
 .report-container {
-    min-height: 200px;
+    min-height: 300px;
 }
 /* Scrollable table container */
 .scrollable-table {
-    max-height: 190px;
+    max-height: 250px;
     overflow-y: auto;
     border-collapse: collapse; /* Collapse borders between cells */
     font-family: Arial, sans-serif;
@@ -34,6 +34,7 @@
     padding: 8px;
     text-align: center;
     border: 1px solid #ddd; /* Cell border */
+    max-width: 10rem;
 }
 
 /* Alternate row background color */
@@ -46,5 +47,5 @@
     position: sticky;
     top: 0;
     margin: 0;
-    background-color: #d5bb50; /* Adjust the background color as needed */
+    background-color: #94c1ff; /* Adjust the background color as needed */
 }

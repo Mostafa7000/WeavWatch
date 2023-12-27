@@ -29,8 +29,8 @@ class PreparationDefectsReport extends Widget
 
         $func = $max ? "max" : "min";
         $maxValue = $func($sums);
-        $maxDefect = array_keys($sums, $maxValue)[0];
-        return ['value' => $maxValue, 'defect' => $maxDefect];
+        $maxDefects = array_keys($sums, $maxValue);
+        return ['value' => $maxValue, 'defects' => $maxDefects];
     }
 
     public function getDress(bool $max)
@@ -47,13 +47,21 @@ class PreparationDefectsReport extends Widget
             $statement->orderBy('number', 'ASC');
         }
 
-        $row = $statement->first();
+        $rows = $statement->get();
 
-        if ($row !== null) {
-            return ['value' => $row->number, 'dress' => $row->code, 'color' => $row->title];
-        } else {
+        $firstRow = $rows->first();
+
+        if ($firstRow == null) {
             return [];
         }
+
+        $matchingRows = $rows->filter(fn ($row) => $row->number == $firstRow->number);
+
+        $dresses = array_map(
+            fn($matchingRow) => ['code' => $matchingRow->code, 'color' => $matchingRow->title],
+            $matchingRows->toArray());
+
+        return ['value' => $firstRow->number, 'dresses' => $dresses];
     }
 
     public function getDate()

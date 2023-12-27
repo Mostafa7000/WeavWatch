@@ -35,8 +35,8 @@ class IronDefectsReport extends Widget
         $result = [];
         foreach ($sums as $size => $sum) {
             $maxValue = $func($sum);
-            $maxDefect = array_keys($sum, $maxValue)[0];
-            $result[$size] = ['value' => $maxValue, 'defect' => $maxDefect];
+            $maxDefects = array_keys($sum, $maxValue);
+            $result[$size] = ['value' => $maxValue, 'defects' => $maxDefects];
         }
         return $result;
     }
@@ -51,22 +51,30 @@ class IronDefectsReport extends Widget
             ->groupBy('size_id', 'dress_id')
             ->select(DB::raw('SUM(a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9 + a10 + a11 + a12) as number, code, title, size_id'));
 
-        $result = [];
+        $maxResult = [];
         foreach ($statement->get() as $row) {
-            // Check if the size already exists in the result array
-            if (isset($result[self::SIZES[$row->size_id]])) {
-                if ($max && $row->number > $result[self::SIZES[$row->size_id]]['value']) {
-                    $result[self::SIZES[$row->size_id]] = ['value' => $row->number, 'dress' => $row->code, 'color' => $row->title];
-                } elseif (!$max && $row->number < $result[self::SIZES[$row->size_id]]['value']) {
-                    $result[self::SIZES[$row->size_id]] = ['value' => $row->number, 'dress' => $row->code, 'color' => $row->title];
+            // Check if the size already exists in the maxResult array
+            if (isset($maxResult[self::SIZES[$row->size_id]])) {
+                if ($max && $row->number > $maxResult[self::SIZES[$row->size_id]]['value']) {
+                    $maxResult[self::SIZES[$row->size_id]] = ['value' => $row->number, 'dress' => $row->code, 'color' => $row->title];
+                } elseif (!$max && $row->number < $maxResult[self::SIZES[$row->size_id]]['value']) {
+                    $maxResult[self::SIZES[$row->size_id]] = ['value' => $row->number, 'dress' => $row->code, 'color' => $row->title];
                 }
             } else {
-                // Add the size and the attributes to the result array
-                $result[self::SIZES[$row->size_id]] = ['value' => $row->number, 'dress' => $row->code, 'color' => $row->title];
+                // Add the size and the attributes to the maxResult array
+                $maxResult[self::SIZES[$row->size_id]] = ['value' => $row->number, 'dress' => $row->code, 'color' => $row->title];
             }
         }
+        foreach ($maxResult as $size => $entry) {
+            $matchingRows = $statement->get()->filter(fn($row)=> self::SIZES[$row->size_id] == $size && $row->number == $entry['value']);
+            $dresses = array_map(
+                fn($matchingRow) => ['code' => $matchingRow->code, 'color' => $matchingRow->title],
+                $matchingRows->toArray());
+            $dresses = array_values($dresses);
+            $maxResult[$size] = ['value' => $entry['value'], 'dresses' => $dresses];
+        }
 
-        return $result;
+        return $maxResult;
     }
 
     public function getDate()

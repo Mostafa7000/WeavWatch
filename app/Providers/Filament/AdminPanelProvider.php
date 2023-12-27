@@ -28,11 +28,11 @@ class AdminPanelProvider extends PanelProvider
             ->path('')
             ->login()
             ->colors([
-                'danger' => Color::Red,
-                'info' => Color::Orange,
-                'primary' => Color::Yellow,
-                'success' => Color::Amber,
-                'warning' => Color::Zinc
+                'danger' => Color::Blue,
+                'info' => '#ADD8E6',
+                'primary' => Color::Cyan,
+                'success' => Color::Teal,
+                'warning' => Color::Indigo
             ])
             ->font('Poppins')
             ->brandName('WeaveWatch')
@@ -60,7 +60,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ])
-            /*->sidebarCollapsibleOnDesktop()*/;
+            ])->sidebarFullyCollapsibleOnDesktop();
     }
 }

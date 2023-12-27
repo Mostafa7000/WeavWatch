@@ -34,17 +34,61 @@
                                 <tr>
                                     <td>{{ $size }}</td>
                                     <td>{{$code}} - {{$data2['color']}}</td>
-
-                                    <td>{{$minDefect[$size][$code]['defect']}} <br> {{$minDefect[$size][$code]['sum']}}
-                                        مرة
+                                    <td>
+                                        @php
+                                            $data = $minDefect[$size][$code];
+                                        @endphp
+                                        عدد المرات: {{$data['sum']}}
+                                        <br>
+                                        العيب:
+                                        @for($i=0; $i<count($data['defects']); $i++)
+                                            {{$data['defects'][$i]}}
+                                            @if($i != count($data['defects'])-1)
+                                                ,
+                                            @endif
+                                        @endfor
                                     </td>
-                                    <td>{{$maxDefect[$size][$code]['defect']}} <br> {{$maxDefect[$size][$code]['sum']}}
-                                        مرة
+                                    <td>
+                                        @php
+                                            $data = $maxDefect[$size][$code];
+                                        @endphp
+                                        عدد المرات: {{$data['sum']}}
+                                        <br>
+                                        العيب:
+                                        @for($i=0; $i<count($data['defects']); $i++)
+                                            {{$data['defects'][$i]}}
+                                            @if($i != count($data['defects'])-1)
+                                                ,
+                                            @endif
+                                        @endfor
                                     </td>
-
-                                    <td>{{$minHour[$size][$code]['hour']}} <br> {{$minHour[$size][$code]['sum']}} مرة
+                                    <td>
+                                        @php
+                                            $data = $minHour[$size][$code];
+                                        @endphp
+                                        عدد العيوب: {{$data['sum']}}
+                                        <br>
+                                        الساعة:
+                                        @for($i=0; $i<count($data['hours']); $i++)
+                                            {{$data['hours'][$i]}}
+                                            @if($i != count($data['hours'])-1)
+                                                ,
+                                            @endif
+                                        @endfor
                                     </td>
-                                    <td>{{$maxHour[$size][$code]['hour']}} <br> {{$maxHour[$size][$code]['sum']}} مرة
+                                    <td>
+                                        @php
+                                            $data = $maxHour[$size][$code];
+                                        @endphp
+                                        عدد العيوب: {{$data['sum']}}
+                                        <br>
+                                        الساعة:
+                                        @for($i=0; $i<count($data['hours']); $i++)
+                                            {{$data['hours'][$i]}}
+                                            @if($i != count($data['hours'])-1)
+                                                ,
+                                            @endif
+                                        @endfor
                                     </td>
                                 </tr>
                             @endforeach

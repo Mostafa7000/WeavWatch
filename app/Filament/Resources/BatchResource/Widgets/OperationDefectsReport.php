@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\BatchResource\Widgets;
 
 use App\Service\ConstantData;
-use DateTime;
 use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +20,7 @@ class OperationDefectsReport extends Widget
     public function getHour(bool $max)
     {
         $result = [];
+        $sums = [];
         for ($i = 1; $i <= 10; $i++) {
             $query = DB::table('operation_defect_reports')
                 ->where('operation_defect_reports.batch_id', $this->record->id)
@@ -34,6 +34,8 @@ class OperationDefectsReport extends Widget
                 $code = $row->code;
                 $sum = $row->sum;
 
+                $sums[$size][$code][$sum][] = self::HOURS[$i];
+
                 // If this size and code combination doesn't exist in the sums array, or if the new sum is greater than the existing sum, update the sum
                 if (!isset($result[$size][$code]) || ($max && $sum > $result[$size][$code]['sum'])) {
                     $result[$size][$code] = ['color' => $row->title, 'hour' => self::HOURS[$i], 'sum' => $sum];
@@ -42,10 +44,14 @@ class OperationDefectsReport extends Widget
                 }
             }
         }
+        foreach ($result as $size => $data) {
+            foreach ($data as $code => $entry) {
+                $result[$size][$code] = ['color' => $entry['color'], 'sum' => $entry['sum'], 'hours' => $sums[$size][$code][$entry['sum']]];
+            }
+        }
 
         return $result;
     }
-
 
     public function getDefect(bool $max)
     {
@@ -70,7 +76,16 @@ class OperationDefectsReport extends Widget
                 $result[$size][$code] = ['color' => $row->color, 'defect' => $defect, 'sum' => $sum];
             }
         }
-
+        foreach ($result as $size => $data) {
+            foreach ($data as $code => $entry) {
+                $matchingRows = $statement->get()->filter(fn($row) => self::SIZES[$row->size_id] == $size && $row->code == $code && $entry['sum'] == $row->sum);
+                $defects = array_map(
+                    fn($matchingRow) => $matchingRow->defect,
+                    $matchingRows->toArray());
+                $defects = array_values($defects);
+                $result[$size][$code] = ['color' => $entry['color'], 'sum' => $entry['sum'], 'defects' => $defects];
+            }
+        }
         return $result;
     }
 

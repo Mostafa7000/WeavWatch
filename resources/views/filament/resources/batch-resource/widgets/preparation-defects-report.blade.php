@@ -27,10 +27,56 @@
                         </thead>
                         <tbody>
                         <tr>
-                            <td>{{$minDress['dress']}} - {{$minDress['color']}} <br> {{$minDress['value']}} عيب</td>
-                            <td>{{$maxDress['dress']}} - {{$maxDress['color']}} <br> {{$maxDress['value']}} عيب</td>
-                            <td>{{$maxDefect['defect']}} <br> {{$maxDefect['value']}} مرة</td>
-                            <td>{{$minDefect['defect']}} <br> {{$minDefect['value']}} مرة</td>
+                            <td>
+                                عدد العيوب: {{$minDress['value']}}
+                                <br>
+                                اللون:
+                                @for($i=0; $i<count($minDress['dresses']);$i++)
+                                    @php
+                                        $dress = $minDress['dresses'][$i];
+                                    @endphp
+                                    {{$dress['code']}} - {{$dress['color']}}
+                                    @if($i != count($minDress['dresses'])-1)
+                                        ,
+                                    @endif
+                                @endfor
+                            </td>
+                            <td>
+                                عدد العيوب: {{$maxDress['value']}}
+                                <br>
+                                اللون:
+                                @for($i=0; $i<count($maxDress['dresses']);$i++)
+                                    @php
+                                        $dress = $maxDress['dresses'][$i];
+                                    @endphp
+                                    {{$dress['code']}} - {{$dress['color']}}
+                                    @if($i != count($maxDress['dresses'])-1)
+                                        ,
+                                    @endif
+                                @endfor
+                            </td>
+                            <td>
+                                عدد المرات: {{$maxDefect['value']}}
+                                <br>
+                                العيب:
+                                @for($i=0; $i<count($maxDefect['defects']); $i++)
+                                    {{$maxDefect['defects'][$i]}}
+                                    @if($i != count($maxDefect['defects'])-1)
+                                        ,
+                                    @endif
+                                @endfor
+                            </td>
+                            <td>
+                                عدد المرات: {{$minDefect['value']}}
+                                <br>
+                                العيب:
+                                @for($i=0; $i<count($minDefect['defects']); $i++)
+                                    {{$minDefect['defects'][$i]}}
+                                    @if($i != count($minDefect['defects'])-1)
+                                        ,
+                                    @endif
+                                @endfor
+                            </td>
                         </tr>
                         </tbody>
                     </table>

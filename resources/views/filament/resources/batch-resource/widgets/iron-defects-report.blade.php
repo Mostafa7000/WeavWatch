@@ -30,12 +30,68 @@
                         @foreach($minDress as $size => $data)
                             <tr>
                                 <td>{{ $size }}</td>
-                                <td>{{$data['dress']}} - {{$data['color']}} <br> {{$data['value']}} عيب</td>
-                                <td>{{$maxDress[$size]['dress']}} - {{$maxDress[$size]['color']}}
-                                    <br> {{$maxDress[$size]['value']}} عيب
+                                <td>
+                                    @php
+                                        $data = $minDress[$size];
+                                    @endphp
+                                    عدد العيوب: {{$data['value']}}
+                                    <br>
+                                    اللون:
+                                    @for($i=0; $i<count($data['dresses']);$i++)
+                                        @php
+                                            $dress = $data['dresses'][$i];
+                                        @endphp
+                                        {{$dress['code']}} - {{$dress['color']}}
+                                        @if($i != count($data['dresses'])-1)
+                                            ,
+                                        @endif
+                                    @endfor
                                 </td>
-                                <td>{{$maxDefect[$size]['defect']}} <br> {{$maxDefect[$size]['value']}} مرة</td>
-                                <td>{{$minDefect[$size]['defect']}} <br> {{$minDefect[$size]['value']}} مرة</td>
+                                <td>
+                                    @php
+                                        $data = $maxDress[$size];
+                                    @endphp
+                                    عدد العيوب: {{$data['value']}}
+                                    <br>
+                                    اللون:
+                                    @for($i=0; $i<count($data['dresses']); $i++)
+                                        @php
+                                            $dress = $data['dresses'][$i];
+                                        @endphp
+                                        {{$dress['code']}} - {{$dress['color']}}
+                                        @if($i != count($data['dresses'])-1)
+                                            ,
+                                        @endif
+                                    @endfor
+                                </td>
+                                <td>
+                                    @php
+                                        $data = $maxDefect[$size];
+                                    @endphp
+                                    عدد المرات: {{$data['value']}}
+                                    <br>
+                                    العيب:
+                                    @for($i=0; $i<count($data['defects']); $i++)
+                                        {{$data['defects'][$i]}}
+                                        @if($i != count($data['defects'])-1)
+                                            ,
+                                        @endif
+                                    @endfor
+                                </td>
+                                <td>
+                                    @php
+                                        $data = $minDefect[$size];
+                                    @endphp
+                                    عدد المرات: {{$data['value']}}
+                                    <br>
+                                    العيب:
+                                    @for($i=0; $i<count($data['defects']); $i++)
+                                        {{$data['defects'][$i]}}
+                                        @if($i != count($data['defects'])-1)
+                                            ,
+                                        @endif
+                                    @endfor
+                                </td>
                             </tr>
                         @endforeach
                         </tbody>

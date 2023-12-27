@@ -207,19 +207,13 @@ class DatabaseSeeder extends Seeder
         // \App\Models\User::factory(10)->create();
 
         User::factory()->create([
-            'name' => 'Ramy',
-            'email' => 'ramy@test.com',
-            'password' => '0000'
+            'name' => 'Marwa',
+            'email' => 'dr.marwarefait@gmail.com',
+            'password' => '123456'
         ]);
 
         DB::table('colors')->insert(self::COLORS);
         DB::table('sizes')->insert(self::SIZES);
-        //DB::table('cloth_defects')->insert(self::CLOTH_DEFECTS);
-        //DB::table('preparation_defects')->insert(self::PREPARATION_DEFECTS);
-        //DB::table('cutting_defects')->insert(self::CUTTING_DEFECTS);
-        //DB::table('needle_defects')->insert(self::NEEDLE_DEFECTS);
         DB::table('operation_defects')->insert(self::OPERATION_DEFECTS);
-        //DB::table('iron_defects')->insert(self::IRON_DEFECTS);
-        //DB::table('packaging_defects')->insert(self::PACKAGING_DEFECTS);
     }
 }

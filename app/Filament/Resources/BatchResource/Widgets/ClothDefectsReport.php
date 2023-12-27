@@ -7,7 +7,6 @@ use DateTime;
 use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use function Laravel\Prompts\select;
 
 class ClothDefectsReport extends Widget
 {
@@ -15,7 +14,7 @@ class ClothDefectsReport extends Widget
     public ?Model $record = null;
     private const CLOTH_DEFECTS = ConstantData::CLOTH_DEFECTS;
 
-    public function getDefect(bool $max)
+    public function getDefect(bool $max): array
     {
         $sums = [];
         for ($i = 1; $i <= 19; $i++) {
@@ -27,11 +26,11 @@ class ClothDefectsReport extends Widget
 
         $func = $max ? "max" : "min";
         $maxValue = $func($sums);
-        $maxDefect = array_keys($sums, $maxValue)[0];
-        return ['value' => $maxValue, 'defect' => $maxDefect];
+        $maxDefects = array_keys($sums, $maxValue);
+        return ['value' => $maxValue, 'defects' => $maxDefects];
     }
 
-    public function getDress(bool $max)
+    public function getDress(bool $max): array
     {
         $statement = DB::table('cloth_defects')
             ->where('cloth_defects.batch_id', $this->record->id)
@@ -45,13 +44,23 @@ class ClothDefectsReport extends Widget
             $statement->orderBy('number', 'ASC');
         }
 
-        $row = $statement->first();
+        $rows = $statement->get();
 
-        if ($row !== null) {
-            return ['value' => $row->number, 'dress' => $row->code, 'color' => $row->title];
-        } else {
+        $firstRow = $rows->first();
+
+        if ($firstRow == null) {
             return [];
         }
+
+        $matchingRows = $rows->filter(function ($row) use ($firstRow) {
+            return $row->number == $firstRow->number;
+        });
+
+        $dresses = array_map(
+            fn($matchingRow) => ['code' => $matchingRow->code, 'color' => $matchingRow->title],
+            $matchingRows->toArray());
+
+        return ['value' => $firstRow->number, 'dresses' => $dresses];
     }
 
     /**
