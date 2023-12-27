@@ -10,5 +10,5 @@
 5. Run `php artisan serve`
 6. Open [127.0.0.1:8000](http://127.0.0.1:8000)
 7. Enter email and password
-    - Email: "ramy@test.com"
-    - Password: "0000"
+    - Email: "dr.marwarefait@gmail.com"
+    - Password: "123456"
