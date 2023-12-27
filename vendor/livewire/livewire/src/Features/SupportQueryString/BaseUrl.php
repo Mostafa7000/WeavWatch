@@ -3,6 +3,7 @@
 namespace Livewire\Features\SupportQueryString;
 
 use Livewire\Features\SupportAttributes\Attribute as LivewireAttribute;
+use Livewire\Features\SupportFormObjects\Form;
 
 #[\Attribute]
 class BaseUrl extends LivewireAttribute
@@ -16,6 +17,10 @@ class BaseUrl extends LivewireAttribute
 
     public function mount()
     {
+        if ($this->as === null && $this->isOnFormObjectProperty()) {
+            $this->as = $this->getSubName();
+        }
+
         $initialValue = request()->query($this->urlName(), 'noexist');
 
         if ($initialValue === 'noexist') return;
@@ -24,7 +29,9 @@ class BaseUrl extends LivewireAttribute
             ? json_decode(json_encode($initialValue), true)
             : json_decode($initialValue, true);
 
-        $this->setValue($decoded === null ? $initialValue : $decoded);
+        $value = $decoded === null ? $initialValue : $decoded;
+
+        $this->setValue($value);
     }
 
     public function dehydrate($context)
@@ -39,6 +46,13 @@ class BaseUrl extends LivewireAttribute
         ];
 
         $context->pushEffect('url', $queryString, $this->getName());
+    }
+
+    public function isOnFormObjectProperty()
+    {
+        $subTarget = $this->getSubTarget();
+
+        return $subTarget && is_subclass_of($subTarget, Form::class);
     }
 
     public function urlName()
