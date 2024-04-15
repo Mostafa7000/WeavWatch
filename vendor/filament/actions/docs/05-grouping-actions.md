@@ -21,7 +21,7 @@ This page is about customizing the look of the group's trigger button and dropdo
 
 ## Customizing the group trigger style
 
-The button which opens the dropdown may be customized in the same way as a normal action. [All of the methods available for trigger buttons](trigger-button) may be used to customize the group trigger button:
+The button which opens the dropdown may be customized in the same way as a normal action. [All the methods available for trigger buttons](trigger-button) may be used to customize the group trigger button:
 
 ```php
 use Filament\Support\Enums\ActionSize;
@@ -40,13 +40,13 @@ ActionGroup::make([
 
 ## Setting the placement of the dropdown
 
-The dropdown may be positioned relative to the trigger button by using the `placement()` method:
+The dropdown may be positioned relative to the trigger button by using the `dropdownPlacement()` method:
 
 ```php
 ActionGroup::make([
     // Array of actions
 ])
-    ->placement('top-start')
+    ->dropdownPlacement('top-start')
 ```
 
 <AutoScreenshot name="actions/group/placement" alt="Action group with top placement style" version="3.x" />
@@ -70,13 +70,15 @@ The `dropdown(false)` method puts the actions inside the parent dropdown, instea
 
 ## Setting the width of the dropdown
 
-The dropdown may be set to a width by using the `width()` method. Options correspond to [Tailwind's max-width scale](https://tailwindcss.com/docs/max-width). The options are `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl`, `5xl`, `6xl` and `7xl`:
+The dropdown may be set to a width by using the `dropdownWidth()` method. Options correspond to [Tailwind's max-width scale](https://tailwindcss.com/docs/max-width). The options are `ExtraSmall`, `Small`, `Medium`, `Large`, `ExtraLarge`, `TwoExtraLarge`, `ThreeExtraLarge`, `FourExtraLarge`, `FiveExtraLarge`, `SixExtraLarge` and `SevenExtraLarge`:
 
 ```php
+use Filament\Support\Enums\MaxWidth;
+
 ActionGroup::make([
     // Array of actions
 ])
-    ->width('xs')
+    ->dropdownWidth(MaxWidth::ExtraSmall)
 ```
 
 ## Controlling the maximum height of the dropdown
@@ -88,4 +90,15 @@ ActionGroup::make([
     // Array of actions
 ])
     ->maxHeight('400px')
+```
+
+## Controlling the dropdown offset
+
+You may control the offset of the dropdown using the `dropdownOffset()` method, by default the offset is set to `8`.
+
+```php
+ActionGroup::make([
+    // Array of actions
+])
+    ->dropdownOffset(16)
 ```

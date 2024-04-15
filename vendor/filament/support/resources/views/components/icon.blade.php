@@ -5,13 +5,25 @@
 ])
 
 @php
-    $icon = ($alias ? \Filament\Support\Facades\FilamentIcon::resolve($alias) : null) ?: $icon;
+    $icon = ($alias ? \Filament\Support\Facades\FilamentIcon::resolve($alias) : null) ?: ($icon ?? $slot);
 @endphp
 
-@if (is_string($icon))
-    @svg($icon, $class, array_filter($attributes->getAttributes()))
+@if ($icon instanceof \Illuminate\Contracts\Support\Htmlable)
+    <span {{ $attributes->class($class) }}>
+        {{ $icon }}
+    </span>
+@elseif (str_contains($icon, '/'))
+    <img
+        {{
+            $attributes
+                ->merge(['src' => $icon])
+                ->class($class)
+        }}
+    />
 @else
-    <div {{ $attributes->class($class) }}>
-        {{ $icon ?? $slot }}
-    </div>
+    @svg(
+        $icon,
+        $class,
+        array_filter($attributes->getAttributes()),
+    )
 @endif

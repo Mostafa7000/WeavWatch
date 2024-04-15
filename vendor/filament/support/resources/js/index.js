@@ -1,10 +1,14 @@
 import AlpineFloatingUI from '@awcodes/alpine-floating-ui'
 import AlpineLazyLoadAssets from 'alpine-lazy-load-assets'
+// import { clearAllBodyScrollLocks, disableBodyScroll } from 'body-scroll-lock'
+import { md5 } from 'js-md5'
 import Sortable from './sortable'
 import Tooltip from '@ryangjchandler/alpine-tooltip'
 
+import '../css/components/pagination.css'
 import 'tippy.js/dist/tippy.css'
 import 'tippy.js/themes/light.css'
+import '../css/sortable.css'
 
 document.addEventListener('alpine:init', () => {
     window.Alpine.plugin(AlpineFloatingUI)
@@ -12,6 +16,10 @@ document.addEventListener('alpine:init', () => {
     window.Alpine.plugin(Sortable)
     window.Alpine.plugin(Tooltip)
 })
+
+// document.addEventListener('livewire:navigating', () => {
+//     clearAllBodyScrollLocks()
+// })
 
 // https://github.com/laravel/framework/blob/5299c22321c0f1ea8ff770b84a6c6469c4d6edec/src/Illuminate/Translation/MessageSelector.php#L15
 const pluralize = function (text, number, variables) {
@@ -102,4 +110,7 @@ const pluralize = function (text, number, variables) {
     )
 }
 
+// window.clearAllBodyScrollLocks = clearAllBodyScrollLocks
+// window.disableBodyScroll = disableBodyScroll
+window.jsMd5 = md5
 window.pluralize = pluralize

@@ -2,14 +2,24 @@
 
 namespace Filament\Panel\Concerns;
 
+use Closure;
 use Filament\Billing\Providers\Contracts\Provider as BillingProvider;
 use Filament\Navigation\MenuItem;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Str;
 
 trait HasTenancy
 {
     protected ?BillingProvider $tenantBillingProvider = null;
+
+    protected string $tenantBillingRouteSlug = 'billing';
+
+    protected bool | Closure $hasTenantMenu = true;
+
+    protected ?string $tenantRoutePrefix = null;
+
+    protected ?string $tenantDomain = null;
 
     protected ?string $tenantModel = null;
 
@@ -48,6 +58,13 @@ trait HasTenancy
         return $this;
     }
 
+    public function tenantMenu(bool | Closure $condition = true): static
+    {
+        $this->hasTenantMenu = $condition;
+
+        return $this;
+    }
+
     public function tenant(?string $model, ?string $slugAttribute = null, ?string $ownershipRelationship = null): static
     {
         $this->tenantModel = $model;
@@ -57,9 +74,30 @@ trait HasTenancy
         return $this;
     }
 
+    public function tenantRoutePrefix(?string $prefix): static
+    {
+        $this->tenantRoutePrefix = $prefix;
+
+        return $this;
+    }
+
+    public function tenantDomain(?string $domain): static
+    {
+        $this->tenantDomain = $domain;
+
+        return $this;
+    }
+
     public function tenantBillingProvider(?BillingProvider $provider): static
     {
         $this->tenantBillingProvider = $provider;
+
+        return $this;
+    }
+
+    public function tenantBillingRouteSlug(string $slug): static
+    {
+        $this->tenantBillingRouteSlug = $slug;
 
         return $this;
     }
@@ -103,9 +141,34 @@ trait HasTenancy
         return filled($this->getTenantRegistrationPage());
     }
 
+    public function hasTenantRoutePrefix(): bool
+    {
+        return filled($this->getTenantRoutePrefix());
+    }
+
+    public function getTenantRoutePrefix(): ?string
+    {
+        return $this->tenantRoutePrefix;
+    }
+
+    public function hasTenantDomain(): bool
+    {
+        return filled($this->getTenantDomain());
+    }
+
+    public function getTenantDomain(): ?string
+    {
+        return $this->tenantDomain;
+    }
+
     public function getTenantBillingProvider(): ?BillingProvider
     {
         return $this->tenantBillingProvider;
+    }
+
+    public function getTenantBillingRouteSlug(): string
+    {
+        return Str::start($this->tenantBillingRouteSlug, '/');
     }
 
     public function getTenantProfilePage(): ?string
@@ -151,13 +214,10 @@ trait HasTenancy
             return null;
         }
 
-        return route(
-            "filament.{$this->getId()}.tenant.billing",
-            [
-                'tenant' => $tenant,
-                ...$parameters,
-            ],
-        );
+        return $this->route('tenant.billing', [
+            'tenant' => $tenant,
+            ...$parameters,
+        ]);
     }
 
     /**
@@ -169,7 +229,7 @@ trait HasTenancy
             return null;
         }
 
-        return route("filament.{$this->getId()}.tenant.profile", $parameters);
+        return $this->route('tenant.profile', $parameters);
     }
 
     /**
@@ -181,7 +241,12 @@ trait HasTenancy
             return null;
         }
 
-        return route("filament.{$this->getId()}.tenant.registration", $parameters);
+        return $this->route('tenant.registration', $parameters);
+    }
+
+    public function hasTenantMenu(): bool
+    {
+        return (bool) $this->evaluate($this->hasTenantMenu);
     }
 
     /**
@@ -190,6 +255,13 @@ trait HasTenancy
     public function getTenantMenuItems(): array
     {
         return collect($this->tenantMenuItems)
+            ->filter(function (MenuItem $item, string | int $key): bool {
+                if (in_array($key, ['billing', 'profile', 'register'])) {
+                    return true;
+                }
+
+                return $item->isVisible();
+            })
             ->sort(fn (MenuItem $item): int => $item->getSort())
             ->all();
     }

@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('batch_id')->constrained('batches')->cascadeOnDelete();
             $table->foreignId('dress_id')->constrained('dresses')->cascadeOnDelete();
+            $table->foreignId('size_id')->constrained('sizes')->cascadeOnDelete();
             $table->integer('a1')->default(0)->nullable();
             $table->integer('a2')->default(0)->nullable();
             $table->integer('a3')->default(0)->nullable();
@@ -24,6 +25,7 @@ return new class extends Migration {
             $table->integer('a8')->default(0)->nullable();
             $table->integer('a9')->default(0)->nullable();
             $table->integer('a10')->default(0)->nullable();
+            $table->string('other')->nullable();
             $table->timestamps();
         });
     }

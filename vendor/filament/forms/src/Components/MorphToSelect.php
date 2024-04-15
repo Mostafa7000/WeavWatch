@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 class MorphToSelect extends Component
 {
     use Concerns\CanAllowHtml;
+    use Concerns\CanBeNative;
     use Concerns\CanBePreloaded;
     use Concerns\CanBeSearchable;
     use Concerns\HasLoadingMessage;
@@ -21,14 +22,14 @@ class MorphToSelect extends Component
      */
     protected string $view = 'filament-forms::components.fieldset';
 
-    public bool | Closure $isRequired = false;
+    protected bool | Closure $isRequired = false;
 
     protected int | Closure $optionsLimit = 50;
 
     /**
      * @var array<Type> | Closure
      */
-    public array | Closure $types = [];
+    protected array | Closure $types = [];
 
     final public function __construct(string $name)
     {
@@ -66,17 +67,23 @@ class MorphToSelect extends Component
                     fn (Type $type): string => $type->getLabel(),
                     $types,
                 ))
+                ->native($this->isNative())
                 ->required($isRequired)
                 ->live()
-                ->afterStateUpdated(fn (Set $set) => $set($keyColumn, null)),
+                ->afterStateUpdated(function (Set $set) use ($keyColumn) {
+                    $set($keyColumn, null);
+                    $this->callAfterStateUpdated();
+                }),
             Select::make($keyColumn)
                 ->label($selectedType?->getLabel())
                 ->hiddenLabel()
                 ->options($selectedType?->getOptionsUsing)
                 ->getSearchResultsUsing($selectedType?->getSearchResultsUsing)
                 ->getOptionLabelUsing($selectedType?->getOptionLabelUsing)
-                ->required($isRequired)
-                ->hidden(! $selectedType)
+                ->native($this->isNative())
+                ->required(filled($selectedType))
+                ->hidden(blank($selectedType))
+                ->dehydratedWhenHidden()
                 ->searchable($this->isSearchable())
                 ->searchDebounce($this->getSearchDebounce())
                 ->searchPrompt($this->getSearchPrompt())
@@ -85,7 +92,14 @@ class MorphToSelect extends Component
                 ->loadingMessage($this->getLoadingMessage())
                 ->allowHtml($this->isHtmlAllowed())
                 ->optionsLimit($this->getOptionsLimit())
-                ->preload($this->isPreloaded()),
+                ->preload($this->isPreloaded())
+                ->when(
+                    $this->isLive(),
+                    fn (Select $component) => $component->live(onBlur: $this->isLiveOnBlur()),
+                )
+                ->afterStateUpdated(function () {
+                    $this->callAfterStateUpdated();
+                }),
         ];
     }
 

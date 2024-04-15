@@ -18,12 +18,15 @@ class ActionContainer extends Component
 
     public static function make(Action $action): static
     {
-        return app(static::class, ['action' => $action]);
+        $static = app(static::class, ['action' => $action]);
+        $static->configure();
+
+        return $static;
     }
 
     public function getKey(): string
     {
-        return parent::getKey() ?? "{$this->action->getName()}Action";
+        return parent::getKey() ?? "{$this->getStatePath()}.{$this->action->getName()}Action";
     }
 
     public function isHidden(): bool

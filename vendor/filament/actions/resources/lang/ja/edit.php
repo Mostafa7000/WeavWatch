@@ -8,12 +8,12 @@ return [
 
         'modal' => [
 
-            'heading' => ':label編集',
+            'heading' => ':label 編集',
 
             'actions' => [
 
                 'save' => [
-                    'label' => '保存',
+                    'label' => '変更を保存',
                 ],
 
             ],

@@ -11,4 +11,8 @@ enum FiltersLayout
     case BelowContent;
 
     case Dropdown;
+
+    case Modal;
+
+    case Hidden;
 }

@@ -15,7 +15,7 @@ return [
             ],
 
             'add_between' => [
-                'label' => 'قرار دادن',
+                'label' => 'قراردادن',
             ],
 
             'delete' => [
@@ -185,6 +185,15 @@ return [
 
             ],
 
+            'svg' => [
+
+                'messages' => [
+                    'confirmation' => 'ویرایش فایل‌های SVG توصیه نمی‌شود، زیرا می‌تواند منجر به کاهش کیفیت در هنگام مقیاس‌بندی شود.\n آیا مطمئن هستید که می‌خواهید ادامه دهید؟',
+                    'disabled' => 'ویرایش فایل‌های SVG غیرفعال است زیرا می‌تواند منجر به کاهش کیفیت در هنگام مقیاس‌بندی شود.',
+                ],
+
+            ],
+
         ],
 
     ],
@@ -241,12 +250,25 @@ return [
 
     ],
 
+    'radio' => [
+
+        'boolean' => [
+            'true' => 'بله',
+            'false' => 'خیر',
+        ],
+
+    ],
+
     'repeater' => [
 
         'actions' => [
 
             'add' => [
                 'label' => 'افزودن به :label',
+            ],
+
+            'add_between' => [
+                'label' => 'درج بین',
             ],
 
             'delete' => [
@@ -336,16 +358,16 @@ return [
 
                 'modal' => [
 
-                    'heading' => 'ساختن',
+                    'heading' => 'ایجاد',
 
                     'actions' => [
 
                         'create' => [
-                            'label' => 'ساختن',
+                            'label' => 'ایجاد',
                         ],
 
                         'create_another' => [
-                            'label' => 'ساختن و ساختن یکی دیگر',
+                            'label' => 'ایجاد و ایجاد یکی دیگر',
                         ],
 
                     ],
@@ -395,6 +417,31 @@ return [
 
     'tags_input' => [
         'placeholder' => 'تگ جدید',
+    ],
+
+    'text_input' => [
+
+        'actions' => [
+
+            'hide_password' => [
+                'label' => 'مخفی کردن رمز',
+            ],
+
+            'show_password' => [
+                'label' => 'نشان دادن رمز',
+            ],
+
+        ],
+
+    ],
+
+    'toggle_buttons' => [
+
+        'boolean' => [
+            'true' => 'بله',
+            'false' => 'خیر',
+        ],
+
     ],
 
     'wizard' => [

@@ -1,8 +1,16 @@
 ---
 title: Getting started
 ---
+import LaracastsBanner from "@components/LaracastsBanner.astro"
 
 ## Overview
+
+<LaracastsBanner
+    title="Introduction to Filament"
+    description="Watch the Rapid Laravel Development with Filament series on Laracasts - it will teach you how to get started with the resources."
+    url="https://laracasts.com/series/rapid-laravel-development-with-filament/episodes/2"
+    series="rapid-laravel-development"
+/>
 
 Resources are static classes that are used to build CRUD interfaces for your Eloquent models. They describe how administrators should be able to interact with data from your app - using tables and forms.
 
@@ -52,8 +60,6 @@ If you'd like to save time, Filament can automatically generate the [form](#reso
 php artisan make:filament-resource Customer --generate
 ```
 
-> If your table contains ENUM columns, the `doctrine/dbal` package we use is unable to scan your table and will crash. Hence Filament is unable to generate the schema for your resource if it contains an ENUM column. Read more about this issue [here](https://github.com/doctrine/dbal/issues/3819#issuecomment-573419808).
-
 ### Handling soft deletes
 
 By default, you will not be able to interact with deleted records in the app. If you'd like to add functionality to restore, force delete and filter trashed records in your resource, use the `--soft-deletes` flag when generating the resource:
@@ -72,6 +78,18 @@ By default, only List, Create and Edit pages are generated for your resource. If
 php artisan make:filament-resource Customer --view
 ```
 
+### Specifiying a custom model namespace
+
+By default, Filament will assume that your model exists in the `App\Models` directory. You can pass a different namespace for the model using the `--model-namespace` flag:
+
+```bash
+php artisan make:filament-resource Customer --model-namespace=Custom\\Path\\Models
+```
+
+In this example, the model should exist at `Custom\Path\Models\Customer`. Please note the double backslashes `\\` in the command that are required.
+
+Now when [generating the resource](#automatically-generating-forms-and-tables), Filament will be able to locate the model and read the database schema.
+
 ## Record titles
 
 A `$recordTitleAttribute` may be set for your resource, which is the name of the column on your model that can be used to identify it from others.
@@ -87,6 +105,13 @@ This is required for features like [global search](global-search) to work.
 > You may specify the name of an [Eloquent accessor](https://laravel.com/docs/eloquent-mutators#defining-an-accessor) if just one column is inadequate at identifying a record.
 
 ## Resource forms
+
+<LaracastsBanner
+    title="Basic Form Inputs"
+    description="Watch the Rapid Laravel Development with Filament series on Laracasts - it will teach you the basics of adding a form to your resource."
+    url="https://laracasts.com/series/rapid-laravel-development-with-filament/episodes/3"
+    series="rapid-laravel-development"
+/>
 
 Resource classes contain a `form()` method that is used to build the forms on the [Create](creating-records) and [Edit](editing-records) pages:
 
@@ -136,6 +161,13 @@ Forms\Components\TextInput::make('password')
 ```
 
 ## Resource tables
+
+<LaracastsBanner
+    title="Table Columns"
+    description="Watch the Rapid Laravel Development with Filament series on Laracasts - it will teach you the basics of adding a table to your resource."
+    url="https://laracasts.com/series/rapid-laravel-development-with-filament/episodes/9"
+    series="rapid-laravel-development"
+/>
 
 Resource classes contain a `table()` method that is used to build the table on the [List page](listing-records):
 
@@ -229,6 +261,16 @@ public static function getPluralModelLabel(): string
 }
 ```
 
+### Automatic model label capitalization
+
+By default, Filament will automatically capitalize each word in the model label, for some parts of the UI. For example, in page titles, the navigation menu, and the breadcrumbs.
+
+If you want to disable this behaviour for a resource, you can set `$hasTitleCaseModelLabel` in the resource:
+
+```php
+protected static bool $hasTitleCaseModelLabel = false;
+```
+
 ## Resource navigation items
 
 Filament will automatically generate a navigation menu item for your resource using the [plural label](#plural-label).
@@ -259,7 +301,9 @@ protected static ?string $navigationIcon = 'heroicon-o-user-group';
 Alternatively, you may set a dynamic navigation icon in the `getNavigationIcon()` method:
 
 ```php
-public static function getNavigationIcon(): ?string
+use Illuminate\Contracts\Support\Htmlable;
+
+public static function getNavigationIcon(): string | Htmlable | null
 {
     return 'heroicon-o-user-group';
 }
@@ -299,6 +343,29 @@ public static function getNavigationGroup(): ?string
 }
 ```
 
+#### Grouping resource navigation items under other items
+
+You may group navigation items as children of other items, by passing the label of the parent item as the `$navigationParentItem`:
+
+```php
+protected static ?string $navigationParentItem = 'Products';
+
+protected static ?string $navigationGroup = 'Shop';
+```
+
+As seen above, if the parent item has a navigation group, that navigation group must also be defined, so the correct parent item can be identified.
+
+You may also use the `getNavigationParentItem()` method to set a dynamic parent item label:
+
+```php
+public static function getNavigationParentItem(): ?string
+{
+    return __('filament/navigation.groups.shop.items.products');
+}
+```
+
+> If you're reaching for a third level of navigation like this, you should consider using [clusters](clusters) instead, which are a logical grouping of resources and [custom pages](../pages), which can share their own separate navigation.
+
 ## Generating URLs to resource pages
 
 Filament provides `getUrl()` static method on resource classes to generate URLs to resources and specific pages within them. Traditionally, you would need to construct the URL by hand or by using Laravel's `route()` helper, but these methods depend on knowledge of the resource's slug or route naming conventions.
@@ -328,6 +395,43 @@ CustomerResource::getUrl('edit', ['record' => $customer]); // /admin/customers/e
 ```
 
 In this example, `$customer` can be an Eloquent model object, or an ID.
+
+### Generating URLs to resource modals
+
+This can be especially useful if you are using [simple resources](#simple-modal-resources) with only one page.
+
+To generate a URL for an action in the resource's table, you should pass the `tableAction` and `tableActionRecord` as URL parameters:
+
+```php
+use App\Filament\Resources\CustomerResource;
+use Filament\Tables\Actions\EditAction;
+
+CustomerResource::getUrl(parameters: [
+    'tableAction' => EditAction::getDefaultName(),
+    'tableActionRecord' => $customer,
+]); // /admin/customers?tableAction=edit&tableActionRecord=1
+```
+
+Or if you want to generate a URL for an action on the page like a `CreateAction` in the header, you can pass it in to the `action` parameter:
+
+```php
+use App\Filament\Resources\CustomerResource;
+use Filament\Actions\CreateAction;
+
+CustomerResource::getUrl(parameters: [
+    'action' => CreateAction::getDefaultName(),
+]); // /admin/customers?action=create
+```
+
+### Generating URLs to resources in other panels
+
+If you have multiple panels in your app, `getUrl()` will generate a URL within the current panel. You can also indicate which panel the resource is associated with, by passing the panel ID to the `panel` argument:
+
+```php
+use App\Filament\Resources\CustomerResource;
+
+CustomerResource::getUrl(panel: 'marketing');
+```
 
 ## Customizing the resource Eloquent query
 
@@ -374,6 +478,48 @@ By default, Filament will generate a URL based on the name of the resource. You 
 protected static ?string $slug = 'pending-orders';
 ```
 
+## Resource sub-navigation
+
+Sub-navigation allows the user to navigate between different pages within a resource. Typically, all pages in the sub-navigation will be related to the same record in the resource. For example, in a Customer resource, you may have a sub-navigation with the following pages:
+
+- View customer, a [`ViewRecord` page](viewing-records) that provides a read-only view of the customer's details.
+- Edit customer, an [`EditRecord` page](editing-records) that allows the user to edit the customer's details.
+- Edit customer contact, an [`EditRecord` page](editing-records) that allows the user to edit the customer's contact details. You can [learn how to create more than one Edit page](editing-records#creating-another-edit-page).
+- Manage addresses, a [`ManageRelatedRecords` page](relation-managers#relation-pages) that allows the user to manage the customer's addresses.
+- Manage payments, a [`ManageRelatedRecords` page](relation-managers#relation-pages) that allows the user to manage the customer's payments.
+
+To add a sub-navigation to each "singular record" page in the resource, you can add the `getRecordSubNavigation()` method to the resource class:
+
+```php
+use App\Filament\Resources\CustomerResource\Pages;
+use Filament\Resources\Pages\Page;
+
+public static function getRecordSubNavigation(Page $page): array
+{
+    return $page->generateNavigationItems([
+        Pages\ViewCustomer::class,
+        Pages\EditCustomer::class,
+        Pages\EditCustomerContact::class,
+        Pages\ManageCustomerAddresses::class,
+        Pages\ManageCustomerPayments::class,
+    ]);
+}
+```
+
+Each item in the sub-navigation can be customized using the [same navigation methods as normal pages](../navigation).
+
+> If you're looking to add sub-navigation to switch *between* entire resources and [custom pages](../pages), you might be looking for [clusters](../clusters), which are used to group these together. The `getRecordSubNavigation()` method is intended to construct a navigation between pages that relate to a particular record *inside* a resource.
+
+### Sub-navigation position
+
+The sub-navigation is rendered at the start of the page by default. You may change the position by setting the `$subNavigationPosition` property on the resource. The value may be `SubNavigationPosition::Start`, `SubNavigationPosition::End`, or `SubNavigationPosition::Top` to render the sub-navigation as tabs:
+
+```php
+use Filament\Pages\SubNavigationPosition;
+
+protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::End;
+```
+
 ## Deleting resource pages
 
 If you'd like to delete a page from your resource, you can just delete the page file from the `Pages` directory of your resource, and its entry in the `getPages()` method.
@@ -390,3 +536,4 @@ public static function getPages(): array
 }
 ```
 
+Deleting a page will not delete any actions that link to that page. Any actions will open a modal instead of sending the user to the non-existant page. For instance, the `CreateAction` on the List page, the `EditAction` on the table or View page, or the `ViewAction` on the table or Edit page. If you want to remove those buttons, you must delete the actions as well.

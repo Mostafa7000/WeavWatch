@@ -73,8 +73,8 @@ class PiecesRelationManager extends RelationManager
                 Forms\Components\TextInput::make('value')
                     ->label('العدد')
                     ->numeric()
-                    ->hint('العدد المطلوب المتبقي = ' . $this->getRemainingPieces())
-                    ->maxValue($this->getRemainingPieces())
+//                    ->hint('العدد المطلوب المتبقي = ' . $this->getRemainingPieces())
+//                    ->maxValue($this->getRemainingPieces())
                     ->required()
                     ->live(),
             ])->columns(3);

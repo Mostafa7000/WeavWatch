@@ -2,6 +2,7 @@
 
 namespace Filament\Forms\Components\Actions;
 
+use Exception;
 use Filament\Actions\Concerns\HasMountableArguments;
 use Filament\Actions\MountableAction;
 use Illuminate\Database\Eloquent\Model;
@@ -27,6 +28,10 @@ class Action extends MountableAction
             return $this->action;
         }
 
+        if ($event = $this->getLivewireEventClickHandler()) {
+            return $event;
+        }
+
         $argumentsParameter = '';
 
         if (count($arguments = $this->getArguments())) {
@@ -35,12 +40,24 @@ class Action extends MountableAction
             $argumentsParameter .= '';
         }
 
-        return "mountFormComponentAction('{$this->getComponent()->getKey()}', '{$this->getName()}'{$argumentsParameter})";
+        $componentKey = $this->getComponent()->getKey();
+
+        if (blank($componentKey)) {
+            $componentClass = $this->getComponent()::class;
+
+            throw new Exception("The form component [{$componentClass}] must have a [key()] set in order to use actions. This [key()] must be a unique identifier for the component.");
+        }
+
+        return "mountFormComponentAction('{$componentKey}', '{$this->getName()}'{$argumentsParameter})";
     }
 
     public function toFormComponent(): ActionContainer
     {
-        return ActionContainer::make($this);
+        $component = ActionContainer::make($this);
+
+        $this->component($component);
+
+        return $component;
     }
 
     /**
@@ -75,5 +92,10 @@ class Action extends MountableAction
             Model::class, $record::class => [$record],
             default => parent::resolveDefaultClosureDependencyForEvaluationByType($parameterType),
         };
+    }
+
+    public function getInfolistName(): string
+    {
+        return 'mountedFormComponentActionInfolist';
     }
 }

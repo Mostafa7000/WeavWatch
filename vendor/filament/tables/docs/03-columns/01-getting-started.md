@@ -2,8 +2,16 @@
 title: Getting started
 ---
 import AutoScreenshot from "@components/AutoScreenshot.astro"
+import LaracastsBanner from "@components/LaracastsBanner.astro"
 
 ## Overview
+
+<LaracastsBanner
+    title="Table Columns"
+    description="Watch the Rapid Laravel Development with Filament series on Laracasts - it will teach you the basics of adding columns to Filament resource tables."
+    url="https://laracasts.com/series/rapid-laravel-development-with-filament/episodes/9"
+    series="rapid-laravel-development"
+/>
 
 Column classes can be found in the `Filament\Tables\Columns` namespace. You can put them inside the `$table->columns()` method:
 
@@ -141,7 +149,7 @@ public function table(Table $table): Table
 
 ## Searching
 
-Columns may be searchable, by using the text input field in the top right of the table. To make a column searchable, you must use the `searchable()` method:
+Columns may be searchable by using the text input field in the top right of the table. To make a column searchable, you must use the `searchable()` method:
 
 ```php
 use Filament\Tables\Columns\TextColumn;
@@ -171,8 +179,25 @@ TextColumn::make('full_name')
     ->searchable(query: function (Builder $query, string $search): Builder {
         return $query
             ->where('first_name', 'like', "%{$search}%")
-            ->where('last_name', 'like', "%{$search}%");
+            ->orWhere('last_name', 'like', "%{$search}%");
     })
+```
+
+#### Customizing the table search field placeholder
+
+You may customize the placeholder in the search field using the `searchPlaceholder()` method on the `$table`:
+
+```php
+use Filament\Tables\Table;
+
+public static function table(Table $table): Table
+{
+    return $table
+        ->columns([
+            // ...
+        ])
+        ->searchPlaceholder('Search (ID, Name)');
+}
 ```
 
 ### Searching individually
@@ -211,6 +236,40 @@ use Livewire\Attributes\Url;
 public array $tableColumnSearches = [];
 ```
 
+### Customizing the table search debounce
+
+You may customize the debounce time in all table search fields using the `searchDebounce()` method on the `$table`. By default it is set to `500ms`:
+
+```php
+use Filament\Tables\Table;
+
+public static function table(Table $table): Table
+{
+    return $table
+        ->columns([
+            // ...
+        ])
+        ->searchDebounce('750ms');
+}
+```
+
+### Searching when the input is blurred
+
+Instead of automatically reloading the table contents while the user is typing their search, which is affected by the [debounce](#customizing-the-table-search-debounce) of the search field, you may change the behaviour so that the table is only searched when the user blurs the input (tabs or clicks out of it), using the `searchOnBlur()` method:
+
+```php
+use Filament\Tables\Table;
+
+public static function table(Table $table): Table
+{
+    return $table
+        ->columns([
+            // ...
+        ])
+        ->searchOnBlur();
+}
+```
+
 ### Persist search in session
 
 To persist the table or individual column search in the user's session, use the `persistSearchInSession()` or `persistColumnSearchInSession()` method:
@@ -227,18 +286,6 @@ public function table(Table $table): Table
         ->persistSearchInSession()
         ->persistColumnSearchesInSession();
 }
-```
-
-### Forcing case-insensitive column search
-
-By default, searching will use the sensitivity settings from the database table column. This is to avoid unnecessary performance overhead when searching large datasets that would arise if we were to force insensitivity for all users. However, if your database does not search case-insensitively by default, you can force it to by using the `forceSearchCaseInsensitive()` method:
-
-```php
-use Filament\Tables\Columns\TextColumn;
-
-TextColumn::make('name')
-    ->searchable()
-    ->forceSearchCaseInsensitive()
 ```
 
 ## Column actions and URLs
@@ -301,14 +348,27 @@ TextColumn::make('title')
 
 ## Setting a default value
 
-To set a default value for fields with a `null` state, you may use the `default()` method:
+To set a default value for columns with an empty state, you may use the `default()` method. This method will treat the default state as if it were real, so columns like [image](image) or [color](color) will display the default image or color.
 
 ```php
 use Filament\Tables\Columns\TextColumn;
 
-TextColumn::make('title')
-    ->default('Untitled')
+TextColumn::make('description')
+    ->default('No description.')
 ```
+
+## Adding placeholder text if a column is empty
+
+Sometimes you may want to display placeholder text for columns with an empty state, which is styled as a lighter gray text. This differs from the [default value](#setting-a-default-value), as the placeholder is always text and not treated as if it were real state.
+
+```php
+use Filament\Tables\Columns\TextColumn;
+
+TextColumn::make('description')
+    ->placeholder('No description.')
+```
+
+<AutoScreenshot name="tables/columns/placeholder" alt="Column with a placeholder for empty state" version="3.x" />
 
 ## Hiding columns
 
@@ -377,8 +437,11 @@ Sometimes you need to calculate the state of a column, instead of directly readi
 By passing a callback function to the `state()` method, you can customize the returned state for that column based on the `$record`:
 
 ```php
-Tables\Columns\TextColumn::make('amount_including_vat')
-    ->state(function (Model $record): float {
+use App\Models\Order;
+use Filament\Tables\Columns\TextColumn;
+
+TextColumn::make('amount_including_vat')
+    ->state(function (Order $record): float {
         return $record->amount * (1 + $record->vat_rate);
     })
 ```
@@ -406,7 +469,7 @@ TextColumn::make('title')
     ->tooltip(fn (Model $record): string => "By {$record->author->name}")
 ```
 
-## Aligning column content
+## Horizontally aligning column content
 
 Table columns are aligned to the start (left in LTR interfaces or right in RTL interfaces) by default. You may change the alignment using the `alignment()` method, and passing it `Alignment::Start`, `Alignment::Center`, `Alignment::End` or `Alignment::Justify` options:
 
@@ -427,6 +490,106 @@ use Filament\Tables\Columns\TextColumn;
 
 TextColumn::make('name')
     ->alignEnd()
+```
+
+## Vertically aligning column content
+
+Table column content is vertically centered by default. You may change the vertical alignment using the `verticalAlignment()` method, and passing it `VerticalAlignment::Start`, `VerticalAlignment::Center` or `VerticalAlignment::End` options:
+
+```php
+use Filament\Support\Enums\VerticalAlignment;
+use Filament\Tables\Columns\TextColumn;
+
+TextColumn::make('name')
+    ->verticalAlignment(VerticalAlignment::Start)
+```
+
+<AutoScreenshot name="tables/columns/vertical-alignment" alt="Table with column vertically aligned to the start" version="3.x" />
+
+Alternatively, you may use shorthand methods like `verticallyAlignStart()`:
+
+```php
+use Filament\Support\Enums\VerticalAlignment;
+use Filament\Tables\Columns\TextColumn;
+
+TextColumn::make('name')
+    ->verticallyAlignStart()
+```
+
+## Allowing column headers to wrap
+
+By default, column headers will not wrap onto multiple lines, if they need more space. You may allow them to wrap using the `wrapHeader()` method:
+
+```php
+use Filament\Tables\Columns\TextColumn;
+
+TextColumn::make('name')
+    ->wrapHeader()
+```
+
+## Controlling the width of columns
+
+By default, columns will take up as much space as they need. You may allow some columns to consume more space than others by using the `grow()` method:
+
+```php
+use Filament\Tables\Columns\TextColumn;
+
+TextColumn::make('name')
+    ->grow()
+```
+
+Alternatively, you can define a width for the column, which is passed to the header cell using the `style` attribute, so you can use any valid CSS value:
+
+```php
+use Filament\Tables\Columns\IconColumn;
+
+IconColumn::make('is_paid')
+    ->label('Paid')
+    ->boolean()
+    ->width('1%')
+```
+
+## Grouping columns
+
+You group multiple columns together underneath a single heading using a `ColumnGroup` object:
+
+```php
+use Filament\Tables\Columns\ColumnGroup;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+
+public function table(Table $table): Table
+{
+    return $table
+        ->columns([
+            TextColumn::make('title'),
+            TextColumn::make('slug'),
+            ColumnGroup::make('Visibility', [
+                TextColumn::make('status'),
+                IconColumn::make('is_featured'),
+            ]),
+            TextColumn::make('author.name'),
+        ]);
+}
+```
+
+The first argument is the label of the group, and the second is an array of column objects that belong to that group.
+
+<AutoScreenshot name="tables/columns/grouping" alt="Table with grouped columns" version="3.x" />
+
+You can also control the group header [alignment](#horizontally-aligning-column-content) and [wrapping](#allowing-column-headers-to-wrap) on the `ColumnGroup` object. To improve the multi-line fluency of the API, you can chain the `columns()` onto the object instead of passing it as the second argument:
+
+```php
+use Filament\Support\Enums\Alignment;
+use Filament\Tables\Columns\ColumnGroup;
+
+ColumnGroup::make('Website visibility')
+    ->columns([
+        // ...
+    ])
+    ->alignment(Alignment::Center)
+    ->wrapHeader()
 ```
 
 ## Custom attributes

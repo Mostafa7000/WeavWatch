@@ -45,7 +45,7 @@ class ManagePost extends Component implements HasForms, HasActions
 
 ## Adding the action
 
-Add a method that returns your action:
+Add a method that returns your action. The method must share the exact same name as the action, or the name followed by `Action`:
 
 ```php
 use App\Models\Post;
@@ -60,15 +60,21 @@ class ManagePost extends Component implements HasForms, HasActions
 {
     use InteractsWithActions;
     use InteractsWithForms;
-    
+
     public Post $post;
-    
+
     public function deleteAction(): Action
     {
         return Action::make('delete')
             ->requiresConfirmation()
             ->action(fn () => $this->post->delete());
     }
+    
+    // This method name also works, since the action name is `delete`:
+    // public function delete(): Action
+    
+    // This method name does not work, since the action name is `delete`, not `deletePost`:
+    // public function deletePost(): Action
 
     // ...
 }
@@ -79,7 +85,7 @@ Finally, you need to render the action in your view. To do this, you can use `{{
 ```blade
 <div>
     {{ $this->deleteAction }}
-    
+
     <x-filament-actions::modals />
 </div>
 ```
@@ -94,10 +100,10 @@ Sometimes, you may wish to pass arguments to your action. For example, if you're
 <div>
     @foreach ($posts as $post)
         <h2>{{ $post->title }}</h2>
-        
-        {{ ($this->delete)(['post' => $post->id]) }}
+
+        {{ ($this->deleteAction)(['post' => $post->id]) }}
     @endforeach
-    
+
     <x-filament-actions::modals />
 </div>
 ```
@@ -114,10 +120,42 @@ public function deleteAction(): Action
         ->requiresConfirmation()
         ->action(function (array $arguments) {
             $post = Post::find($arguments['post']);
-            
+
             $post?->delete();
         });
 }
+```
+
+## Hiding actions in a Livewire view
+
+If you use `hidden()` or `visible()` to control if an action is rendered, you should wrap the action in an `@if` check for `isVisible()`:
+
+```blade
+<div>
+    @if ($this->deleteAction->isVisible())
+        {{ $this->deleteAction }}
+    @endif
+    
+    {{-- Or --}}
+    
+    @if (($this->deleteAction)(['post' => $post->id])->isVisible())
+        {{ ($this->deleteAction)(['post' => $post->id]) }}
+    @endif
+</div>
+```
+
+The `hidden()` and `visible()` methods also control if the action is `disabled()`, so they are still useful to protect the action from being run if the user does not have permission. Encapsulating this logic in the `hidden()` or `visible()` of the action itself is good practice otherwise you need to define the condition in the view and in `disabled()`.
+
+You can also take advantage of this to hide any wrapping elements that may not need to be rendered if the action is hidden:
+
+```blade
+<div>
+    @if ($this->deleteAction->isVisible())
+        <div>
+            {{ $this->deleteAction }}
+        </div>
+    @endif
+</div>
 ```
 
 ## Grouping actions in a Livewire view
@@ -131,7 +169,7 @@ You may [group actions together into a dropdown menu](grouping-actions) by using
         $this->viewAction,
         $this->deleteAction,
     ]" />
-    
+
     <x-filament-actions::modals />
 </div>
 ```
@@ -153,7 +191,7 @@ You can also pass in any attributes to customize the appearance of the trigger b
         tooltip="More actions"
         dropdown-placement="bottom-start"
     />
-    
+
     <x-filament-actions::modals />
 </div>
 ```
@@ -175,10 +213,10 @@ public function editAction(): Action
         // ...
         ->action(function (array $arguments) {
             $post = Post::find($arguments['post']);
-            
+
             // ...
-            
-            $this->replaceMountedAction('publish', $arguments);        
+
+            $this->replaceMountedAction('publish', $arguments);
         });
 }
 
@@ -189,7 +227,7 @@ public function publishAction(): Action
         // ...
         ->action(function (array $arguments) {
             $post = Post::find($arguments['post']);
-            
+
             $post->publish();
         });
 }
@@ -197,4 +235,4 @@ public function publishAction(): Action
 
 Now, when the first action is submitted, the second action will open in its place. The [arguments](#passing-action-arguments) that were originally passed to the first action get passed to the second action, so you can use them to persist data between requests.
 
-If the first action is cancelled, the second one is not opened. If the second action is cancelled, the first one has already run and cannot be cancelled.
+If the first action is canceled, the second one is not opened. If the second action is canceled, the first one has already run and cannot be cancelled.

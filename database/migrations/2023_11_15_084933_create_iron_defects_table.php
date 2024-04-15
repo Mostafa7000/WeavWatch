@@ -28,6 +28,7 @@ return new class extends Migration
             $table->integer('a10')->default(0)->nullable();
             $table->integer('a11')->default(0)->nullable();
             $table->integer('a12')->default(0)->nullable();
+            $table->string('other')->nullable();
             $table->timestamps();
         });
     }

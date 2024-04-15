@@ -89,11 +89,11 @@ return [
                 ],
 
                 'flip_horizontal' => [
-                    'label' => 'Flip image horizontal',
+                    'label' => 'Flip image horizontally',
                 ],
 
                 'flip_vertical' => [
-                    'label' => 'Flip image vertical',
+                    'label' => 'Flip image vertically',
                 ],
 
                 'move_down' => [
@@ -185,6 +185,15 @@ return [
 
             ],
 
+            'svg' => [
+
+                'messages' => [
+                    'confirmation' => 'Editing SVG files is not recommended as it can result in quality loss when scaling.\n Are you sure you want to continue?',
+                    'disabled' => 'Editing SVG files is disabled as it can result in quality loss when scaling.',
+                ],
+
+            ],
+
         ],
 
     ],
@@ -241,12 +250,25 @@ return [
 
     ],
 
+    'radio' => [
+
+        'boolean' => [
+            'true' => 'Yes',
+            'false' => 'No',
+        ],
+
+    ],
+
     'repeater' => [
 
         'actions' => [
 
             'add' => [
                 'label' => 'Add to :label',
+            ],
+
+            'add_between' => [
+                'label' => 'Insert between',
             ],
 
             'delete' => [
@@ -395,6 +417,31 @@ return [
 
     'tags_input' => [
         'placeholder' => 'New tag',
+    ],
+
+    'text_input' => [
+
+        'actions' => [
+
+            'hide_password' => [
+                'label' => 'Hide password',
+            ],
+
+            'show_password' => [
+                'label' => 'Show password',
+            ],
+
+        ],
+
+    ],
+
+    'toggle_buttons' => [
+
+        'boolean' => [
+            'true' => 'Yes',
+            'false' => 'No',
+        ],
+
     ],
 
     'wizard' => [

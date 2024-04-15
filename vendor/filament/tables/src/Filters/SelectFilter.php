@@ -23,9 +23,13 @@ class SelectFilter extends BaseFilter
 
     protected bool | Closure $isSearchable = false;
 
+    protected bool | Closure $canSelectPlaceholder = true;
+
     protected int | Closure $optionsLimit = 50;
 
-    protected bool | Closure $isSearchForcedCaseInsensitive = false;
+    protected bool | Closure | null $isSearchForcedCaseInsensitive = null;
+
+    protected ?Closure $getOptionLabelFromRecordUsing = null;
 
     protected function setUp(): void
     {
@@ -47,7 +51,15 @@ class SelectFilter extends BaseFilter
                     $relationshipQuery = $filter->getRelationshipQuery();
 
                     $labels = $relationshipQuery
-                        ->whereKey($state['values'])
+                        ->when(
+                            $filter->getRelationship() instanceof \Znck\Eloquent\Relations\BelongsToThrough,
+                            fn (Builder $query) => $query->distinct(),
+                        )
+                        ->when(
+                            $this->getRelationshipKey(),
+                            fn (Builder $query, string $relationshipKey) => $query->whereIn($relationshipKey, $state['values']),
+                            fn (Builder $query) => $query->whereKey($state['values'])
+                        )
                         ->pluck($relationshipQuery->qualifyColumn($filter->getRelationshipTitleAttribute()))
                         ->all();
                 } else {
@@ -60,7 +72,13 @@ class SelectFilter extends BaseFilter
 
                 $labels = collect($labels)->join(', ', ' & ');
 
-                return ["{$filter->getIndicator()}: {$labels}"];
+                $indicator = $filter->getIndicator();
+
+                if (! $indicator instanceof Indicator) {
+                    $indicator = Indicator::make("{$indicator}: {$labels}");
+                }
+
+                return [$indicator];
             }
 
             if (blank($state['value'] ?? null)) {
@@ -69,7 +87,11 @@ class SelectFilter extends BaseFilter
 
             if ($filter->queriesRelationships()) {
                 $label = $filter->getRelationshipQuery()
-                    ->whereKey($state['value'])
+                    ->when(
+                        $this->getRelationshipKey(),
+                        fn (Builder $query, string $relationshipKey) => $query->where($relationshipKey, $state['value']),
+                        fn (Builder $query) => $query->whereKey($state['value'])
+                    )
                     ->first()
                     ?->getAttributeValue($filter->getRelationshipTitleAttribute());
             } else {
@@ -80,10 +102,23 @@ class SelectFilter extends BaseFilter
                 return [];
             }
 
-            return ["{$filter->getIndicator()}: {$label}"];
+            $indicator = $filter->getIndicator();
+
+            if (! $indicator instanceof Indicator) {
+                $indicator = Indicator::make("{$indicator}: {$label}");
+            }
+
+            return [$indicator];
         });
 
         $this->resetState(['value' => null]);
+    }
+
+    public function getActiveCount(): int
+    {
+        $state = $this->getState();
+
+        return filled($this->isMultiple() ? ($state['values'] ?? []) : ($state['value'] ?? null)) ? 1 : 0;
     }
 
     /**
@@ -105,7 +140,7 @@ class SelectFilter extends BaseFilter
             $data['values'] ?? null :
             $data['value'] ?? null;
 
-        if (! count(array_filter(
+        if (blank(Arr::first(
             Arr::wrap($values),
             fn ($value) => filled($value),
         ))) {
@@ -121,11 +156,18 @@ class SelectFilter extends BaseFilter
 
         return $query->whereHas(
             $this->getRelationshipName(),
-            function (Builder $query) use ($values) {
+            function (Builder $query) use ($isMultiple, $values) {
                 if ($this->modifyRelationshipQueryUsing) {
                     $query = $this->evaluate($this->modifyRelationshipQueryUsing, [
                         'query' => $query,
                     ]) ?? $query;
+                }
+
+                if ($relationshipKey = $this->getRelationshipKey($query)) {
+                    return $query->{$isMultiple ? 'whereIn' : 'where'}(
+                        $relationshipKey,
+                        $values,
+                    );
                 }
 
                 return $query->whereKey($values);
@@ -171,6 +213,13 @@ class SelectFilter extends BaseFilter
         return $this;
     }
 
+    public function selectablePlaceholder(bool | Closure $condition = true): static
+    {
+        $this->canSelectPlaceholder = $condition;
+
+        return $this;
+    }
+
     public function getAttribute(): string
     {
         return $this->evaluate($this->attribute) ?? $this->getName();
@@ -184,16 +233,16 @@ class SelectFilter extends BaseFilter
         return $this->getAttribute();
     }
 
-    public function forceSearchCaseInsensitive(bool | Closure $condition = true): static
+    public function forceSearchCaseInsensitive(bool | Closure | null $condition = true): static
     {
         $this->isSearchForcedCaseInsensitive = $condition;
 
         return $this;
     }
 
-    public function isSearchForcedCaseInsensitive(): bool
+    public function isSearchForcedCaseInsensitive(): ?bool
     {
-        return (bool) $this->evaluate($this->isSearchForcedCaseInsensitive);
+        return $this->evaluate($this->isSearchForcedCaseInsensitive);
     }
 
     public function getFormField(): Select
@@ -203,6 +252,7 @@ class SelectFilter extends BaseFilter
             ->multiple($this->isMultiple())
             ->placeholder($this->getPlaceholder())
             ->searchable($this->isSearchable())
+            ->selectablePlaceholder($this->canSelectPlaceholder())
             ->preload($this->isPreloaded())
             ->native($this->isNative())
             ->optionsLimit($this->getOptionsLimit());
@@ -227,6 +277,10 @@ class SelectFilter extends BaseFilter
             $field->getOptionLabelsUsing($this->getOptionLabelsUsing);
         }
 
+        if ($this->getOptionLabelFromRecordUsing) {
+            $field->getOptionLabelFromRecordUsing($this->getOptionLabelFromRecordUsing);
+        }
+
         if ($this->getSearchResultsUsing) {
             $field->getSearchResultsUsing($this->getSearchResultsUsing);
         }
@@ -246,6 +300,11 @@ class SelectFilter extends BaseFilter
     public function isSearchable(): bool
     {
         return (bool) $this->evaluate($this->isSearchable);
+    }
+
+    public function canSelectPlaceholder(): bool
+    {
+        return (bool) $this->evaluate($this->canSelectPlaceholder);
     }
 
     public function optionsLimit(int | Closure $limit): static
@@ -270,5 +329,12 @@ class SelectFilter extends BaseFilter
     public function isNative(): bool
     {
         return (bool) $this->evaluate($this->isNative);
+    }
+
+    public function getOptionLabelFromRecordUsing(?Closure $callback): static
+    {
+        $this->getOptionLabelFromRecordUsing = $callback;
+
+        return $this;
     }
 }

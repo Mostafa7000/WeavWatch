@@ -1,8 +1,6 @@
-<x-filament-panels::page.simple>
-    <x-slot name="subheading">
-        {{ $this->backAction }}
-    </x-slot>
-
+<x-dynamic-component
+    :component="static::isSimple() ? 'filament-panels::page.simple' : 'filament-panels::page'"
+>
     <x-filament-panels::form wire:submit="save">
         {{ $this->form }}
 
@@ -11,4 +9,4 @@
             :full-width="$this->hasFullWidthFormActions()"
         />
     </x-filament-panels::form>
-</x-filament-panels::page.simple>
+</x-dynamic-component>

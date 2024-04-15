@@ -13,10 +13,9 @@ return new class extends Migration
     {
         Schema::create('batches', function (Blueprint $table) {
             $table->id();
-            $table->integer('required_quantity');
-            $table->string('message_number');
-            $table->string('operation_number');
-            $table->string('model_number');
+            $table->string('product_number');
+            $table->string('batch_number');
+            $table->string('location');
             $table->timestamps();
         });
     }

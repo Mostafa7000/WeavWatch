@@ -1,6 +1,7 @@
 ---
 title: Managing relationships
 ---
+import LaracastsBanner from "@components/LaracastsBanner.astro"
 
 ## Choosing the right tool for the job
 
@@ -32,7 +33,7 @@ From a UX perspective, this solution is only suitable if your related model only
 
 > These are compatible with `BelongsTo`, `HasOne` and `MorphOne` relationships.
 
-All layout form components ([Grid](../../forms/layout/grid#grid-component), [Section](../../forms/layout/section), [Fieldset](../../forms/layout/fieldset), [Section](../../forms/layout/section), etc) have a `relationship()` method. When you use this, all fields within that layout are saved to the related model instead of the owner's model:
+All layout form components ([Grid](../../forms/layout/grid#grid-component), [Section](../../forms/layout/section), [Fieldset](../../forms/layout/fieldset), etc.) have a [`relationship()` method](../../forms/advanced#saving-data-to-relationships). When you use this, all fields within that layout are saved to the related model instead of the owner's model:
 
 ```php
 use Filament\Forms\Components\Fieldset;
@@ -51,7 +52,16 @@ Fieldset::make('Metadata')
 
 In this example, the `title`, `description` and `image` are automatically loaded from the `metadata` relationship, and saved again when the form is submitted. If the `metadata` record does not exist, it is automatically created.
 
+This feature is explained more in depth in the [Forms documentation](../../forms/advanced#saving-data-to-relationships). Please visit that page for more information about how to use it.
+
 ## Creating a relation manager
+
+<LaracastsBanner
+    title="Relation Managers"
+    description="Watch the Rapid Laravel Development with Filament series on Laracasts - it will teach you the basics of adding relation managers to Filament resources."
+    url="https://laracasts.com/series/rapid-laravel-development-with-filament/episodes/13"
+    series="rapid-laravel-development"
+/>
 
 To create a relation manager, you can use the `make:filament-relation-manager` command:
 
@@ -103,6 +113,30 @@ public static function getRelations(): array
 
 Once a table and form have been defined for the relation manager, visit the [Edit](editing-records) or [View](viewing-records) page of your resource to see it in action.
 
+### Read-only mode
+
+Relation managers are usually displayed on either the Edit or View page of a resource. On the View page, Filament will automatically hide all actions that modify the relationship, such as create, edit, and delete. We call this "read-only mode", and it is there by default to preserve the read-only behaviour of the View page. However, you can disable this behaviour, by overriding the `isReadOnly()` method on the relation manager class to return `false` all the time:
+
+```php
+public function isReadOnly(): bool
+{
+    return false;
+}
+```
+
+Alternatively, if you hate this functionality, you can disable it for all relation managers at once in the panel [configuration](../configuration):
+
+```php
+use Filament\Panel;
+
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        // ...
+        ->readOnlyRelationManagersOnResourceViewPagesByDefault(false);
+}
+```
+
 ### Unconventional inverse relationship names
 
 For inverse relationships that do not follow Laravel's naming guidelines, you may wish to use the `inverseRelationship()` method on the table:
@@ -134,9 +168,9 @@ You can find out more about soft deleting [here](#deleting-records).
 
 ## Listing related records
 
-Related records will be listed in a table. The entire relation manager is based around this table, which contains actions to [create](#creating-records), [edit](#editing-records), [attach / detach](#attaching-and-detaching-records), [associate / dissociate](#associating-and-dissociating-records), and delete records.
+Related records will be listed in a table. The entire relation manager is based around this table, which contains actions to [create](#creating-related-records), [edit](#editing-related-records), [attach / detach](#attaching-and-detaching-records), [associate / dissociate](#associating-and-dissociating-records), and delete records.
 
-You may may use any of the features of the [table builder](../../tables) to customize relation managers.
+You may use any features of the [Table Builder](../../tables) to customize relation managers.
 
 ### Listing with pivot attributes
 
@@ -182,7 +216,7 @@ Please ensure that any pivot attributes are listed in the `withPivot()` method o
 
 ### Customizing the `CreateAction`
 
-To learn how to customize the `CreateAction`, including mutating the form data, changing the notification, and adding lifecycle hooks, please see the [actions documentation](../../actions/prebuilt-actions/create).
+To learn how to customize the `CreateAction`, including mutating the form data, changing the notification, and adding lifecycle hooks, please see the [Actions documentation](../../actions/prebuilt-actions/create).
 
 ## Editing related records
 
@@ -209,7 +243,7 @@ Please ensure that any pivot attributes are listed in the `withPivot()` method o
 
 ### Customizing the `EditAction`
 
-To learn how to customize the `EditAction`, including mutating the form data, changing the notification, and adding lifecycle hooks, please see the [actions documentation](../../actions/prebuilt-actions/edit).
+To learn how to customize the `EditAction`, including mutating the form data, changing the notification, and adding lifecycle hooks, please see the [Actions documentation](../../actions/prebuilt-actions/edit).
 
 ## Attaching and detaching records
 
@@ -289,7 +323,7 @@ use Filament\Tables\Actions\AttachAction;
 use Illuminate\Database\Eloquent\Builder;
 
 AttachAction::make()
-    ->recordSelectOptionsQuery(fn (Builder $query) => $query->whereBelongsTo(auth()->user())
+    ->recordSelectOptionsQuery(fn (Builder $query) => $query->whereBelongsTo(auth()->user()))
 ```
 
 ### Searching the options to attach across multiple columns
@@ -303,16 +337,27 @@ AttachAction::make()
     ->recordSelectSearchColumns(['title', 'description'])
 ```
 
-### Customizing the select field in the attach modal
+### Attaching multiple records
 
-You may customize the select field object that is used during attachment by passing a function to the `modifyRecordSelectUsing()` method:
+The `multiple()` method on the `AttachAction` component allows you to select multiple values:
+
+```php
+use Filament\Tables\Actions\AttachAction;
+
+AttachAction::make()
+    ->multiple()
+```
+
+### Customizing the select field in the attached modal
+
+You may customize the select field object that is used during attachment by passing a function to the `recordSelect()` method:
 
 ```php
 use Filament\Forms\Components\Select;
 use Filament\Tables\Actions\AttachAction;
 
 AttachAction::make()
-    ->modifyRecordSelectUsing(
+    ->recordSelect(
         fn (Select $select) => $select->placeholder('Select a post'),
     )
 ```
@@ -323,10 +368,14 @@ By default, you will not be allowed to attach a record more than once. This is b
 
 Please ensure that the `id` attribute is listed in the `withPivot()` method of the relationship *and* inverse relationship.
 
-Finally, add the `$allowsDuplicates` property to the relation manager:
+Finally, add the `allowDuplicates()` method to the table:
 
 ```php
-protected bool $allowsDuplicates = true;
+public function table(Table $table): Table
+{
+    return $table
+        ->allowDuplicates();
+}
 ```
 
 ## Associating and dissociating records
@@ -388,7 +437,7 @@ use Filament\Tables\Actions\AssociateAction;
 use Illuminate\Database\Eloquent\Builder;
 
 AssociateAction::make()
-    ->recordSelectOptionsQuery(fn (Builder $query) => $query->whereBelongsTo(auth()->user())
+    ->recordSelectOptionsQuery(fn (Builder $query) => $query->whereBelongsTo(auth()->user()))
 ```
 
 ### Searching the options to associate across multiple columns
@@ -402,16 +451,27 @@ AssociateAction::make()
     ->recordSelectSearchColumns(['title', 'description'])
 ```
 
+### Associating multiple records
+
+The `multiple()` method on the `AssociateAction` component allows you to select multiple values:
+
+```php
+use Filament\Tables\Actions\AssociateAction;
+
+AssociateAction::make()
+    ->multiple()
+```
+
 ### Customizing the select field in the associate modal
 
-You may customize the select field object that is used during association by passing a function to the `modifyRecordSelectUsing()` method:
+You may customize the select field object that is used during association by passing a function to the `recordSelect()` method:
 
 ```php
 use Filament\Forms\Components\Select;
 use Filament\Tables\Actions\AssociateAction;
 
 AssociateAction::make()
-    ->modifyRecordSelectUsing(
+    ->recordSelect(
         fn (Select $select) => $select->placeholder('Select a post'),
     )
 ```
@@ -491,17 +551,51 @@ public function table(Table $table): Table
 
 ### Customizing the `DeleteAction`
 
-To learn how to customize the `DeleteAction`, including changing the notification and adding lifecycle hooks, please see the [actions documentation](../../actions/prebuilt-actions/delete).
+To learn how to customize the `DeleteAction`, including changing the notification and adding lifecycle hooks, please see the [Actions documentation](../../actions/prebuilt-actions/delete).
+
+## Importing related records
+
+The [`ImportAction`](../../actions/prebuilt-actions/import) can be added to the header of a relation manager to import records. In this case, you probably want to tell the importer which owner these new records belong to. You can use [import options](../../actions/prebuilt-actions/import#using-import-options) to pass through the ID of the owner record:
+
+```php
+ImportAction::make()
+    ->importer(ProductImporter::class)
+    ->options(['categoryId' => $this->getOwnerRecord()->getKey()])
+```
+
+Now, in the importer class, you can associate the owner in a one-to-many relationship with the imported record:
+
+```php
+public function resolveRecord(): ?Product
+{
+    $product = Product::firstOrNew([
+        'sku' => $this->data['sku'],
+    ]);
+    
+    $product->category()->associate($this->options['categoryId']);
+    
+    return $product;
+}
+```
+
+Alternatively, you can attach the record in a many-to-many relationship using the `afterSave()` hook of the importer:
+
+```php
+protected function afterSave(): void
+{
+    $this->record->categories()->syncWithoutDetaching([$this->options['categoryId']]);
+}
+```
 
 ## Accessing the relationship's owner record
 
-Relation managers are Livewire components. When they are first loaded, the owner record (the Eloquent record which serves as a parent - the main resource model) is mounted in a public `$ownerRecord` property. Thus, you may access the owner record using:
+Relation managers are Livewire components. When they are first loaded, the owner record (the Eloquent record which serves as a parent - the main resource model) is saved into a property. You can read this property using:
 
 ```php
-$this->ownerRecord
+$this->getOwnerRecord()
 ```
 
-However, in you're inside a `static` method like `form()` or `table()`, `$this` isn't accessible. So, you may [use a callback](../../forms/advanced#form-component-utility-injection) to access the `$livewire` instance:
+However, if you're inside a `static` method like `form()` or `table()`, `$this` isn't accessible. So, you may [use a callback](../../forms/advanced#form-component-utility-injection) to access the `$livewire` instance:
 
 ```php
 use Filament\Forms;
@@ -514,7 +608,7 @@ public function form(Form $form): Form
         ->schema([
             Forms\Components\Select::make('store_id')
                 ->options(function (RelationManager $livewire): array {
-                    return $livewire->ownerRecord->stores()
+                    return $livewire->getOwnerRecord()->stores()
                         ->pluck('name', 'id')
                         ->toArray();
                 }),
@@ -569,6 +663,93 @@ public function hasCombinedRelationManagerTabsWithContent(): bool
 {
     return true;
 }
+```
+
+## Adding badges to relation manager tabs
+
+You can add a badge to a relation manager tab by setting the `$badge` property:
+
+```php
+protected static ?string $badge = 'new';
+```
+
+Alternatively, you can override the `getBadge()` method:
+
+```php
+use Illuminate\Database\Eloquent\Model;
+
+public static function getBadge(Model $ownerRecord, string $pageClass): ?string
+{
+    return static::$badge;
+}
+```
+
+Or, if you are using a [relation group](#grouping-relation-managers), you can use the `badge()` method:
+
+```php
+use Filament\Resources\RelationManagers\RelationGroup;
+
+RelationGroup::make('Contacts', [
+    // ...
+])->badge('new');
+```
+
+### Changing the color of relation manager tab badges
+
+If a badge value is defined, it will display using the primary color by default. To style the badge contextually, set the `$badgeColor` to either `danger`, `gray`, `info`, `primary`, `success` or `warning`:
+
+```php
+protected static ?string $badgeColor = 'danger';
+```
+
+Alternatively, you can override the `getBadgeColor()` method:
+
+```php
+use Illuminate\Database\Eloquent\Model;
+
+public static function getBadgeColor(Model $ownerRecord, string $pageClass): ?string
+{
+    return 'danger';
+}
+```
+
+Or, if you are using a [relation group](#grouping-relation-managers), you can use the `badgeColor()` method:
+
+```php
+use Filament\Resources\RelationManagers\RelationGroup;
+
+RelationGroup::make('Contacts', [
+    // ...
+])->badgeColor('danger');
+```
+
+### Adding a tooltip to relation manager tab badges
+
+If a badge value is defined, you can add a tooltip to it by setting the `$badgeTooltip` property:
+
+```php
+protected static ?string $badgeTooltip = 'There are new posts';
+```
+
+Alternatively, you can override the `getBadgeTooltip()` method:
+
+```php
+use Illuminate\Database\Eloquent\Model;
+
+public static function getBadgeTooltip(Model $ownerRecord, string $pageClass): ?string
+{
+    return 'There are new posts';
+}
+```
+
+Or, if you are using a [relation group](#grouping-relation-managers), you can use the `badgeTooltip()` method:
+
+```php
+use Filament\Resources\RelationManagers\RelationGroup;
+
+RelationGroup::make('Contacts', [
+    // ...
+])->badgeTooltip('There are new posts');
 ```
 
 ## Sharing a resource's form and table with a relation manager
@@ -679,6 +860,40 @@ public function table(Table $table): Table
 }
 ```
 
+## Customizing the relation manager title
+
+To set the title of the relation manager, you can use the `$title` property on the relation manager class:
+
+```php
+protected static ?string $title = 'Posts';
+```
+
+To set the title of the relation manager dynamically, you can override the `getTitle()` method on the relation manager class:
+
+```php
+use Illuminate\Database\Eloquent\Model;
+
+public static function getTitle(Model $ownerRecord, string $pageClass): string
+{
+    return __('relation-managers.posts.title');
+}
+```
+
+The title will be reflected in the [heading of the table](../../tables/advanced#customizing-the-table-header), as well as the relation manager tab if there is more than one. If you want to customize the table heading independently, you can still use the `$table->heading()` method:
+
+```php
+use Filament\Tables;
+
+public function table(Table $table): Table
+{
+    return $table
+        ->heading('Posts')
+        ->columns([
+            // ...
+        ]);
+}
+```
+
 ## Customizing the relation manager record title
 
 The relation manager uses the concept of a "record title attribute" to determine which attribute of the related model should be used to identify it. When creating a relation manager, this attribute is passed as the third argument to the `make:filament-relation-manager` command:
@@ -720,14 +935,53 @@ AttachAction::make()
     ->recordSelectSearchColumns(['title', 'id'])
 ```
 
-## Read-only mode
+## Relation pages
 
-Relation managers are usually displayed on either the Edit or View page of a resource. On the View page, Filament will automatically hide all actions that modify the relationship, such as create, edit and delete. However, you can disable this behaviour, by overriding the `isReadOnly()` method on the relation manager class to return `false` all the time:
+Using a `ManageRelatedRecords` page is an alternative to using a relation manager, if you want to keep the functionality of managing a relationship separate from editing or viewing the owner record.
+
+This feature is ideal if you are using [resource sub-navigation](getting-started#resource-sub-navigation), as you are easily able to switch between the View or Edit page and the relation page.
+
+To create a relation page, you should use the `make:filament-page` command:
+
+```bash
+php artisan make:filament-page ManageCustomerAddresses --resource=CustomerResource --type=ManageRelatedRecords
+```
+
+When you run this command, you will be asked a series of questions to customize the page, for example, the name of the relationship and its title attribute.
+
+You must register this new page in your resource's `getPages()` method:
 
 ```php
-public function isReadOnly(): bool
+public static function getPages(): array
 {
-    return false;
+    return [
+        'index' => Pages\ListCustomers::route('/'),
+        'create' => Pages\CreateCustomer::route('/create'),
+        'view' => Pages\ViewCustomer::route('/{record}'),
+        'edit' => Pages\EditCustomer::route('/{record}/edit'),
+        'addresses' => Pages\ManageCustomerAddresses::route('/{record}/addresses'),
+    ];
+}
+```
+
+> When using a relation page, you do not need to generate a relation manager with `make:filament-relation-manager`, and you do not need to register it in the `getRelations()` method of the resource.
+
+Now, you can customize the page in exactly the same way as a relation manager, with the same `table()` and `form()`.
+
+### Adding relation pages to resource sub-navigation
+
+If you're using [resource sub-navigation](getting-started#resource-sub-navigation), you can register this page as normal in `getRecordSubNavigation()` of the resource:
+
+```php
+use App\Filament\Resources\CustomerResource\Pages;
+use Filament\Resources\Pages\Page;
+
+public static function getRecordSubNavigation(Page $page): array
+{
+    return $page->generateNavigationItems([
+        // ...
+        Pages\ManageCustomerAddresses::class,
+    ]);
 }
 ```
 
@@ -762,3 +1016,13 @@ class CommentsRelationManager extends RelationManager
 ```
 
 Now, you can access the `status` in the relation manager class using `$this->status`.
+
+## Disabling lazy loading
+
+By default, relation managers are lazy-loaded. This means that they will only be loaded when they are visible on the page.
+
+To disable this behavior, you may override the `$isLazy` property on the relation manager class:
+
+```php
+protected static bool $isLazy = false;
+```

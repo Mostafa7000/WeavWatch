@@ -15,7 +15,7 @@ protected function mutateFormDataBeforeFill(array $data): array
 }
 ```
 
-Alternatively, if you're editing records in a modal action, check out the [actions documentation](../../actions/prebuilt-actions/edit#customizing-data-before-filling-the-form).
+Alternatively, if you're editing records in a modal action, check out the [Actions documentation](../../actions/prebuilt-actions/edit#customizing-data-before-filling-the-form).
 
 ## Customizing data before saving
 
@@ -30,7 +30,7 @@ protected function mutateFormDataBeforeSave(array $data): array
 }
 ```
 
-Alternatively, if you're editing records in a modal action, check out the [actions documentation](../../actions/prebuilt-actions/edit#customizing-data-before-saving).
+Alternatively, if you're editing records in a modal action, check out the [Actions documentation](../../actions/prebuilt-actions/edit#customizing-data-before-saving).
 
 ## Customizing the saving process
 
@@ -47,7 +47,7 @@ protected function handleRecordUpdate(Model $record, array $data): Model
 }
 ```
 
-Alternatively, if you're editing records in a modal action, check out the [actions documentation](../../actions/prebuilt-actions/edit#customizing-the-saving-process).
+Alternatively, if you're editing records in a modal action, check out the [Actions documentation](../../actions/prebuilt-actions/edit#customizing-the-saving-process).
 
 ## Customizing redirects
 
@@ -95,7 +95,7 @@ protected function getSavedNotificationTitle(): ?string
 }
 ```
 
-Alternatively, if you're editing records in a modal action, check out the [actions documentation](../../actions/prebuilt-actions/edit#customizing-the-save-notification).
+Alternatively, if you're editing records in a modal action, check out the [Actions documentation](../../actions/prebuilt-actions/edit#customizing-the-save-notification).
 
 You may customize the entire notification by overriding the `getSavedNotification()` method on the edit page class:
 
@@ -176,7 +176,38 @@ class EditUser extends EditRecord
 }
 ```
 
-Alternatively, if you're editing records in a modal action, check out the [actions documentation](../../actions/prebuilt-actions/edit#lifecycle-hooks).
+Alternatively, if you're editing records in a modal action, check out the [Actions documentation](../../actions/prebuilt-actions/edit#lifecycle-hooks).
+
+## Saving a part of the form independently
+
+You may want to allow the user to save a part of the form independently of the rest of the form. One way to do this is with a [section action in the header or footer](../../forms/layout/section#adding-actions-to-the-sections-header-or-footer). From the `action()` method, you can call `saveFormComponentOnly()`, passing in the `Section` component that you want to save:
+
+```php
+use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\Section;
+use Filament\Notifications\Notification;
+use Filament\Resources\Pages\EditRecord;
+
+Section::make('Rate limiting')
+    ->schema([
+        // ...
+    ])
+    ->footerActions([
+        fn (string $operation): Action => Action::make('save')
+            ->action(function (Section $component, EditRecord $livewire) {
+                $livewire->saveFormComponentOnly($component);
+                
+                Notification::make()
+                    ->title('Rate limiting saved')
+                    ->body('The rate limiting settings have been saved successfully.')
+                    ->success()
+                    ->send();
+            })
+            ->visible($operation === 'edit'),
+    ])
+```
+
+The `$operation` helper is available, to ensure that the action is only visible when the form is being edited.
 
 ## Halting the saving process
 
@@ -206,7 +237,7 @@ protected function beforeSave(): void
 }
 ```
 
-Alternatively, if you're editing records in a modal action, check out the [actions documentation](../../actions/prebuilt-actions/edit#halting-the-saving-process).
+Alternatively, if you're editing records in a modal action, check out the [Actions documentation](../../actions/prebuilt-actions/edit#halting-the-saving-process).
 
 ## Authorization
 
@@ -272,6 +303,62 @@ class EditUser extends EditRecord
 
 To view the entire actions API, please visit the [pages section](../pages#adding-actions-to-pages).
 
+## Creating another Edit page
+
+One Edit page may not be enough space to allow users to navigate many form fields. You can create as many Edit pages for a resource as you want. This is especially useful if you are using [resource sub-navigation](getting-started#resource-sub-navigation), as you are then easily able to switch between the different Edit pages.
+
+To create an Edit page, you should use the `make:filament-page` command:
+
+```bash
+php artisan make:filament-page EditCustomerContact --resource=CustomerResource --type=EditRecord
+```
+
+You must register this new page in your resource's `getPages()` method:
+
+```php
+public static function getPages(): array
+{
+    return [
+        'index' => Pages\ListCustomers::route('/'),
+        'create' => Pages\CreateCustomer::route('/create'),
+        'view' => Pages\ViewCustomer::route('/{record}'),
+        'edit' => Pages\EditCustomer::route('/{record}/edit'),
+        'edit-contact' => Pages\EditCustomerContact::route('/{record}/edit/contact'),
+    ];
+}
+```
+
+Now, you can define the `form()` for this page, which can contain other fields that are not present on the main Edit page:
+
+```php
+use Filament\Forms\Form;
+
+public function form(Form $form): Form
+{
+    return $form
+        ->schema([
+            // ...
+        ]);
+}
+```
+
+## Adding edit pages to resource sub-navigation
+
+If you're using [resource sub-navigation](getting-started#resource-sub-navigation), you can register this page as normal in `getRecordSubNavigation()` of the resource:
+
+```php
+use App\Filament\Resources\CustomerResource\Pages;
+use Filament\Resources\Pages\Page;
+
+public static function getRecordSubNavigation(Page $page): array
+{
+    return $page->generateNavigationItems([
+        // ...
+        Pages\EditCustomerContact::class,
+    ]);
+}
+```
+
 ## Custom views
 
 For further customization opportunities, you can override the static `$view` property on the page class to a custom view in your app:
@@ -282,7 +369,7 @@ protected static string $view = 'filament.resources.users.pages.edit-user';
 
 This assumes that you have created a view at `resources/views/filament/resources/users/pages/edit-user.blade.php`.
 
-Here's a very simple example of what that view might contain:
+Here's a basic example of what that view might contain:
 
 ```blade
 <x-filament-panels::page>
@@ -297,7 +384,7 @@ Here's a very simple example of what that view might contain:
 
     @if (count($relationManagers = $this->getRelationManagers()))
         <x-filament-panels::resources.relation-managers
-            :active-manager="$activeRelationManager"
+            :active-manager="$this->activeRelationManager"
             :managers="$relationManagers"
             :owner-record="$record"
             :page-class="static::class"

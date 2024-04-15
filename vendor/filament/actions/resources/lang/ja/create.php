@@ -8,7 +8,7 @@ return [
 
         'modal' => [
 
-            'heading' => ':label作成',
+            'heading' => ':label 作成',
 
             'actions' => [
 

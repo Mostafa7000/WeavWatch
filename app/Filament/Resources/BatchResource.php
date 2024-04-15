@@ -11,19 +11,24 @@ use App\Filament\Resources\BatchResource\RelationManagers\NeedleDefectsRelationM
 use App\Filament\Resources\BatchResource\RelationManagers\OperationDefectsRelationManager;
 use App\Filament\Resources\BatchResource\RelationManagers\PackagingDefectsRelationManager;
 use App\Filament\Resources\BatchResource\RelationManagers\PiecesRelationManager;
-use App\Filament\Resources\BatchResource\RelationManagers\PreparationDefectsRelationManager;
+use App\Filament\Resources\BatchResource\RelationManagers\PrintDefectsRelationManager;
 use App\Filament\Resources\BatchResource\Widgets\ClothDefectsReport;
 use App\Models\Batch;
+use App\Models\Customer;
 use App\Models\CuttingDefect;
-use App\Models\PreparationDefect;
+use App\Models\PrintDefect;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\Concerns\HasRelationManagers;
 use Filament\Resources\RelationManagers\RelationGroup;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class BatchResource extends Resource
 {
@@ -39,30 +44,50 @@ class BatchResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('بيانات الطلبية')
+                Forms\Components\Section::make('رقم الطلبية')
                     ->schema([
-                        Forms\Components\TextInput::make('message_number')
-                            ->label('رقم الرسالة'),
-                        Forms\Components\TextInput::make('operation_number')
-                            ->label('أمر التشغيل'),
-                        Forms\Components\TextInput::make('model_number')
-                            ->label('اسم الموديل')
+                        Forms\Components\Select::make('customer_id')
+                            ->relationship('customer')
+                            ->label('رقم العميل')
+                            ->required()
+                            ->getOptionLabelFromRecordUsing(fn(Customer $customer
+                            ) => $customer->code.'- '.$customer->name),
+                        Forms\Components\TextInput::make('product_number')
+                            ->label('رقم المنتج')
+                            ->required(),
+                        Forms\Components\TextInput::make('batch_number')
+                            ->label('رقم الطلبية')
+                            ->required()
                     ])->columns(3),
-                Forms\Components\Section::make('الكميات المطلوبة')
+                Forms\Components\Section::make('رقم التشغيل')
                     ->schema([
-                        Forms\Components\TextInput::make('required_quantity')
-                            ->numeric()
+                        Forms\Components\TextInput::make('location')
+                            ->label('مكان الإنتاج')
                             ->required()
-                            ->label('الكمية المطلوبة'),
-                        Forms\Components\Select::make('sizes')
-                            ->relationship('sizes', 'title', function ($query) {
-                                $query->orderBy('id');
-                            })
-                            ->label('المقاسات')
-                            ->multiple()
-                            ->preload()
-                            ->required()
-        ]),
+                    ])->columns(1),
+                Forms\Components\Section::make('الكمية الإجمالية')
+                    ->schema([
+                        Repeater::make('sizeQuantity')
+                            ->relationship()
+                            ->schema([
+                                Forms\Components\Select::make('size_id')
+                                    ->relationship('size', 'title', function ($query) {
+                                        $query->orderBy('id');
+                                    })
+                                    ->label('المقاس')
+                                    ->preload()
+                                    ->required()
+                                    ->disableOptionsWhenSelectedInSiblingRepeaterItems(),
+                                Forms\Components\TextInput::make('quantity')
+                                    ->required()
+                                    ->label('الكمية')
+                            ])
+                            ->defaultItems(1)
+                            ->label('')
+                            ->columns(2)
+                            ->addActionLabel('إضافة')
+                        ,
+                    ]),
             ]);
     }
 
@@ -70,20 +95,26 @@ class BatchResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id'),
-                Tables\Columns\TextColumn::make('message_number')
-                    ->label('رقم الرسالة'),
-                Tables\Columns\TextColumn::make('operation_number')
-                    ->label('أمر التشغيل'),
-                Tables\Columns\TextColumn::make('model_number')
-                    ->label('اسم الموديل')
+                Tables\Columns\TextColumn::make('customer.code')
+                    ->label('رقم العميل'),
+                Tables\Columns\TextColumn::make('product_number')
+                    ->label('رقم المنتج'),
+                Tables\Columns\TextColumn::make('batch_number')
+                    ->label('رقم الطلبية'),
+                Tables\Columns\TextColumn::make('location')
+                    ->label('مكان الإنتاج')
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->label('عرض وتعديل'),
-                Tables\Actions\ViewAction::make()->label('التقارير')
+                Tables\Actions\ViewAction::make()->label('التقارير'),
+                Tables\Actions\Action::make('pdf')
+                    ->label('تحميل')
+                    ->color('success')
+                    ->icon('heroicon-s-arrow-down-on-square')
+                    ->url(fn(Batch $record) => route('pdf', $record), true)
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -101,9 +132,9 @@ class BatchResource extends Resource
             DressesRelationManager::class,
             PiecesRelationManager::class,
             ClothDefectsRelationManager::class,
-            PreparationDefectsRelationManager::class,
             CuttingDefectsRelationManager::class,
             NeedleDefectsRelationManager::class,
+            PrintDefectsRelationManager::class,
             OperationDefectsRelationManager::class,
             IronDefectsRelationManager::class,
             PackagingDefectsRelationManager::class,

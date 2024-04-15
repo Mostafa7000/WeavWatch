@@ -7,16 +7,18 @@ use Illuminate\Support\Arr;
 
 trait CanPaginateRecords
 {
-    protected int | string | Closure | null $defaultPaginationPageOption = 10;
+    protected int | string | Closure | null $defaultPaginationPageOption = null;
 
     protected bool | Closure $isPaginated = true;
 
-    protected bool | Closure $isPaginatedWhileReordering = true;
+    protected bool | Closure $isPaginatedWhileReordering = false;
 
     /**
      * @var array<int | string> | Closure | null
      */
     protected array | Closure | null $paginationPageOptions = null;
+
+    protected bool | Closure $hasExtremePaginationLinks = false;
 
     public function defaultPaginationPageOption(int | string | Closure | null $option): static
     {
@@ -57,9 +59,28 @@ trait CanPaginateRecords
         return $this;
     }
 
+    public function extremePaginationLinks(bool | Closure $condition = true): static
+    {
+        $this->hasExtremePaginationLinks = $condition;
+
+        return $this;
+    }
+
     public function getDefaultPaginationPageOption(): int | string | null
     {
-        return $this->evaluate($this->defaultPaginationPageOption) ?? Arr::first($this->getPaginationPageOptions());
+        $option = $this->evaluate($this->defaultPaginationPageOption);
+
+        if ($option) {
+            return $option;
+        }
+
+        $options = $this->getPaginationPageOptions();
+
+        if (in_array(10, $options)) {
+            return 10;
+        }
+
+        return Arr::first($options);
     }
 
     /**
@@ -78,5 +99,10 @@ trait CanPaginateRecords
     public function isPaginatedWhileReordering(): bool
     {
         return (bool) $this->evaluate($this->isPaginatedWhileReordering);
+    }
+
+    public function hasExtremePaginationLinks(): bool
+    {
+        return (bool) $this->evaluate($this->hasExtremePaginationLinks);
     }
 }

@@ -6,6 +6,10 @@ return [
 
     'actions' => [
 
+        'billing' => [
+            'label' => 'Abonnement verwalten',
+        ],
+
         'logout' => [
             'label' => 'Abmelden',
         ],
@@ -38,6 +42,10 @@ return [
 
             'light' => [
                 'label' => 'Light Mode einschalten',
+            ],
+
+            'system' => [
+                'label' => 'Systemthema benutzen',
             ],
 
         ],

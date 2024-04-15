@@ -2,16 +2,21 @@
 
 namespace Filament\Widgets;
 
+use Filament\Actions;
 use Filament\Forms;
+use Filament\Infolists;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 
-class TableWidget extends Widget implements Forms\Contracts\HasForms, Tables\Contracts\HasTable
+class TableWidget extends Widget implements Actions\Contracts\HasActions, Forms\Contracts\HasForms, Infolists\Contracts\HasInfolists, Tables\Contracts\HasTable
 {
+    use Actions\Concerns\InteractsWithActions;
     use Forms\Concerns\InteractsWithForms;
+    use Infolists\Concerns\InteractsWithInfolists;
     use Tables\Concerns\InteractsWithTable {
         makeTable as makeBaseTable;
     }
@@ -26,9 +31,9 @@ class TableWidget extends Widget implements Forms\Contracts\HasForms, Tables\Con
      */
     protected static ?string $heading = null;
 
-    protected function paginateTableQuery(Builder $query): Paginator
+    protected function paginateTableQuery(Builder $query): Paginator | CursorPaginator
     {
-        return $query->simplePaginate($this->getTableRecordsPerPage() == 'all' ? $query->count() : $this->getTableRecordsPerPage());
+        return $query->simplePaginate(($this->getTableRecordsPerPage() === 'all') ? $query->count() : $this->getTableRecordsPerPage());
     }
 
     /**

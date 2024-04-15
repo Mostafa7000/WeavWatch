@@ -5,7 +5,7 @@ namespace Filament\Tables\Filters\Concerns;
 use Closure;
 use Filament\Support\Contracts\HasLabel as LabelInterface;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Collection;
+use UnitEnum;
 
 trait HasOptions
 {
@@ -37,25 +37,23 @@ trait HasOptions
     {
         $options = $this->evaluate($this->options);
 
-        $enum = $options;
         if (
-            is_string($enum) &&
-            function_exists('enum_exists') &&
-            enum_exists($enum)
+            is_string($options) &&
+            enum_exists($enum = $options)
         ) {
-            return collect($enum::cases())
-                ->when(
-                    is_a($enum, LabelInterface::class, allow_string: true),
-                    fn (Collection $options): Collection => $options
-                        ->mapWithKeys(fn ($case) => [
-                            ($case?->value ?? $case->name) => $case->getLabel() ?? $case->name,
-                        ]),
-                    fn (Collection $options): Collection => $options
-                        ->mapWithKeys(fn ($case) => [
-                            ($case?->value ?? $case->name) => $case->name,
-                        ]),
-                )
-                ->all();
+            if (is_a($enum, LabelInterface::class, allow_string: true)) {
+                return array_reduce($enum::cases(), function (array $carry, LabelInterface & UnitEnum $case): array {
+                    $carry[$case?->value ?? $case->name] = $case->getLabel() ?? $case->name;
+
+                    return $carry;
+                }, []);
+            }
+
+            return array_reduce($enum::cases(), function (array $carry, UnitEnum $case): array {
+                $carry[$case?->value ?? $case->name] = $case->name;
+
+                return $carry;
+            }, []);
         }
 
         if ($options instanceof Arrayable) {
@@ -84,5 +82,20 @@ trait HasOptions
         $this->getSearchResultsUsing = $callback;
 
         return $this;
+    }
+
+    public function getOptionLabelUsingCallback(): ?Closure
+    {
+        return $this->getOptionLabelUsing;
+    }
+
+    public function getOptionLabelsUsingCallback(): ?Closure
+    {
+        return $this->getOptionLabelsUsing;
+    }
+
+    public function getSearchResultsUsingCallback(): ?Closure
+    {
+        return $this->getSearchResultsUsing;
     }
 }

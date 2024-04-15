@@ -16,17 +16,17 @@ class DressesRelationManager extends RelationManager
 {
     protected static string $relationship = 'dresses';
     protected static ?string $recordTitleAttribute = 'code';
-    protected static ?string $modelLabel = 'فستان';
+    protected static ?string $modelLabel = 'ثوب';
     protected static ?string $pluralModelLabel = self::PLURAL_NAME;
     protected static ?string $title = self::PLURAL_NAME;
-    private const PLURAL_NAME = 'الفساتين';
+    private const PLURAL_NAME = 'الأثواب';
 
     public function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('code')
-                    ->label('الكود')
+                    ->label('كود الثوب')
                     ->required()
                     ->maxLength(255)
                     ->rule(new UniqueCodeInBatch($this->ownerRecord->id)),
@@ -35,7 +35,13 @@ class DressesRelationManager extends RelationManager
                     ->required()
                     ->preload()
                     ->label('اللون'),
-            ]);
+                Forms\Components\TextInput::make('bath_code')
+                    ->label('كود الحوض')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('meters')
+                    ->label('عدد الأمتار')
+                    ->maxLength(255)
+            ])->columns(4);
     }
 
     public function table(Table $table): Table
@@ -46,14 +52,22 @@ class DressesRelationManager extends RelationManager
             )
             ->recordTitleAttribute('code')
             ->columns([
+                Tables\Columns\TextColumn::make('bath_code')
+                    ->sortable()
+                    ->searchable()
+                    ->label('كود الحوض'),
                 Tables\Columns\TextColumn::make('code')
                     ->sortable()
                     ->searchable()
-                    ->label('الكود'),
+                    ->label('كود الثوب'),
                 Tables\Columns\TextColumn::make('color.title')
                     ->sortable()
                     ->searchable()
-                    ->label('اللون')
+                    ->label('اللون'),
+                Tables\Columns\TextColumn::make('meters')
+                    ->sortable()
+                    ->searchable()
+                    ->label('عدد الأمتار')
             ])
             ->filters([
                 //

@@ -11,11 +11,13 @@ use Filament\Support\Concerns\HasIconColor;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Str;
 
-class Section extends Component implements Contracts\CanConcealComponents, Contracts\CanEntangleWithSingularRelationships
+class Section extends Component implements Contracts\CanConcealComponents, Contracts\CanEntangleWithSingularRelationships, Contracts\HasFooterActions, Contracts\HasHeaderActions
 {
     use Concerns\CanBeCollapsed;
     use Concerns\CanBeCompacted;
     use Concerns\EntanglesStateWithSingularRelationship;
+    use Concerns\HasFooterActions;
+    use Concerns\HasHeaderActions;
     use HasDescription;
     use HasExtraAlpineAttributes;
     use HasHeading;
@@ -87,6 +89,11 @@ class Section extends Component implements Contracts\CanConcealComponents, Contr
         }
 
         return $id;
+    }
+
+    public function getKey(): ?string
+    {
+        return parent::getKey() ?? ($this->getActions() ? $this->getId() : null);
     }
 
     public function canConcealComponents(): bool

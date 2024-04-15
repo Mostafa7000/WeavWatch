@@ -7,7 +7,7 @@ use Filament\Notifications\Notification;
 use Filament\Support\Exceptions\Cancel;
 use Filament\Support\Exceptions\Halt;
 
-class MountableAction extends StaticAction implements HasLivewire
+abstract class MountableAction extends StaticAction implements HasLivewire
 {
     use Concerns\BelongsToLivewire;
     use Concerns\CanBeMounted;
@@ -15,6 +15,7 @@ class MountableAction extends StaticAction implements HasLivewire
     use Concerns\CanOpenModal;
     use Concerns\CanRedirect;
     use Concerns\CanRequireConfirmation;
+    use Concerns\CanUseDatabaseTransactions;
     use Concerns\HasForm;
     use Concerns\HasInfolist;
     use Concerns\HasLifecycleHooks;
@@ -39,14 +40,14 @@ class MountableAction extends StaticAction implements HasLivewire
         return $this->evaluate($this->getActionFunction(), $parameters);
     }
 
-    public function cancel(): void
+    public function cancel(bool $shouldRollBackDatabaseTransaction = false): void
     {
-        throw new Cancel();
+        throw (new Cancel())->rollBackDatabaseTransaction($shouldRollBackDatabaseTransaction);
     }
 
-    public function halt(): void
+    public function halt(bool $shouldRollBackDatabaseTransaction = false): void
     {
-        throw new Halt();
+        throw (new Halt())->rollBackDatabaseTransaction($shouldRollBackDatabaseTransaction);
     }
 
     /**

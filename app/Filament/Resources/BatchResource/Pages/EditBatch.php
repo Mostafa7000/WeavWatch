@@ -9,6 +9,7 @@ use Filament\Resources\Pages\EditRecord;
 class EditBatch extends EditRecord
 {
     protected static string $resource = BatchResource::class;
+    protected static ?string $title = 'عرض وتعديل الطلبية';
 
     protected function getHeaderActions(): array
     {

@@ -3,9 +3,11 @@
 namespace Filament\Actions\Concerns;
 
 use Closure;
+use Filament\Actions\Contracts\HasRecord;
 use Filament\Actions\MountableAction;
 use Filament\Actions\StaticAction;
 use Filament\Support\Enums\Alignment;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Support\View\Components\Modal;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View;
@@ -68,9 +70,11 @@ trait CanOpenModal
 
     protected string | Htmlable | Closure | null $modalDescription = null;
 
-    protected string | Closure | null $modalWidth = null;
+    protected MaxWidth | string | Closure | null $modalWidth = null;
 
-    protected bool | Closure | null $isModalHidden = false;
+    protected bool | Closure | null $hasModal = null;
+
+    protected bool | Closure | null $isModalHidden = null;
 
     protected bool | Closure | null $hasModalCloseButton = null;
 
@@ -288,7 +292,7 @@ trait CanOpenModal
         return $this;
     }
 
-    public function modalWidth(string | Closure | null $width = null): static
+    public function modalWidth(MaxWidth | string | Closure | null $width = null): static
     {
         $this->modalWidth = $width;
 
@@ -300,7 +304,14 @@ trait CanOpenModal
         return null;
     }
 
-    public function modalHidden(bool | Closure | null $condition = false): static
+    public function modal(bool | Closure | null $condition = true): static
+    {
+        $this->hasModal = $condition;
+
+        return $this;
+    }
+
+    public function modalHidden(bool | Closure | null $condition = true): static
     {
         $this->isModalHidden = $condition;
 
@@ -401,8 +412,16 @@ trait CanOpenModal
             return $action;
         }
 
-        return $action
-            ->livewire($this->getLivewire());
+        $action->livewire($this->getLivewire());
+
+        if (
+            ($this instanceof HasRecord) &&
+            ($action instanceof HasRecord)
+        ) {
+            $action->record($this->getRecord());
+        }
+
+        return $action;
     }
 
     /**
@@ -475,7 +494,7 @@ trait CanOpenModal
 
     public function getModalAlignment(): Alignment | string
     {
-        return $this->evaluate($this->modalAlignment) ?? (in_array($this->getModalWidth(), ['xs', 'sm']) ? Alignment::Center : Alignment::Start);
+        return $this->evaluate($this->modalAlignment) ?? (in_array($this->getModalWidth(), [MaxWidth::ExtraSmall, MaxWidth::Small, 'xs', 'sm'])) ? Alignment::Center : Alignment::Start;
     }
 
     public function getModalSubmitActionLabel(): string
@@ -498,9 +517,29 @@ trait CanOpenModal
         return $this->evaluate($this->modalContentFooter);
     }
 
+    public function hasModalContent(): bool
+    {
+        return $this->modalContent !== null;
+    }
+
+    public function hasModalContentFooter(): bool
+    {
+        return $this->modalContentFooter !== null;
+    }
+
+    public function getCustomModalHeading(): string | Htmlable | null
+    {
+        return $this->evaluate($this->modalHeading);
+    }
+
     public function getModalHeading(): string | Htmlable
     {
-        return $this->evaluate($this->modalHeading) ?? $this->getLabel();
+        return $this->getCustomModalHeading() ?? $this->getLabel();
+    }
+
+    public function hasCustomModalHeading(): bool
+    {
+        return filled($this->getCustomModalHeading());
     }
 
     public function getModalDescription(): string | Htmlable | null
@@ -508,9 +547,14 @@ trait CanOpenModal
         return $this->evaluate($this->modalDescription);
     }
 
-    public function getModalWidth(): string
+    public function hasModalDescription(): bool
     {
-        return $this->evaluate($this->modalWidth) ?? '4xl';
+        return filled($this->getModalDescription());
+    }
+
+    public function getModalWidth(): MaxWidth | string
+    {
+        return $this->evaluate($this->modalWidth) ?? MaxWidth::FourExtraLarge;
     }
 
     public function isModalFooterSticky(): bool
@@ -528,9 +572,22 @@ trait CanOpenModal
         return (bool) $this->evaluate($this->isModalSlideOver);
     }
 
-    public function isModalHidden(): bool
+    public function shouldOpenModal(?Closure $checkForFormUsing = null): bool
     {
-        return (bool) $this->evaluate($this->isModalHidden);
+        if (is_bool($hasModal = $this->evaluate($this->hasModal))) {
+            return $hasModal;
+        }
+
+        if ($this->evaluate($this->isModalHidden)) {
+            return false;
+        }
+
+        return $this->hasCustomModalHeading() ||
+            $this->hasModalDescription() ||
+            $this->hasModalContent() ||
+            $this->hasModalContentFooter() ||
+            $this->getInfolist() ||
+            (value($checkForFormUsing, $this) ?? false);
     }
 
     public function hasModalCloseButton(): bool

@@ -2,8 +2,16 @@
 title: File upload
 ---
 import AutoScreenshot from "@components/AutoScreenshot.astro"
+import LaracastsBanner from "@components/LaracastsBanner.astro"
 
 ## Overview
+
+<LaracastsBanner
+    title="File Uploads"
+    description="Watch the Rapid Laravel Development with Filament series on Laracasts - it will teach you the basics of adding file upload fields to Filament forms."
+    url="https://laracasts.com/series/rapid-laravel-development-with-filament/episodes/8"
+    series="rapid-laravel-development"
+/>
 
 The file upload field is based on [Filepond](https://pqina.nl/filepond).
 
@@ -15,7 +23,7 @@ FileUpload::make('attachment')
 
 <AutoScreenshot name="forms/fields/file-upload/simple" alt="File upload" version="3.x" />
 
-> Filament also supports [`spatie/laravel-medialibrary`](https://github.com/spatie/laravel-medialibrary). See our [plugin documentation](/plugins/spatie-media-library) for more information.
+> Filament also supports [`spatie/laravel-medialibrary`](https://github.com/spatie/laravel-medialibrary). See our [plugin documentation](/plugins/filament-spatie-media-library) for more information.
 
 ## Configuring the storage disk and directory
 
@@ -103,7 +111,22 @@ FileUpload::make('attachments')
     ->storeFileNamesIn('attachment_file_names')
 ```
 
-`attachment_file_names` will now store the original file name/s of your uploaded files, so you can save them to the database when the form is submitted. If you're uploading `multiple()` files, make sure that you add an `array` [cast](https://laravel.com/docs/eloquent-mutators#array-and-json-casting) to this Eloquent model property too.
+`attachment_file_names` will now store the original file names of your uploaded files, so you can save them to the database when the form is submitted. If you're uploading `multiple()` files, make sure that you add an `array` [cast](https://laravel.com/docs/eloquent-mutators#array-and-json-casting) to this Eloquent model property too.
+
+## Avatar mode
+
+You can enable avatar mode for your file upload field using the `avatar()` method:
+
+```php
+use Filament\Forms\Components\FileUpload;
+
+FileUpload::make('avatar')
+    ->avatar()
+```
+
+This will only allow images to be uploaded, and when they are, it will display them in a compact circle layout that is perfect for avatars.
+
+This feature pairs well with the [circle cropper](#allowing-users-to-crop-images-as-a-circle).
 
 ## Image editor
 
@@ -191,6 +214,22 @@ FileUpload::make('image')
     ->imageEditorViewportWidth('1920')
     ->imageEditorViewportHeight('1080')
 ```
+
+### Allowing users to crop images as a circle
+
+You can allow users to crop images as a circle using the `circleCropper()` method:
+
+```php
+use Filament\Forms\Components\FileUpload;
+
+FileUpload::make('image')
+    ->image()
+    ->avatar()
+    ->imageEditor()
+    ->circleCropper()
+```
+
+This is perfectly accompanied by the [`avatar()` method](#avatar-mode), which renders the images in a compact circle layout.
 
 ### Cropping and resizing images without the editor
 
@@ -305,7 +344,9 @@ FileUpload::make('attachment')
     ->storeFiles(false)
 ```
 
-When the form is submitted a temporary file upload object will be returned instead of a permanently stored file path. This is perfect for temporary files like imported CSVs.
+When the form is submitted, a temporary file upload object will be returned instead of a permanently stored file path. This is perfect for temporary files like imported CSVs.
+
+Please be aware that images, video and audio files will not show the stored file name in the form's preview, unless you use [`previewable(false)`](#previewing-files). This is due to a limitation with the FilePond preview plugin.
 
 ## Orienting images from their EXIF data
 
@@ -316,6 +357,39 @@ use Filament\Forms\Components\FileUpload;
 
 FileUpload::make('attachment')
     ->orientImagesFromExif(false)
+```
+
+## Hiding the remove file button
+
+It is also possible to hide the remove uploaded file button by using `deletable(false)`:
+
+```php
+use Filament\Forms\Components\FileUpload;
+
+FileUpload::make('attachment')
+    ->deletable(false)
+```
+
+## Prevent file information fetching
+
+While the form is loaded, it will automatically detect whether the files exist, what size they are, and what type of files they are. This is all done on the backend. When using remote storage with many files, this can be time-consuming. You can use the `fetchFileInformation(false)` method to disable this feature:
+
+```php
+use Filament\Forms\Components\FileUpload;
+
+FileUpload::make('attachment')
+    ->fetchFileInformation(false)
+```
+
+## Customizing the uploading message
+
+You may customize the uploading message that is displayed in the form's submit button using the `uploadingMessage()` method:
+
+```php
+use Filament\Forms\Components\FileUpload;
+
+FileUpload::make('attachment')
+    ->uploadingMessage('Uploading attachment...')
 ```
 
 ## File upload validation
@@ -346,7 +420,7 @@ FileUpload::make('image')
 
 ### File size validation
 
-You may also restrict the size of uploaded files, in kilobytes:
+You may also restrict the size of uploaded files in kilobytes:
 
 ```php
 use Filament\Forms\Components\FileUpload;

@@ -15,13 +15,22 @@ use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 
 trait HasAuth
 {
+    protected string | Closure $emailVerifiedMiddlewareName = 'verified';
+
     /**
      * @var string | Closure | array<class-string, string> | null
      */
     protected string | Closure | array | null $emailVerificationRouteAction = null;
+
+    protected string $emailVerificationPromptRouteSlug = 'prompt';
+
+    protected string $emailVerificationRouteSlug = 'verify';
+
+    protected string $emailVerificationRoutePrefix = 'email-verification';
 
     protected bool $isEmailVerificationRequired = false;
 
@@ -30,26 +39,40 @@ trait HasAuth
      */
     protected string | Closure | array | null $loginRouteAction = null;
 
+    protected string $loginRouteSlug = 'login';
+
     /**
      * @var string | Closure | array<class-string, string> | null
      */
     protected string | Closure | array | null $registrationRouteAction = null;
+
+    protected string $registrationRouteSlug = 'register';
 
     /**
      * @var string | Closure | array<class-string, string> | null
      */
     protected string | Closure | array | null $requestPasswordResetRouteAction = null;
 
+    protected string $requestPasswordResetRouteSlug = 'request';
+
     /**
      * @var string | Closure | array<class-string, string> | null
      */
     protected string | Closure | array | null $resetPasswordRouteAction = null;
 
+    protected string $resetPasswordRouteSlug = 'reset';
+
+    protected string $resetPasswordRoutePrefix = 'password-reset';
+
     protected ?string $profilePage = null;
+
+    protected bool $isProfilePageSimple = true;
 
     protected string $authGuard = 'web';
 
     protected ?string $authPasswordBroker = null;
+
+    protected bool | Closure $arePasswordsRevealable = true;
 
     /**
      * @param  string | Closure | array<class-string, string> | null  $promptAction
@@ -58,6 +81,34 @@ trait HasAuth
     {
         $this->emailVerificationRouteAction = $promptAction;
         $this->requiresEmailVerification($isRequired);
+
+        return $this;
+    }
+
+    public function emailVerificationPromptRouteSlug(string $slug): static
+    {
+        $this->emailVerificationPromptRouteSlug = $slug;
+
+        return $this;
+    }
+
+    public function emailVerificationRouteSlug(string $slug): static
+    {
+        $this->emailVerificationRouteSlug = $slug;
+
+        return $this;
+    }
+
+    public function emailVerificationRoutePrefix(string $prefix): static
+    {
+        $this->emailVerificationRoutePrefix = $prefix;
+
+        return $this;
+    }
+
+    public function emailVerifiedMiddlewareName(string | Closure $name): static
+    {
+        $this->emailVerifiedMiddlewareName = $name;
 
         return $this;
     }
@@ -79,6 +130,13 @@ trait HasAuth
         return $this;
     }
 
+    public function loginRouteSlug(string $slug): static
+    {
+        $this->loginRouteSlug = $slug;
+
+        return $this;
+    }
+
     /**
      * @param  string | Closure | array<class-string, string> | null  $requestAction
      * @param  string | Closure | array<class-string, string> | null  $resetAction
@@ -87,6 +145,27 @@ trait HasAuth
     {
         $this->requestPasswordResetRouteAction = $requestAction;
         $this->resetPasswordRouteAction = $resetAction;
+
+        return $this;
+    }
+
+    public function passwordResetRequestRouteSlug(string $slug): static
+    {
+        $this->requestPasswordResetRouteSlug = $slug;
+
+        return $this;
+    }
+
+    public function passwordResetRouteSlug(string $slug): static
+    {
+        $this->resetPasswordRouteSlug = $slug;
+
+        return $this;
+    }
+
+    public function passwordResetRoutePrefix(string $prefix): static
+    {
+        $this->resetPasswordRoutePrefix = $prefix;
 
         return $this;
     }
@@ -101,9 +180,24 @@ trait HasAuth
         return $this;
     }
 
-    public function profile(?string $page = EditProfile::class): static
+    public function registrationRouteSlug(string $slug): static
+    {
+        $this->registrationRouteSlug = $slug;
+
+        return $this;
+    }
+
+    public function profile(?string $page = EditProfile::class, bool $isSimple = true): static
     {
         $this->profilePage = $page;
+        $this->simpleProfilePage($isSimple);
+
+        return $this;
+    }
+
+    public function simpleProfilePage(bool $condition = true): static
+    {
+        $this->isProfilePageSimple = $condition;
 
         return $this;
     }
@@ -142,6 +236,11 @@ trait HasAuth
         return $this->profilePage;
     }
 
+    public function isProfilePageSimple(): bool
+    {
+        return $this->isProfilePageSimple;
+    }
+
     /**
      * @param  array<mixed>  $parameters
      */
@@ -156,12 +255,12 @@ trait HasAuth
 
     public function getEmailVerificationPromptRouteName(): string
     {
-        return "filament.{$this->getId()}.auth.email-verification.prompt";
+        return $this->generateRouteName('auth.email-verification.prompt');
     }
 
     public function getEmailVerifiedMiddleware(): string
     {
-        return "verified:{$this->getEmailVerificationPromptRouteName()}";
+        return "{$this->getEmailVerifiedMiddlewareName()}:{$this->getEmailVerificationPromptRouteName()}";
     }
 
     /**
@@ -173,7 +272,7 @@ trait HasAuth
             return null;
         }
 
-        return route("filament.{$this->getId()}.auth.login", $parameters);
+        return $this->route('auth.login', $parameters);
     }
 
     /**
@@ -185,7 +284,7 @@ trait HasAuth
             return null;
         }
 
-        return route("filament.{$this->getId()}.auth.register", $parameters);
+        return $this->route('auth.register', $parameters);
     }
 
     /**
@@ -197,7 +296,7 @@ trait HasAuth
             return null;
         }
 
-        return route("filament.{$this->getId()}.auth.password-reset.request", $parameters);
+        return $this->route('auth.password-reset.request', $parameters);
     }
 
     /**
@@ -206,7 +305,7 @@ trait HasAuth
     public function getVerifyEmailUrl(MustVerifyEmail | Model | Authenticatable $user, array $parameters = []): string
     {
         return URL::temporarySignedRoute(
-            "filament.{$this->getId()}.auth.email-verification.verify",
+            $this->generateRouteName('auth.email-verification.verify'),
             now()->addMinutes(config('auth.verification.expire', 60)),
             [
                 'id' => $user->getKey(),
@@ -222,7 +321,7 @@ trait HasAuth
     public function getResetPasswordUrl(string $token, CanResetPassword | Model | Authenticatable $user, array $parameters = []): string
     {
         return URL::signedRoute(
-            "filament.{$this->getId()}.auth.password-reset.reset",
+            $this->generateRouteName('auth.password-reset.reset'),
             [
                 'email' => $user->getEmailForPasswordReset(),
                 'token' => $token,
@@ -240,7 +339,7 @@ trait HasAuth
             return null;
         }
 
-        return route("filament.{$this->getId()}.auth.profile", $parameters);
+        return $this->route('auth.profile', $parameters);
     }
 
     /**
@@ -248,7 +347,12 @@ trait HasAuth
      */
     public function getLogoutUrl(array $parameters = []): string
     {
-        return route("filament.{$this->getId()}.auth.logout", $parameters);
+        return $this->route('auth.logout', $parameters);
+    }
+
+    public function getEmailVerifiedMiddlewareName(): string
+    {
+        return $this->evaluate($this->emailVerifiedMiddlewareName);
     }
 
     /**
@@ -259,12 +363,32 @@ trait HasAuth
         return $this->emailVerificationRouteAction;
     }
 
+    public function getEmailVerificationPromptRouteSlug(): string
+    {
+        return Str::start($this->emailVerificationPromptRouteSlug, '/');
+    }
+
+    public function getEmailVerificationRouteSlug(string $suffix): string
+    {
+        return Str::start($this->emailVerificationRouteSlug, '/') . $suffix;
+    }
+
+    public function getEmailVerificationRoutePrefix(): string
+    {
+        return Str::start($this->emailVerificationRoutePrefix, '/');
+    }
+
     /**
      * @return string | Closure | array<class-string, string> | null
      */
     public function getLoginRouteAction(): string | Closure | array | null
     {
         return $this->loginRouteAction;
+    }
+
+    public function getLoginRouteSlug(): string
+    {
+        return Str::start($this->loginRouteSlug, '/');
     }
 
     /**
@@ -275,6 +399,11 @@ trait HasAuth
         return $this->registrationRouteAction;
     }
 
+    public function getRegistrationRouteSlug(): string
+    {
+        return Str::start($this->registrationRouteSlug, '/');
+    }
+
     /**
      * @return string | Closure | array<class-string, string> | null
      */
@@ -283,12 +412,27 @@ trait HasAuth
         return $this->requestPasswordResetRouteAction;
     }
 
+    public function getRequestPasswordResetRouteSlug(): string
+    {
+        return Str::start($this->requestPasswordResetRouteSlug, '/');
+    }
+
     /**
      * @return string | Closure | array<class-string, string> | null
      */
     public function getResetPasswordRouteAction(): string | Closure | array | null
     {
         return $this->resetPasswordRouteAction;
+    }
+
+    public function getResetPasswordRouteSlug(): string
+    {
+        return Str::start($this->resetPasswordRouteSlug, '/');
+    }
+
+    public function getResetPasswordRoutePrefix(): string
+    {
+        return Str::start($this->resetPasswordRoutePrefix, '/');
     }
 
     public function hasEmailVerification(): bool
@@ -319,5 +463,17 @@ trait HasAuth
     public function getAuthPasswordBroker(): ?string
     {
         return $this->authPasswordBroker;
+    }
+
+    public function revealablePasswords(bool | Closure $condition = true): static
+    {
+        $this->arePasswordsRevealable = $condition;
+
+        return $this;
+    }
+
+    public function arePasswordsRevealable(): bool
+    {
+        return (bool) $this->evaluate($this->arePasswordsRevealable);
     }
 }

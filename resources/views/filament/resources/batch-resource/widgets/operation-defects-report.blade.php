@@ -2,8 +2,8 @@
     <x-filament::section>
         <link rel="stylesheet" href="{{asset('css/filament/widgets/table.css')}}">
         @php
-            $minHour = $this->getHour(0);
-            $maxHour = $this->getHour(1);
+            $minDress = $this->getDress(0);
+            $maxDress = $this->getDress(1);
 
             $minDefect = $this->getDefect(0);
             $maxDefect = $this->getDefect(1);
@@ -16,82 +16,84 @@
                 <h2 class="text-center font-light text-xl mb-2" style="color: #c44e47">{{$date}}</h2>
             @endif
             <div class="scrollable-table">
-                @if(!empty($minHour))
-                    <table dir="rtl" class="report">
+                @if(!empty($minDress))
+                    <table dir="rtl" class="report mx-auto">
                         <thead>
                         <tr>
                             <th>المقاس</th>
-                            <th>الثوب</th>
-                            <th>أقل عيب</th>
+                            <th>أفضل لون</th>
+                            <th>أسوأ لون</th>
                             <th>أعلى عيب</th>
-                            <th>أفضل ساعة</th>
-                            <th>أسوأ ساعة</th>
+                            <th>أقل عيب</th>
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($minDefect as $size => $data)
-                            @foreach($data as $code => $data2)
-                                <tr>
-                                    <td>{{ $size }}</td>
-                                    <td>{{$code}} - {{$data2['color']}}</td>
-                                    <td>
+                        @foreach($minDress as $size => $data)
+                            <tr>
+                                <td>{{ $size }}</td>
+                                <td>
+                                    @php
+                                        $data = $minDress[$size];
+                                    @endphp
+                                    عدد العيوب: {{$data['value']}}
+                                    <br>
+                                    اللون:
+                                    @for($i=0; $i<count($data['dresses']);$i++)
                                         @php
-                                            $data = $minDefect[$size][$code];
+                                            $dress = $data['dresses'][$i];
                                         @endphp
-                                        عدد المرات: {{$data['sum']}}
-                                        <br>
-                                        العيب:
-                                        @for($i=0; $i<count($data['defects']); $i++)
-                                            {{$data['defects'][$i]}}
-                                            @if($i != count($data['defects'])-1)
-                                                ,
-                                            @endif
-                                        @endfor
-                                    </td>
-                                    <td>
+                                        {{$dress['code']}} - {{$dress['color']}}
+                                        @if($i != count($data['dresses'])-1)
+                                            ,
+                                        @endif
+                                    @endfor
+                                </td>
+                                <td>
+                                    @php
+                                        $data = $maxDress[$size];
+                                    @endphp
+                                    عدد العيوب: {{$data['value']}}
+                                    <br>
+                                    اللون:
+                                    @for($i=0; $i<count($data['dresses']); $i++)
                                         @php
-                                            $data = $maxDefect[$size][$code];
+                                            $dress = $data['dresses'][$i];
                                         @endphp
-                                        عدد المرات: {{$data['sum']}}
-                                        <br>
-                                        العيب:
-                                        @for($i=0; $i<count($data['defects']); $i++)
-                                            {{$data['defects'][$i]}}
-                                            @if($i != count($data['defects'])-1)
-                                                ,
-                                            @endif
-                                        @endfor
-                                    </td>
-                                    <td>
-                                        @php
-                                            $data = $minHour[$size][$code];
-                                        @endphp
-                                        عدد العيوب: {{$data['sum']}}
-                                        <br>
-                                        الساعة:
-                                        @for($i=0; $i<count($data['hours']); $i++)
-                                            {{$data['hours'][$i]}}
-                                            @if($i != count($data['hours'])-1)
-                                                ,
-                                            @endif
-                                        @endfor
-                                    </td>
-                                    <td>
-                                        @php
-                                            $data = $maxHour[$size][$code];
-                                        @endphp
-                                        عدد العيوب: {{$data['sum']}}
-                                        <br>
-                                        الساعة:
-                                        @for($i=0; $i<count($data['hours']); $i++)
-                                            {{$data['hours'][$i]}}
-                                            @if($i != count($data['hours'])-1)
-                                                ,
-                                            @endif
-                                        @endfor
-                                    </td>
-                                </tr>
-                            @endforeach
+                                        {{$dress['code']}} - {{$dress['color']}}
+                                        @if($i != count($data['dresses'])-1)
+                                            ,
+                                        @endif
+                                    @endfor
+                                </td>
+                                <td>
+                                    @php
+                                        $data = $maxDefect[$size];
+                                    @endphp
+                                    عدد المرات: {{$data['value']}}
+                                    <br>
+                                    العيب:
+                                    @for($i=0; $i<count($data['defects']); $i++)
+                                        {{$data['defects'][$i]}}
+                                        @if($i != count($data['defects'])-1)
+                                            ,
+                                        @endif
+                                    @endfor
+                                </td>
+                                <td>
+                                    @php
+                                        $data = $minDefect[$size];
+                                    @endphp
+                                    عدد المرات: {{$data['value']}}
+                                    <br>
+                                    العيب:
+                                    @for($i=0; $i<count($data['defects']); $i++)
+                                        {{$data['defects'][$i]}}
+                                        @if($i != count($data['defects'])-1)
+                                            ,
+                                        @endif
+                                    @endfor
+                                </td>
+                            </tr>
                         @endforeach
                         </tbody>
                     </table>

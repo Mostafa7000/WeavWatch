@@ -32,9 +32,39 @@ class User extends Authenticatable implements FilamentUser
 
 The `canAccessPanel()` method returns `true` or `false` depending on whether the user is allowed to access the `$panel`. In this example, we check if the user's email ends with `@yourdomain.com` and if they have verified their email address.
 
+Since you have access to the current `$panel`, you can write conditional checks for separate panels. For example, only restricting access to the admin panel while allowing all users to access the other panels of your app:
+
+```php
+<?php
+
+namespace App\Models;
+
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
+class User extends Authenticatable implements FilamentUser
+{
+    // ...
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        if ($panel->getId() === 'admin') {
+            return str_ends_with($this->email, '@yourdomain.com') && $this->hasVerifiedEmail();
+        }
+
+        return true;
+    }
+}
+```
+
+## Authorizing access to Resources
+
+See the [Authorization](resources/getting-started#authorization) section in the Resource documentation for controlling access to Resource pages and their data records.
+
 ## Setting up user avatars
 
-Out of the box, Filament uses [ui-avatars.com](https://ui-avatars.com) to generate avatars based on a user's name. However, if you user model has an `avatar_url` attribute, that will be used instead. To customize how Filament gets a user's avatar URL, you can implement the `HasAvatar` contract:
+Out of the box, Filament uses [ui-avatars.com](https://ui-avatars.com) to generate avatars based on a user's name. However, if your user model has an `avatar_url` attribute, that will be used instead. To customize how Filament gets a user's avatar URL, you can implement the `HasAvatar` contract:
 
 ```php
 <?php
@@ -69,6 +99,7 @@ In this example, we create a new file at `app/Filament/AvatarProviders/BoringAva
 
 namespace App\Filament\AvatarProviders;
 
+use Filament\AvatarProviders\Contracts;
 use Filament\Facades\Filament;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
@@ -102,7 +133,7 @@ public function panel(Panel $panel): Panel
 }
 ```
 
-## Configuring the user name attribute
+## Configuring the user's name attribute
 
 By default, Filament will use the `name` attribute of the user to display their name in the app. To change this, you can implement the `HasName` contract:
 
@@ -204,9 +235,62 @@ This class extends the base profile page class from the Filament codebase. Other
 
 In the `form()` method of the example, we call methods like `getNameFormComponent()` to get the default form components for the page. You can customize these components as required. For all the available customization options, see the base `EditProfile` page class in the Filament codebase - it contains all the methods that you can override to make changes.
 
+#### Customizing an authentication field without needing to re-define the form
+
+If you'd like to customize a field in an authentication form without needing to define a new `form()` method, you could extend the specific field method and chain your customizations:
+
+```php
+use Filament\Forms\Components\Component;
+
+protected function getPasswordFormComponent(): Component
+{
+    return parent::getPasswordFormComponent()
+        ->revealable(false);
+}
+```
+
+### Using a sidebar on the profile page
+
+By default, the profile page does not use the standard page layout with a sidebar. This is so that it works with the [tenancy](tenancy) feature, otherwise it would not be accessible if the user had no tenants, since the sidebar links are routed to the current tenant.
+
+If you aren't using [tenancy](tenancy) in your panel, and you'd like the profile page to use the standard page layout with a sidebar, you can pass the `isSimple: false` parameter to `$panel->profile()` when registering the page:
+
+```php
+use Filament\Panel;
+
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        // ...
+        ->profile(isSimple: false);
+}
+```
+
+### Customizing the authentication route slugs
+
+You can customize the URL slugs used for the authentication routes in the [configuration](configuration):
+
+```php
+use Filament\Panel;
+
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        // ...
+        ->loginRouteSlug('login')
+        ->registrationRouteSlug('register')
+        ->passwordResetRoutePrefix('password-reset')
+        ->passwordResetRequestRouteSlug('request')
+        ->passwordResetRouteSlug('reset')
+        ->emailVerificationRoutePrefix('email-verification')
+        ->emailVerificationPromptRouteSlug('prompt')
+        ->emailVerificationRouteSlug('verify');
+}
+```
+
 ### Setting the authentication guard
 
-To set the authentication guard that Filament uses, you can pass in the guard name to the `authGuard()` configuration method:
+To set the authentication guard that Filament uses, you can pass in the guard name to the `authGuard()` [configuration](configuration) method:
 
 ```php
 use Filament\Panel;
@@ -221,7 +305,7 @@ public function panel(Panel $panel): Panel
 
 ### Setting the password broker
 
-To set the password broker that Filament uses, you can pass in the broker name to the `authPasswordBroker()` configuration method:
+To set the password broker that Filament uses, you can pass in the broker name to the `authPasswordBroker()` [configuration](configuration) method:
 
 ```php
 use Filament\Panel;
@@ -233,3 +317,32 @@ public function panel(Panel $panel): Panel
         ->authPasswordBroker('users');
 }
 ```
+
+### Disabling revealable password inputs
+
+By default, all password inputs in authentication forms are [`revealable()`](../forms/fields/text-input#revealable-password-inputs). This allows the user can see a plain text version of the password they're typing by clicking a button. To disable this feature, you can pass `false` to the `revealablePasswords()` [configuration](configuration) method:
+
+```php
+use Filament\Panel;
+
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        // ...
+        ->revealablePasswords(false);
+}
+```
+
+You could also disable this feature on a per-field basis by calling `->revealable(false)` on the field object when [extending the base page class](#customizing-an-authentication-field-without-needing-to-re-define-the-form).
+
+## Setting up guest access to a panel
+
+By default, Filament expects to work with authenticated users only. To allow guests to access a panel, you need to avoid using components which expect a signed-in user (such as profiles, avatars), and remove the built-in Authentication middleware:
+
+- Remove the default `Authenticate::class` from the `authMiddleware()` array in the panel configuration.
+- Remove `->login()` and any other [authentication features](#authentication-features) from the panel.
+- Remove the default `AccountWidget` from the `widgets()` array, because it reads the current user's data.
+
+### Authorizing guests in policies
+
+When present, Filament relies on [Laravel Model Policies](https://laravel.com/docs/authorization#generating-policies) for access control. To give read-access for [guest users in a model policy](https://laravel.com/docs/authorization#guest-users), create the Policy and update the `viewAny()` and `view()` methods, changing the `User $user` param to `?User $user` so that it's optional, and `return true;`. Alternatively, you can remove those methods from the policy entirely.

@@ -58,17 +58,39 @@ TextEntry::make('created_at')
 
 ## Number formatting
 
-The `numeric()` method allows you to format an entry as a number, using PHP's `number_format()`:
+The `numeric()` method allows you to format an entry as a number:
 
 ```php
 use Filament\Infolists\Components\TextEntry;
 
 TextEntry::make('stock')
-    ->numeric(
-        decimalPlaces: 0,
-        decimalSeparator: '.',
-        thousandsSeparator: ',',
-    )
+    ->numeric()
+```
+
+If you would like to customize the number of decimal places used to format the number with, you can use the `decimalPlaces` argument:
+
+```php
+use Filament\Infolists\Components\TextEntry;
+
+TextEntry::make('stock')
+    ->numeric(decimalPlaces: 0)
+```
+
+By default, your app's locale will be used to format the number suitably. If you would like to customize the locale used, you can pass it to the `locale` argument:
+
+```php
+use Filament\Infolists\Components\TextEntry;
+
+TextEntry::make('stock')
+    ->numeric(locale: 'nl')
+```
+
+Alternatively, you can set the default locale used across your app using the `Number::useLocale()` method in the `boot()` method of a service provider:
+
+```php
+use Illuminate\Support\Number;
+
+Number::useLocale('nl');
 ```
 
 ## Currency formatting
@@ -79,7 +101,33 @@ The `money()` method allows you to easily format monetary values, in any currenc
 use Filament\Infolists\Components\TextEntry;
 
 TextEntry::make('price')
-    ->money('eur')
+    ->money('EUR')
+```
+
+There is also a `divideBy` argument for `money()` that allows you to divide the original value by a number before formatting it. This could be useful if your database stores the price in cents, for example:
+
+```php
+use Filament\Infolists\Components\TextEntry;
+
+TextEntry::make('price')
+    ->money('EUR', divideBy: 100)
+```
+
+By default, your app's locale will be used to format the money suitably. If you would like to customize the locale used, you can pass it to the `locale` argument:
+
+```php
+use Filament\Infolists\Components\TextEntry;
+
+TextEntry::make('price')
+    ->money('EUR', locale: 'nl')
+```
+
+Alternatively, you can set the default locale used across your app using the `Number::useLocale()` method in the `boot()` method of a service provider:
+
+```php
+use Illuminate\Support\Number;
+
+Number::useLocale('nl');
 ```
 
 ## Limiting text length
@@ -100,10 +148,10 @@ use Filament\Infolists\Components\TextEntry;
 
 TextEntry::make('description')
     ->limit(50)
-    ->tooltip(function (TextEntry $entry): ?string {
-        $state = $entry->getState();
+    ->tooltip(function (TextEntry $component): ?string {
+        $state = $component->getState();
 
-        if (strlen($state) <= $entry->getCharacterLimit()) {
+        if (strlen($state) <= $component->getCharacterLimit()) {
             return null;
         }
 
@@ -121,6 +169,17 @@ use Filament\Infolists\Components\TextEntry;
 
 TextEntry::make('description')
     ->words(10)
+```
+
+## Limiting text to a specific number of lines
+
+You may want to limit text to a specific number of lines instead of limiting it to a fixed length. Clamping text to a number of lines is useful in responsive interfaces where you want to ensure a consistent experience across all screen sizes. This can be achieved using the `lineClamp()` method:
+
+```php
+use Filament\Infolists\Components\TextEntry;
+
+TextEntry::make('description')
+    ->lineClamp(2)
 ```
 
 ## Listing multiple values
@@ -162,6 +221,21 @@ TextEntry::make('authors.name')
     ->limitList(3)
 ```
 
+#### Expanding the limited list
+
+You can allow the limited items to be expanded and collapsed, using the `expandableLimitedList()` method:
+
+```php
+use Filament\Infolists\Components\TextEntry;
+
+TextEntry::make('authors.name')
+    ->listWithLineBreaks()
+    ->limitList(3)
+    ->expandableLimitedList()
+```
+
+Please note that this is only a feature for `listWithLineBreaks()` or `bulleted()`, where each item is on its own line.
+
 ### Using a list separator
 
 If you want to "explode" a text string from your model into multiple list items, you can do so with the `separator()` method. This is useful for displaying comma-separated tags [as badges](#displaying-as-a-badge), for example:
@@ -185,6 +259,29 @@ TextEntry::make('description')
     ->html()
 ```
 
+If you use this method, then the HTML will be sanitized to remove any potentially unsafe content before it is rendered. If you'd like to opt out of this behavior, you can wrap the HTML in an `HtmlString` object by formatting it:
+
+```php
+use Filament\Infolists\Components\TextEntry;
+use Illuminate\Support\HtmlString;
+
+TextEntry::make('description')
+    ->formatStateUsing(fn (string $state): HtmlString => new HtmlString($state))
+```
+
+Or, you can return a `view()` object from the `formatStateUsing()` method, which will also not be sanitized:
+
+```php
+use Filament\Infolists\Components\TextEntry;
+use Illuminate\Contracts\View\View;
+
+TextEntry::make('description')
+    ->formatStateUsing(fn (string $state): View => view(
+        'filament.infolists.components.description-entry-content',
+        ['state' => $state],
+    ))
+```
+
 ### Rendering Markdown as HTML
 
 If your entry value is Markdown, you may render it using `markdown()`:
@@ -205,17 +302,6 @@ use Filament\Infolists\Components\TextEntry;
 
 TextEntry::make('status')
     ->formatStateUsing(fn (string $state): string => __("statuses.{$state}"))
-```
-
-## Adding a placeholder if the entry is empty
-
-Sometimes you may want to display a placeholder if the entry's value is empty:
-
-```php
-use Filament\Infolists\Components\TextEntry;
-
-TextEntry::make('updated_at')
-    ->placeholder('Never')
 ```
 
 ## Customizing the color
@@ -247,7 +333,8 @@ TextEntry::make('email')
 You may set the position of an icon using `iconPosition()`:
 
 ```php
-use Filament\Infolists\Components\TextEntry;use Filament\Support\Enums\IconPosition;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Support\Enums\IconPosition;
 
 TextEntry::make('email')
     ->icon('heroicon-m-envelope')
@@ -256,9 +343,23 @@ TextEntry::make('email')
 
 <AutoScreenshot name="infolists/entries/text/icon-after" alt="Text entry with icon after" version="3.x" />
 
+The icon color defaults to the text color, but you may customize the icon color separately using `iconColor()`:
+
+```php
+use Filament\Infolists\Components\TextEntry;
+
+TextEntry::make('email')
+    ->icon('heroicon-m-envelope')
+    ->iconColor('primary')
+```
+
+<AutoScreenshot name="infolists/entries/text/icon-color" alt="Text entry with icon in the primary color" version="3.x" />
+
 ## Customizing the text size
 
-You may make the text larger using `size(TextEntrySize::Large)`:
+Text columns have small font size by default, but you may change this to `TextEntrySize::ExtraSmall`, `TextEntrySize::Medium`, or `TextEntrySize::Large`.
+
+For instance, you may make the text larger using `size(TextEntrySize::Large)`:
 
 ```php
 use Filament\Infolists\Components\TextEntry;
@@ -271,18 +372,19 @@ TextEntry::make('title')
 
 ## Customizing the font weight
 
-Text entries have regular font weight by default but you may change this to any of the following options: `FontWeight::Thin`, `FontWeight::ExtraLight`, `FontWeight::Light`, `FontWeight::Medium`, `FontWeight::SemiBold`, `FontWeight::Bold`, `FontWeight::ExtraBold` or `FontWeight::Black`.
+Text entries have regular font weight by default, but you may change this to any of the following options: `FontWeight::Thin`, `FontWeight::ExtraLight`, `FontWeight::Light`, `FontWeight::Medium`, `FontWeight::SemiBold`, `FontWeight::Bold`, `FontWeight::ExtraBold` or `FontWeight::Black`.
 
 For instance, you may make the font bold using `weight(FontWeight::Bold)`:
 
 ```php
-use Filament\Infolists\Components\TextEntry;use Filament\Support\Enums\FontWeight;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Support\Enums\FontWeight;
 
 TextEntry::make('title')
     ->weight(FontWeight::Bold)
 ```
 
-<AutoScreenshot name="infolists/entries/text/bolt" alt="Text entry in a bold font" version="3.x" />
+<AutoScreenshot name="infolists/entries/text/bold" alt="Text entry in a bold font" version="3.x" />
 
 ## Customizing the font family
 

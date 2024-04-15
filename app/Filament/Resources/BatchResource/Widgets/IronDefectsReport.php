@@ -8,7 +8,7 @@ use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class IronDefectsReport extends Widget
+class IronDefectsReport extends AbstractWidget
 {
     protected static string $view = 'filament.resources.batch-resource.widgets.iron-defects-report';
 

@@ -4,10 +4,14 @@
     'badgeColor' => null,
     'button' => false,
     'color' => null,
+    'dropdownMaxHeight' => null,
+    'dropdownOffset' => null,
     'dropdownPlacement' => null,
+    'dropdownWidth' => null,
     'dynamicComponent' => null,
     'group' => null,
     'icon' => null,
+    'iconSize' => null,
     'iconButton' => false,
     'label' => null,
     'link' => false,
@@ -19,18 +23,28 @@
 @if (! ($dynamicComponent && $group))
     @php
         $group = \Filament\Actions\ActionGroup::make($actions)
-            ->badge($badge)
             ->badgeColor($badgeColor)
             ->color($color)
+            ->dropdownMaxHeight($dropdownMaxHeight)
+            ->dropdownOffset($dropdownOffset)
             ->dropdownPlacement($dropdownPlacement)
+            ->dropdownWidth($dropdownWidth)
             ->icon($icon)
+            ->iconSize($iconSize)
             ->label($label)
             ->size($size)
             ->tooltip($tooltip)
             ->view($view);
 
+        $badge === true
+            ? $group->badge()
+            : $group->badge($badge);
+
         if ($button) {
-            $group->button();
+            $group
+                ->button()
+                ->iconPosition($attributes->get('iconPosition') ?? $attributes->get('icon-position'))
+                ->outlined($attributes->get('outlined') ?? false);
         }
 
         if ($iconButton) {
@@ -81,20 +95,20 @@
 
     <x-filament::dropdown
         :max-height="$group->getDropdownMaxHeight()"
+        :offset="$group->getDropdownOffset()"
         :placement="$group->getDropdownPlacement() ?? 'bottom-start'"
         :width="$group->getDropdownWidth()"
         teleport
     >
         <x-slot name="trigger">
             <x-dynamic-component
-                :badge="$group->getBadge()"
-                :badge-color="$group->getBadgeColor()"
-                :component="$dynamicComponent"
                 :color="$group->getColor()"
-                :tooltip="$group->getTooltip()"
+                :component="$dynamicComponent"
                 :icon="$group->getIcon()"
-                :size="$group->getSize()"
+                :icon-size="$group->getIconSize()"
                 :label-sr-only="$group->isLabelHidden()"
+                :size="$group->getSize()"
+                :tooltip="$group->getTooltip()"
                 :attributes="\Filament\Support\prepare_inherited_attributes($attributes)->merge($group->getExtraAttributes(), escape: false)"
             >
                 {{ $slot }}

@@ -8,7 +8,7 @@ return [
 
         'modal' => [
 
-            'heading' => ':label削除',
+            'heading' => ':label 削除',
 
             'actions' => [
 
@@ -32,16 +32,16 @@ return [
 
     'multiple' => [
 
-        'label' => '選択の削除',
+        'label' => '選択中を削除',
 
         'modal' => [
 
-            'heading' => '選択した:labelを削除',
+            'heading' => '選択中の:labelを削除',
 
             'actions' => [
 
                 'delete' => [
-                    'label' => '選択の削除',
+                    'label' => '削除',
                 ],
 
             ],

@@ -15,7 +15,7 @@ protected function mutateFormDataBeforeCreate(array $data): array
 }
 ```
 
-Alternatively, if you're creating records in a modal action, check out the [actions documentation](../../actions/prebuilt-actions/create#customizing-data-before-saving).
+Alternatively, if you're creating records in a modal action, check out the [Actions documentation](../../actions/prebuilt-actions/create#customizing-data-before-saving).
 
 ## Customizing the creation process
 
@@ -30,7 +30,7 @@ protected function handleRecordCreation(array $data): Model
 }
 ```
 
-Alternatively, if you're creating records in a modal action, check out the [actions documentation](../../actions/prebuilt-actions/create#customizing-the-creation-process).
+Alternatively, if you're creating records in a modal action, check out the [Actions documentation](../../actions/prebuilt-actions/create#customizing-the-creation-process).
 
 ## Customizing redirects
 
@@ -69,7 +69,7 @@ protected function getCreatedNotificationTitle(): ?string
 }
 ```
 
-Alternatively, if you're creating records in a modal action, check out the [actions documentation](../../actions/prebuilt-actions/create#customizing-the-save-notification).
+Alternatively, if you're creating records in a modal action, check out the [Actions documentation](../../actions/prebuilt-actions/create#customizing-the-save-notification).
 
 You may customize the entire notification by overriding the `getCreatedNotification()` method on the create page class:
 
@@ -150,7 +150,7 @@ class CreateUser extends CreateRecord
 }
 ```
 
-Alternatively, if you're creating records in a modal action, check out the [actions documentation](../../actions/prebuilt-actions/create#lifecycle-hooks).
+Alternatively, if you're creating records in a modal action, check out the [Actions documentation](../../actions/prebuilt-actions/create#lifecycle-hooks).
 
 ## Halting the creation process
 
@@ -162,7 +162,7 @@ use Filament\Notifications\Notification;
 
 protected function beforeCreate(): void
 {
-    if (! $this->getRecord()->team->subscribed()) {
+    if (! auth()->user()->team->subscribed()) {
         Notification::make()
             ->warning()
             ->title('You don\'t have an active subscription!')
@@ -180,7 +180,7 @@ protected function beforeCreate(): void
 }
 ```
 
-Alternatively, if you're creating records in a modal action, check out the [actions documentation](../../actions/prebuilt-actions/create#halting-the-creation-process).
+Alternatively, if you're creating records in a modal action, check out the [Actions documentation](../../actions/prebuilt-actions/create#halting-the-creation-process).
 
 ## Authorization
 
@@ -253,7 +253,7 @@ protected function getSteps(): array
 }
 ```
 
-Alternatively, if you're creating records in a modal action, check out the [actions documentation](../../actions/prebuilt-actions/create#using-a-wizard).
+Alternatively, if you're creating records in a modal action, check out the [Actions documentation](../../actions/prebuilt-actions/create#using-a-wizard).
 
 Now, create a new record to see your wizard in action! Edit will still use the form defined within the resource class.
 
@@ -330,6 +330,26 @@ class CreateCategory extends CreateRecord
 }
 ```
 
+## Importing resource records
+
+Filament includes an `ImportAction` that you can add to the `getHeaderActions()` of the [List page](listing-records). It allows users to upload a CSV of data to import into the resource:
+
+```php
+use App\Filament\Imports\ProductImporter;
+use Filament\Actions;
+
+protected function getHeaderActions(): array
+{
+    return [
+        Actions\ImportAction::make()
+            ->importer(ProductImporter::class),
+        Actions\CreateAction::make(),
+    ];
+}
+```
+
+The "importer" class [needs to be created](../../actions/prebuilt-actions/import#creating-an-importer) to tell Filament how to import each row of the CSV. You can learn everything about the `ImportAction` in the [Actions documentation](../../actions/prebuilt-actions/import).
+
 ## Custom view
 
 For further customization opportunities, you can override the static `$view` property on the page class to a custom view in your app:
@@ -340,7 +360,7 @@ protected static string $view = 'filament.resources.users.pages.create-user';
 
 This assumes that you have created a view at `resources/views/filament/resources/users/pages/create-user.blade.php`.
 
-Here's a very simple example of what that view might contain:
+Here's a basic example of what that view might contain:
 
 ```blade
 <x-filament-panels::page>

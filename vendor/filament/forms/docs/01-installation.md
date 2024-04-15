@@ -9,16 +9,18 @@ title: Installation
 Filament requires the following to run:
 
 - PHP 8.1+
-- Laravel v9.0+
+- Laravel v10.0+
 - Livewire v3.0+
 
-> **Livewire v3 is still in beta**
-> Although breaking changes should be minimal, we recommend testing your application thoroughly before using Livewire v3 in production.
+> **Livewire v3 is recently released!**<br />
+> The Livewire team have done a great job in making it stable, but it was a complete rewrite of Livewire v2. You may encounter issues, so we recommend testing your application thoroughly before using Filament v3 in production.
 
-First, require the Forms Builder package using Composer:
+## Installation
+
+Require the Form Builder package using Composer:
 
 ```bash
-composer require filament/forms:"^3.0"
+composer require filament/forms:"^3.2" -W
 ```
 
 ## New Laravel projects
@@ -48,7 +50,7 @@ php artisan filament:install --forms
 Run the following command to install Tailwind CSS with the Tailwind Forms and Typography plugins:
 
 ```bash
-npm install tailwindcss @tailwindcss/forms @tailwindcss/typography postcss autoprefixer --save-dev
+npm install tailwindcss @tailwindcss/forms @tailwindcss/typography postcss postcss-nesting autoprefixer --save-dev
 ```
 
 Create a new `tailwind.config.js` file and add the Filament `preset` *(includes the Filament color scheme and the required Tailwind plugins)*:
@@ -76,11 +78,12 @@ Add Tailwind's CSS layers to your `resources/css/app.css`:
 @tailwind utilities;
 ```
 
-Create a `postcss.config.js` file in the root of your project and register Tailwind CSS and Autoprefixer as plugins:
+Create a `postcss.config.js` file in the root of your project and register Tailwind CSS, PostCSS Nesting and Autoprefixer as plugins:
 
 ```js
 export default {
     plugins: {
+        'tailwindcss/nesting': 'postcss-nesting',
         tailwindcss: {},
         autoprefixer: {},
     },
@@ -158,7 +161,7 @@ php artisan vendor:publish --tag=filament-config
 
 > Upgrading from Filament v2? Please review the [upgrade guide](upgrade-guide).
 
-Filament automatically upgrades to the latest non-breaking version when you run `composer update`. If you notice that Filament is not upgrading automatically, ensure that the `filament:upgrade` command is present in your `composer.json`:
+Filament automatically upgrades to the latest non-breaking version when you run `composer update`. After any updates, all Laravel caches need to be cleared, and frontend assets need to be republished. You can do this all at once using the `filament:upgrade` command, which should have been added to your `composer.json` file when you ran `filament:install` the first time:
 
 ```json
 "post-autoload-dump": [
@@ -167,7 +170,7 @@ Filament automatically upgrades to the latest non-breaking version when you run 
 ],
 ```
 
-If you prefer not to use automatic upgrades, remove the `filament:upgrade` command from your `composer.json`, and run the following commands:
+Please note that `filament:upgrade` does not actually handle the update process, as Composer does that already. If you're upgrading manually without a `post-autoload-dump` hook, you can run the command yourself:
 
 ```bash
 composer update

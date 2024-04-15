@@ -12,9 +12,9 @@ Start by creating a widget with the command:
 php artisan make:filament-widget BlogPostsChart --chart
 ```
 
-There are several chart classes available, but we'll use the `LineChartWidget` class for this example.
+There is a single `ChartWidget` class that is used for all charts. The type of chart is set by the `getType()` method. In this example, that method returns the string `'line'`.
 
-The `getHeading()` method is used to return a heading that describes the chart.
+The `protected static ?string $heading` variable is used to set the heading that describes the chart. If you need to set the heading dynamically, you can override the `getHeading()` method.
 
 The `getData()` method is used to return an array of datasets and labels. Each dataset is a labeled array of points to plot on the chart, and each label is a string. This structure is identical to the [Chart.js](https://www.chartjs.org/docs) library, which Filament uses to render charts. You may use the [Chart.js documentation](https://www.chartjs.org/docs) to fully understand the possibilities to return from `getData()`, based on the chart type.
 
@@ -23,14 +23,11 @@ The `getData()` method is used to return an array of datasets and labels. Each d
 
 namespace App\Filament\Widgets;
 
-use Filament\Widgets\LineChartWidget;
+use Filament\Widgets\ChartWidget;
 
-class BlogPostsChart extends LineChartWidget
+class BlogPostsChart extends ChartWidget
 {
-    public function getHeading(): string
-    {
-        return 'Blog posts';
-    }
+    protected static ?string $heading = 'Blog Posts';
 
     protected function getData(): array
     {
@@ -44,6 +41,11 @@ class BlogPostsChart extends LineChartWidget
             'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         ];
     }
+
+    protected function getType(): string
+    {
+        return 'line';
+    }
 }
 ```
 
@@ -53,14 +55,14 @@ Now, check out your widget in the dashboard.
 
 Below is a list of available chart widget classes which you may extend, and their corresponding [Chart.js](https://www.chartjs.org/docs) documentation page, for inspiration on what to return from `getData()`:
 
-- `Filament\Widgets\BarChartWidget` - [Chart.js documentation](https://www.chartjs.org/docs/latest/charts/bar)
-- `Filament\Widgets\BubbleChartWidget` - [Chart.js documentation](https://www.chartjs.org/docs/latest/charts/bubble)
-- `Filament\Widgets\DoughnutChartWidget` - [Chart.js documentation](https://www.chartjs.org/docs/latest/charts/doughnut)
-- `Filament\Widgets\LineChartWidget` - [Chart.js documentation](https://www.chartjs.org/docs/latest/charts/line)
-- `Filament\Widgets\PieChartWidget` - [Chart.js documentation](https://www.chartjs.org/docs/latest/charts/doughnut)
-- `Filament\Widgets\PolarAreaChartWidget` - [Chart.js documentation](https://www.chartjs.org/docs/latest/charts/polar)
-- `Filament\Widgets\RadarChartWidget` - [Chart.js documentation](https://www.chartjs.org/docs/latest/charts/radar)
-- `Filament\Widgets\ScatterChartWidget` - [Chart.js documentation](https://www.chartjs.org/docs/latest/charts/scatter)
+- Bar chart - [Chart.js documentation](https://www.chartjs.org/docs/latest/charts/bar)
+- Bubble chart - [Chart.js documentation](https://www.chartjs.org/docs/latest/charts/bubble)
+- Doughnut chart - [Chart.js documentation](https://www.chartjs.org/docs/latest/charts/doughnut)
+- Line chart - [Chart.js documentation](https://www.chartjs.org/docs/latest/charts/line)
+- Pie chart - [Chart.js documentation](https://www.chartjs.org/docs/latest/charts/doughnut)
+- Polar area chart - [Chart.js documentation](https://www.chartjs.org/docs/latest/charts/polar)
+- Radar chart - [Chart.js documentation](https://www.chartjs.org/docs/latest/charts/radar)
+- Scatter chart - [Chart.js documentation](https://www.chartjs.org/docs/latest/charts/scatter)
 
 ## Customizing the chart color
 
@@ -182,7 +184,7 @@ protected static ?string $maxHeight = '300px';
 
 ## Setting chart configuration options
 
-You may specify an `$options` variable on the chart class to control the many configuration options that the Chart.js library provides. For instance, you could turn off the [legend](https://www.chartjs.org/docs/latest/configuration/legend.html) for `LineChartWidget` class:
+You may specify an `$options` variable on the chart class to control the many configuration options that the Chart.js library provides. For instance, you could turn off the [legend](https://www.chartjs.org/docs/latest/configuration/legend.html) for a line chart:
 
 ```php
 protected static ?array $options = [
@@ -243,9 +245,9 @@ public function getDescription(): ?string
 
 ## Disabling lazy loading
 
-By default, widgets are lazy loaded. This means that they will only be loaded when they are visible on the page.
+By default, widgets are lazy-loaded. This means that they will only be loaded when they are visible on the page.
 
-To disable this behaviour, you may override the `$isLazy` property on the widget class:
+To disable this behavior, you may override the `$isLazy` property on the widget class:
 
 ```php
 protected static bool $isLazy = true;

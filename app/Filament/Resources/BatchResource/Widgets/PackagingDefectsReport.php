@@ -8,7 +8,7 @@ use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class PackagingDefectsReport extends Widget
+class PackagingDefectsReport extends AbstractWidget
 {
     protected static string $view = 'filament.resources.batch-resource.widgets.packaging-defects-report';
 

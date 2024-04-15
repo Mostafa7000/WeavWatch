@@ -22,7 +22,7 @@ return [
     'form' => [
 
         'email' => [
-            'label' => 'Alamat Email',
+            'label' => 'Alamat email',
         ],
 
         'password' => [
@@ -52,7 +52,8 @@ return [
     'notifications' => [
 
         'throttled' => [
-            'title' => 'Terlalu banyak permintaan. Silakan coba lagi dalam :seconds detik.',
+            'title' => 'Terlalu banyak permintaan',
+            'body' => 'Silakan coba lagi dalam :seconds detik.',
         ],
 
     ],

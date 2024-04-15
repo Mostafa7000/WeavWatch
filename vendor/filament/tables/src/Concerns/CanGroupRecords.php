@@ -13,6 +13,10 @@ trait CanGroupRecords
 
     public function getTableGrouping(): ?Group
     {
+        if ($this->isTableReordering()) {
+            return null;
+        }
+
         if (
             filled($this->tableGrouping) &&
             ($group = $this->getTable()->getGroup($this->tableGrouping))
@@ -32,18 +36,27 @@ trait CanGroupRecords
         $this->resetPage();
     }
 
+    public function getTableGroupingDirection(): ?string
+    {
+        return match ($this->tableGroupingDirection) {
+            'asc' => 'asc',
+            'desc' => 'desc',
+            default => null,
+        };
+    }
+
     protected function applyGroupingToTableQuery(Builder $query): Builder
     {
-        if ($this->isTableReordering()) {
-            return $query;
-        }
-
         $group = $this->getTableGrouping();
 
         if (! $group) {
             return $query;
         }
 
-        return $group->orderQuery($query, $this->tableGroupingDirection ?? 'asc');
+        $group->applyEagerLoading($query);
+
+        $group->orderQuery($query, $this->getTableGroupingDirection() ?? 'asc');
+
+        return $query;
     }
 }

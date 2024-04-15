@@ -10,7 +10,7 @@ return [
 
         'records_per_page' => [
 
-            'label' => 'pe pagină',
+            'label' => 'Pe pagină',
 
             'options' => [
                 'all' => 'Toate',
@@ -22,8 +22,16 @@ return [
 
     'actions' => [
 
+        'first' => [
+            'label' => 'Prima pagină',
+        ],
+
         'go_to_page' => [
             'label' => 'Mergi la pagina :page',
+        ],
+
+        'last' => [
+            'label' => 'Ultima pagină',
         ],
 
         'next' => [

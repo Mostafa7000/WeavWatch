@@ -18,23 +18,14 @@ This command will create two files - a page class in the `/Pages` directory of t
 
 Page classes are all full-page [Livewire](https://livewire.laravel.com) components with a few extra utilities you can use with the panel.
 
-## Conditionally hiding pages in navigation
+## Authorization
 
-You can prevent pages from appearing in the menu by overriding the `shouldRegisterNavigation()` method in your Page class. This is useful if you want to control which users can see the page in the sidebar.
+You can prevent pages from appearing in the menu by overriding the `canAccess()` method in your Page class. This is useful if you want to control which users can see the page in the navigation, and also which users can visit the page directly:
 
 ```php
-public static function shouldRegisterNavigation(): bool
+public static function canAccess(): bool
 {
     return auth()->user()->canManageSettings();
-}
-```
-
-Please be aware that all users will still be able to visit this page through its direct URL, so to fully limit access you must also also check in the `mount()` method of the page:
-
-```php
-public function mount(): void
-{
-    abort_unless(auth()->user()->canManageSettings(), 403);
 }
 ```
 
@@ -68,11 +59,12 @@ protected function getHeaderActions(): array
 If you're using actions on an [Edit](resources/editing-records) or [View](resources/viewing-records) resource page, you can refresh data within the main form using the `refreshFormData()` method:
 
 ```php
+use App\Models\Post;
 use Filament\Actions\Action;
 
 Action::make('approve')
-    ->action(function () {
-        $this->getRecord()->approve();
+    ->action(function (Post $record) {
+        $record->approve();
 
         $this->refreshFormData([
             'status',
@@ -103,14 +95,14 @@ protected function getHeaderWidgets(): array
 
 If you'd like to learn how to build and customize widgets, check out the [Dashboard](dashboard) documentation section.
 
-### Customizing the widgets grid
+### Customizing the widgets' grid
 
 You may change how many grid columns are used to display widgets.
 
 You may override the `getHeaderWidgetsColumns()` or `getFooterWidgetsColumns()` methods to return a number of grid columns to use:
 
 ```php
-protected function getHeaderWidgetsColumns(): int | array
+public function getHeaderWidgetsColumns(): int | array
 {
     return 3;
 }
@@ -121,7 +113,7 @@ protected function getHeaderWidgetsColumns(): int | array
 You may wish to change the number of widget grid columns based on the responsive [breakpoint](https://tailwindcss.com/docs/responsive-design#overview) of the browser. You can do this using an array that contains the number of columns that should be used at each breakpoint:
 
 ```php
-protected function getHeaderWidgetsColumns(): int | array
+public function getHeaderWidgetsColumns(): int | array
 {
     return [
         'md' => 4,
@@ -137,7 +129,7 @@ This pairs well with [responsive widget widths](dashboard#responsive-widget-widt
 You may pass data to widgets from the page using the `getWidgetsData()` method:
 
 ```php
-protected function getWidgetsData(): array
+public function getWidgetData(): array
 {
     return [
         'stats' => [
@@ -295,11 +287,66 @@ This example assumes you have a Blade view at `resources/views/filament/settings
 
 ## Customizing the maximum content width
 
-By default, Filament will restrict the width of the content on the page so it doesn't become too wide on large screens. To change this, you may override the `getContentMaxWidth()` method. Options correspond to [Tailwind's max-width scale](https://tailwindcss.com/docs/max-width). The options are `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl`, `5xl`, `6xl`, `7xl`, and `full`. The default is `7xl`:
+By default, Filament will restrict the width of the content on the page, so it doesn't become too wide on large screens. To change this, you may override the `getMaxContentWidth()` method. Options correspond to [Tailwind's max-width scale](https://tailwindcss.com/docs/max-width). The options are `ExtraSmall`, `Small`, `Medium`, `Large`, `ExtraLarge`, `TwoExtraLarge`, `ThreeExtraLarge`, `FourExtraLarge`, `FiveExtraLarge`, `SixExtraLarge`, `SevenExtraLarge`, `Full`, `MinContent`, `MaxContent`, `FitContent`,  `Prose`, `ScreenSmall`, `ScreenMedium`, `ScreenLarge`, `ScreenExtraLarge` and `ScreenTwoExtraLarge`. The default is `SevenExtraLarge`:
 
 ```php
-public function getContentMaxWidth(): ?string
+use Filament\Support\Enums\MaxWidth;
+
+public function getMaxContentWidth(): MaxWidth
 {
-    return 'full';
+    return MaxWidth::Full;
+}
+```
+
+## Generating URLs to pages
+
+Filament provides `getUrl()` static method on page classes to generate URLs to them. Traditionally, you would need to construct the URL by hand or by using Laravel's `route()` helper, but these methods depend on knowledge of the page's slug or route naming conventions.
+
+The `getUrl()` method, without any arguments, will generate a URL:
+
+```php
+use App\Filament\Pages\Settings;
+
+Settings::getUrl(); // /admin/settings
+```
+
+If your page uses URL / query parameters, you should use the argument:
+
+```php
+use App\Filament\Pages\Settings;
+
+Settings::getUrl(['section' => 'notifications']); // /admin/settings?section=notifications
+```
+
+### Generating URLs to pages in other panels
+
+If you have multiple panels in your app, `getUrl()` will generate a URL within the current panel. You can also indicate which panel the page is associated with, by passing the panel ID to the `panel` argument:
+
+```php
+use App\Filament\Pages\Settings;
+
+Settings::getUrl(panel: 'marketing');
+```
+
+## Adding sub-navigation between pages
+
+You may want to add a common sub-navigation to multiple pages, to allow users to quickly navigate between them. You can do this by defining a [cluster](clusters). Clusters can also contain [resources](resources), and you can switch between multiple pages or resources within a cluster.
+
+## Adding extra attributes to the body tag of a page
+
+You may wish to add extra attributes to the `<body>` tag of a page. To do this, you can set an array of attributes in `$extraBodyAttributes`:
+
+```php
+protected array $extraBodyAttributes = [];
+```
+
+Or, you can return an array of attributes and their values from the `getExtraBodyAttributes()` method:
+
+```php
+public function getExtraBodyAttributes(): array
+{
+    return [
+        'class' => 'settings-page',
+    ];
 }
 ```

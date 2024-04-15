@@ -37,7 +37,7 @@ class Count extends Summarizer
 
         $state = [];
 
-        foreach ($query->clone()->pluck($attribute) as $value) {
+        foreach ($query->clone()->distinct()->pluck($attribute) as $value) {
             $column->record($this->getQuery()->getModel()->setAttribute($attribute, $value));
             $columnState = $column->getState();
             $color = json_encode($column->getColor($columnState));
@@ -73,6 +73,13 @@ class Count extends Summarizer
         }
 
         return $this->selectedState[$this->getSelectAlias()];
+    }
+
+    public function selectAlias(?string $alias): static
+    {
+        $this->selectAlias = $alias;
+
+        return $this;
     }
 
     public function getSelectAlias(): string

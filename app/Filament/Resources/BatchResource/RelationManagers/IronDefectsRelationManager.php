@@ -122,6 +122,10 @@ class IronDefectsRelationManager extends RelationManager
                             ->rules('min:0')
                             ->default(0),
                     ])->columns(5),
+                Forms\Components\Section::make('أخرى')
+                    ->schema([
+                        Forms\Components\TextInput::make('other')->label('عيوب أخرى')
+                    ]),
             ]);
     }
 
@@ -169,6 +173,8 @@ class IronDefectsRelationManager extends RelationManager
                     ->label('علامات ضغط')->sortable(),
                 Tables\Columns\TextColumn::make('a12')
                     ->label('انكماش')->sortable(),
+                Tables\Columns\TextColumn::make('other')
+                    ->label('عيوب أخرى')
             ])
             ->filters([
                 //

@@ -86,6 +86,8 @@ export default function markdownEditorFormComponent({
     isLiveDebounced,
     isLiveOnBlur,
     liveDebounce,
+    maxHeight,
+    minHeight,
     placeholder,
     state,
     translations,
@@ -98,7 +100,12 @@ export default function markdownEditorFormComponent({
         state,
 
         init: async function () {
-            this.editor = new EasyMDE({
+            if (this.$root._editor) {
+                this.$root._editor.toTextArea()
+                this.$root._editor = null
+            }
+
+            this.$root._editor = this.editor = new EasyMDE({
                 autoDownloadFontAwesome: false,
                 autoRefresh: true,
                 autoSave: false,
@@ -106,7 +113,8 @@ export default function markdownEditorFormComponent({
                 imageAccept: 'image/png, image/jpeg, image/gif, image/avif',
                 imageUploadFunction: uploadFileAttachmentUsing,
                 initialValue: this.state ?? '',
-                minHeight: '11.25rem',
+                maxHeight,
+                minHeight,
                 placeholder,
                 previewImagesInEditor: true,
                 spellChecker: false,
@@ -119,6 +127,11 @@ export default function markdownEditorFormComponent({
                 toolbar: this.getToolbar(),
                 uploadImage: true,
             })
+
+            this.editor.codemirror.setOption(
+                'direction',
+                document.documentElement?.dir ?? 'ltr',
+            )
 
             // When creating a link, highlight the URL instead of the label:
             this.editor.codemirror.on('changes', (instance, changes) => {
@@ -194,11 +207,7 @@ export default function markdownEditorFormComponent({
                     return
                 }
 
-                this.editor.value(this.state ?? '')
-
-                // There is an issue with the editor not rendering the content
-                // until after it is focused. All solutions online have been
-                // attempted and none have worked so far.
+                Alpine.raw(this.editor).value(this.state ?? '')
             })
         },
 

@@ -7,17 +7,21 @@ use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Infolists\Concerns\InteractsWithInfolists;
+use Filament\Infolists\Contracts\HasInfolists;
+use Filament\Support\Enums\Alignment;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Support\Exceptions\Halt;
-use Filament\Tables\Contracts\RendersActionModal;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
-abstract class BasePage extends Component implements HasForms, HasActions, RendersActionModal
+abstract class BasePage extends Component implements HasActions, HasForms, HasInfolists
 {
     use InteractsWithActions;
     use InteractsWithForms;
+    use InteractsWithInfolists;
 
     protected static string $layout = 'filament-panels::components.layout.base';
 
@@ -33,7 +37,12 @@ abstract class BasePage extends Component implements HasForms, HasActions, Rende
 
     protected ?string $maxContentWidth = null;
 
-    public static string $formActionsAlignment = 'start';
+    /**
+     * @var array<mixed>
+     */
+    protected array $extraBodyAttributes = [];
+
+    public static string | Alignment $formActionsAlignment = Alignment::Start;
 
     public static bool $formActionsAreSticky = false;
 
@@ -41,12 +50,22 @@ abstract class BasePage extends Component implements HasForms, HasActions, Rende
 
     public function render(): View
     {
-        return view(static::$view, $this->getViewData())
-            ->layout(static::$layout, [
+        return view($this->getView(), $this->getViewData())
+            ->layout($this->getLayout(), [
                 'livewire' => $this,
                 'maxContentWidth' => $this->getMaxContentWidth(),
                 ...$this->getLayoutData(),
             ]);
+    }
+
+    public function getView(): string
+    {
+        return static::$view;
+    }
+
+    public function getLayout(): string
+    {
+        return static::$layout;
     }
 
     public function getHeading(): string | Htmlable
@@ -67,9 +86,17 @@ abstract class BasePage extends Component implements HasForms, HasActions, Rende
             ->title();
     }
 
-    public function getMaxContentWidth(): ?string
+    public function getMaxContentWidth(): MaxWidth | string | null
     {
         return $this->maxContentWidth;
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function getExtraBodyAttributes(): array
+    {
+        return $this->extraBodyAttributes;
     }
 
     /**
@@ -118,17 +145,17 @@ abstract class BasePage extends Component implements HasForms, HasActions, Rende
 
     public static function alignFormActionsStart(): void
     {
-        static::$formActionsAlignment = 'start';
+        static::$formActionsAlignment = Alignment::Start;
     }
 
     public static function alignFormActionsCenter(): void
     {
-        static::$formActionsAlignment = 'center';
+        static::$formActionsAlignment = Alignment::Center;
     }
 
     public static function alignFormActionsEnd(): void
     {
-        static::$formActionsAlignment = 'end';
+        static::$formActionsAlignment = Alignment::End;
     }
 
     /**
@@ -147,7 +174,7 @@ abstract class BasePage extends Component implements HasForms, HasActions, Rende
         static::alignFormActionsEnd();
     }
 
-    public function getFormActionsAlignment(): string
+    public function getFormActionsAlignment(): string | Alignment
     {
         return static::$formActionsAlignment;
     }
@@ -162,7 +189,7 @@ abstract class BasePage extends Component implements HasForms, HasActions, Rende
         return static::$hasInlineLabels;
     }
 
-    public static function formActionsAlignment(string $alignment): void
+    public static function formActionsAlignment(string | Alignment $alignment): void
     {
         static::$formActionsAlignment = $alignment;
     }

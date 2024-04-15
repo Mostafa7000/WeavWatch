@@ -7,7 +7,7 @@ use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class OperationDefectsReport extends Widget
+class OperationDefectsReport extends AbstractWidget
 {
     protected static string $view = 'filament.resources.batch-resource.widgets.operation-defects-report';
 
@@ -15,76 +15,66 @@ class OperationDefectsReport extends Widget
 
     private const SIZES = ConstantData::SIZES;
 
-    private const HOURS = ConstantData::HOURS;
-
-    public function getHour(bool $max)
+    public function getDress(bool $max)
     {
-        $result = [];
-        $sums = [];
-        for ($i = 1; $i <= 10; $i++) {
-            $query = DB::table('operation_defect_reports')
-                ->where('operation_defect_reports.batch_id', $this->record->id)
-                ->join('dresses', 'operation_defect_reports.dress_id', '=', 'dresses.id')
-                ->join('colors', 'dresses.color_id', '=', 'colors.id')
-                ->groupBy('dress_id', 'size_id')
-                ->select(DB::raw("SUM(a$i) as sum, size_id, code, title"))->get();
+        $statement = DB::table('operation_defect_reports')
+            ->where('operation_defect_reports.batch_id', $this->record->id)
+            ->join('dresses', 'operation_defect_reports.dress_id', '=', 'dresses.id')
+            ->join('colors', 'dresses.color_id', '=', 'colors.id')
+            ->groupBy('size_id', 'dress_id')
+            ->select(DB::raw('SUM(quantity) as number, code, title, size_id'));
 
-            foreach ($query as $row) {
-                $size = self::SIZES[$row->size_id];
-                $code = $row->code;
-                $sum = $row->sum;
-
-                $sums[$size][$code][$sum][] = self::HOURS[$i];
-
-                // If this size and code combination doesn't exist in the sums array, or if the new sum is greater than the existing sum, update the sum
-                if (!isset($result[$size][$code]) || ($max && $sum > $result[$size][$code]['sum'])) {
-                    $result[$size][$code] = ['color' => $row->title, 'hour' => self::HOURS[$i], 'sum' => $sum];
-                } else if (!$max && $sum < $result[$size][$code]['sum']) {
-                    $result[$size][$code] = ['color' => $row->title, 'hour' => self::HOURS[$i], 'sum' => $sum];
+        $maxResult = [];
+        foreach ($statement->get() as $row) {
+            // Check if the size already exists in the maxResult array
+            if (isset($maxResult[self::SIZES[$row->size_id]])) {
+                if ($max && $row->number > $maxResult[self::SIZES[$row->size_id]]['value']) {
+                    $maxResult[self::SIZES[$row->size_id]] = ['value' => $row->number, 'dress' => $row->code, 'color' => $row->title];
+                } elseif (!$max && $row->number < $maxResult[self::SIZES[$row->size_id]]['value']) {
+                    $maxResult[self::SIZES[$row->size_id]] = ['value' => $row->number, 'dress' => $row->code, 'color' => $row->title];
                 }
-            }
-        }
-        foreach ($result as $size => $data) {
-            foreach ($data as $code => $entry) {
-                $result[$size][$code] = ['color' => $entry['color'], 'sum' => $entry['sum'], 'hours' => $sums[$size][$code][$entry['sum']]];
+            } else {
+                // Add the size and the attributes to the maxResult array
+                $maxResult[self::SIZES[$row->size_id]] = ['value' => $row->number, 'dress' => $row->code, 'color' => $row->title];
             }
         }
 
-        return $result;
+        foreach ($maxResult as $size => $entry) {
+            $matchingRows = $statement->get()->filter(fn($row)=> self::SIZES[$row->size_id] == $size && $row->number == $entry['value']);
+            $dresses = array_map(
+                fn($matchingRow) => ['code' => $matchingRow->code, 'color' => $matchingRow->title],
+                $matchingRows->toArray());
+            $dresses = array_values($dresses);
+            $maxResult[$size] = ['value' => $entry['value'], 'dresses' => $dresses];
+        }
+
+        return $maxResult;
     }
 
     public function getDefect(bool $max)
     {
         $statement = DB::table('operation_defect_reports')
             ->where('operation_defect_reports.batch_id', $this->record->id)
-            ->join('dresses', 'operation_defect_reports.dress_id', '=', 'dresses.id')
-            ->join('colors', 'dresses.color_id', '=', 'colors.id')
             ->join('operation_defects', 'operation_defect_reports.defect_id', '=', 'operation_defects.id')
-            ->groupBy('size_id', 'dress_id', 'defect_id')
-            ->select(DB::raw('SUM(a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9 + a10) as sum, code, colors.title as color,size_id, operation_defects.title as defect'));
+            ->groupBy('size_id', 'defect_id')
+            ->select(DB::raw('SUM(quantity) as sum, size_id, operation_defects.title as defect'));
 
-        $result = [];
+        $sums = [];
         foreach ($statement->get() as $row) {
             $size = self::SIZES[$row->size_id];
-            $code = $row->code;
             $sum = $row->sum;
             $defect = $row->defect;
 
-            if (!isset($result[$size][$code]) || ($max && $sum > $result[$size][$code]['sum'])) {
-                $result[$size][$code] = ['color' => $row->color, 'defect' => $defect, 'sum' => $sum];
-            } else if (!$max && $sum < $result[$size][$code]['sum']) {
-                $result[$size][$code] = ['color' => $row->color, 'defect' => $defect, 'sum' => $sum];
-            }
+            $sums[$size][$defect] = $sum;
         }
-        foreach ($result as $size => $data) {
-            foreach ($data as $code => $entry) {
-                $matchingRows = $statement->get()->filter(fn($row) => self::SIZES[$row->size_id] == $size && $row->code == $code && $entry['sum'] == $row->sum);
-                $defects = array_map(
-                    fn($matchingRow) => $matchingRow->defect,
-                    $matchingRows->toArray());
-                $defects = array_values($defects);
-                $result[$size][$code] = ['color' => $entry['color'], 'sum' => $entry['sum'], 'defects' => $defects];
-            }
+
+        $func = $max ? "max" : "min";
+
+        $result = [];
+        foreach ($sums as $size => $sum) {
+            $maxValue = $func($sum);
+            $maxDefects = array_keys($sum, $maxValue);
+            $result[$size] = ['value' => $maxValue, 'defects' => $maxDefects];
         }
         return $result;
     }

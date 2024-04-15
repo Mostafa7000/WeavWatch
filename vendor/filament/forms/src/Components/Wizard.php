@@ -7,6 +7,7 @@ use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Wizard\Step;
 use Filament\Support\Concerns;
 use Filament\Support\Enums\IconPosition;
+use Filament\Support\Exceptions\Halt;
 use Illuminate\Contracts\Support\Htmlable;
 use Livewire\Component as LivewireComponent;
 
@@ -27,7 +28,7 @@ class Wizard extends Component
 
     protected ?Closure $modifyPreviousActionUsing = null;
 
-    public int | Closure $startStep = 1;
+    protected int | Closure $startStep = 1;
 
     /**
      * @var view-string
@@ -64,18 +65,26 @@ class Wizard extends Component
 
         $this->registerListeners([
             'wizard::nextStep' => [
-                function (Wizard $component, string $statePath, string $currentStep): void {
+                function (Wizard $component, string $statePath, int $currentStepIndex): void {
                     if ($statePath !== $component->getStatePath()) {
                         return;
                     }
 
                     if (! $component->isSkippable()) {
                         /** @var Step $currentStep */
-                        $currentStep = $component->getChildComponentContainer()->getComponents(withHidden: true)[$currentStep];
+                        $currentStep = array_values(
+                            $component
+                                ->getChildComponentContainer()
+                                ->getComponents()
+                        )[$currentStepIndex];
 
-                        $currentStep->callBeforeValidation();
-                        $currentStep->getChildComponentContainer()->validate();
-                        $currentStep->callAfterValidation();
+                        try {
+                            $currentStep->callBeforeValidation();
+                            $currentStep->getChildComponentContainer()->validate();
+                            $currentStep->callAfterValidation();
+                        } catch (Halt $exception) {
+                            return;
+                        }
                     }
 
                     /** @var LivewireComponent $livewire */
@@ -92,6 +101,7 @@ class Wizard extends Component
             ->label(__('filament-forms::components.wizard.actions.next_step.label'))
             ->iconPosition(IconPosition::After)
             ->livewireClickHandlerEnabled(false)
+            ->livewireTarget('dispatchFormEvent')
             ->button();
 
         if ($this->modifyNextActionUsing) {
@@ -204,7 +214,7 @@ class Wizard extends Component
         if ($this->isStepPersistedInQueryString()) {
             $queryStringStep = request()->query($this->getStepQueryStringKey());
 
-            foreach ($this->getChildComponents() as $index => $step) {
+            foreach ($this->getChildComponentContainer()->getComponents() as $index => $step) {
                 if ($step->getId() !== $queryStringStep) {
                     continue;
                 }

@@ -5,22 +5,26 @@ namespace Filament\Forms\Components;
 use Closure;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Support\Enums\ActionSize;
-use Illuminate\Contracts\Support\Arrayable;
+use Filament\Support\Services\RelationshipJoiner;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Str;
 
-class CheckboxList extends Field implements Contracts\HasNestedRecursiveValidationRules
+class CheckboxList extends Field implements Contracts\CanDisableOptions, Contracts\HasNestedRecursiveValidationRules
 {
     use Concerns\CanBeSearchable;
+    use Concerns\CanDisableOptions;
+    use Concerns\CanDisableOptionsWhenSelectedInSiblingRepeaterItems;
+    use Concerns\CanFixIndistinctState;
+    use Concerns\HasDescriptions;
     use Concerns\HasExtraInputAttributes;
     use Concerns\HasGridDirection;
     use Concerns\HasNestedRecursiveValidationRules;
     use Concerns\HasOptions;
+    use Concerns\HasPivotData;
 
     /**
      * @var view-string
@@ -32,11 +36,6 @@ class CheckboxList extends Field implements Contracts\HasNestedRecursiveValidati
     protected ?Closure $getOptionLabelFromRecordUsing = null;
 
     protected string | Closure | null $relationship = null;
-
-    /**
-     * @var array<string> | Arrayable | Closure
-     */
-    protected array | Arrayable | Closure $descriptions = [];
 
     protected bool | Closure $isBulkToggleable = false;
 
@@ -124,7 +123,7 @@ class CheckboxList extends Field implements Contracts\HasNestedRecursiveValidati
         return 'deselectAll';
     }
 
-    public function relationship(string | Closure | null $name, string | Closure | null $titleAttribute, ?Closure $modifyQueryUsing = null): static
+    public function relationship(string | Closure | null $name = null, string | Closure | null $titleAttribute = null, ?Closure $modifyQueryUsing = null): static
     {
         $this->relationship = $name ?? $this->getName();
         $this->relationshipTitleAttribute = $titleAttribute;
@@ -132,32 +131,12 @@ class CheckboxList extends Field implements Contracts\HasNestedRecursiveValidati
         $this->options(static function (CheckboxList $component) use ($modifyQueryUsing): array {
             $relationship = Relation::noConstraints(fn () => $component->getRelationship());
 
-            $relationshipQuery = $relationship->getQuery();
-
-            // By default, `BelongsToMany` relationships use an inner join to scope the results to only
-            // those that are attached in the pivot table. We need to change this to a left join so
-            // that we can still get results when the relationship is not attached to the record.
-            if ($relationship instanceof BelongsToMany) {
-                /** @var ?JoinClause $firstRelationshipJoinClause */
-                $firstRelationshipJoinClause = $relationshipQuery->getQuery()->joins[0] ?? null;
-
-                if ($firstRelationshipJoinClause) {
-                    $firstRelationshipJoinClause->type = 'left';
-                }
-
-                $relationshipQuery->select($relationshipQuery->getModel()->getTable() . '.*');
-            }
+            $relationshipQuery = app(RelationshipJoiner::class)->prepareQueryForNoConstraints($relationship);
 
             if ($modifyQueryUsing) {
                 $relationshipQuery = $component->evaluate($modifyQueryUsing, [
                     'query' => $relationshipQuery,
                 ]) ?? $relationshipQuery;
-            }
-
-            $relationshipTitleAttribute = $component->getRelationshipTitleAttribute();
-
-            if (empty($relationshipQuery->getQuery()->orders) && filled($relationshipTitleAttribute)) {
-                $relationshipQuery->orderBy($relationshipQuery->qualifyColumn($relationshipTitleAttribute));
             }
 
             if ($component->hasOptionLabelFromRecordUsingCallback()) {
@@ -167,6 +146,12 @@ class CheckboxList extends Field implements Contracts\HasNestedRecursiveValidati
                         $record->{Str::afterLast($relationship->getQualifiedRelatedKeyName(), '.')} => $component->getOptionLabelFromRecord($record),
                     ])
                     ->toArray();
+            }
+
+            $relationshipTitleAttribute = $component->getRelationshipTitleAttribute();
+
+            if (empty($relationshipQuery->getQuery()->orders)) {
+                $relationshipQuery->orderBy($relationshipQuery->qualifyColumn($relationshipTitleAttribute));
             }
 
             if (str_contains($relationshipTitleAttribute, '->')) {
@@ -201,7 +186,15 @@ class CheckboxList extends Field implements Contracts\HasNestedRecursiveValidati
         });
 
         $this->saveRelationshipsUsing(static function (CheckboxList $component, ?array $state) {
-            $component->getRelationship()->sync($state ?? []);
+            $pivotData = $component->getPivotData();
+
+            if ($pivotData === []) {
+                $component->getRelationship()->sync($state ?? []);
+
+                return;
+            }
+
+            $component->getRelationship()->syncWithPivotValues($state ?? [], $pivotData);
         });
 
         $this->dehydrated(false);
@@ -281,45 +274,5 @@ class CheckboxList extends Field implements Contracts\HasNestedRecursiveValidati
     public function isBulkToggleable(): bool
     {
         return (bool) $this->evaluate($this->isBulkToggleable);
-    }
-
-    /**
-     * @param  array<string> | Arrayable | Closure  $descriptions
-     */
-    public function descriptions(array | Arrayable | Closure $descriptions): static
-    {
-        $this->descriptions = $descriptions;
-
-        return $this;
-    }
-
-    /**
-     * @param  array-key  $value
-     */
-    public function hasDescription($value): bool
-    {
-        return array_key_exists($value, $this->getDescriptions());
-    }
-
-    /**
-     * @param  array-key  $value
-     */
-    public function getDescription($value): ?string
-    {
-        return $this->getDescriptions()[$value] ?? null;
-    }
-
-    /**
-     * @return array<string>
-     */
-    public function getDescriptions(): array
-    {
-        $descriptions = $this->evaluate($this->descriptions);
-
-        if ($descriptions instanceof Arrayable) {
-            $descriptions = $descriptions->toArray();
-        }
-
-        return $descriptions;
     }
 }

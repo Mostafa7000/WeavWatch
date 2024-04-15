@@ -6,22 +6,46 @@ return [
 
     'actions' => [
 
+        'billing' => [
+            'label' => 'Gerir assinatura',
+        ],
+
         'logout' => [
             'label' => 'Terminar Sessão',
         ],
 
+        'open_database_notifications' => [
+            'label' => 'Abrir notificações',
+        ],
+
         'open_user_menu' => [
-            'label' => 'menu do usuário',
+            'label' => 'Menu de utilizador',
+        ],
+
+        'sidebar' => [
+
+            'collapse' => [
+                'label' => 'Recolher barra lateral',
+            ],
+
+            'expand' => [
+                'label' => 'Expandir barra lateral',
+            ],
+
         ],
 
         'theme_switcher' => [
 
             'dark' => [
-                'label' => 'Alternar para o modo escuro',
+                'label' => 'Activar o modo escuro',
             ],
 
             'light' => [
-                'label' => 'Alternar para o modo claro',
+                'label' => 'Activar o modo claro',
+            ],
+
+            'system' => [
+                'label' => 'Activar o modo de sistema',
             ],
 
         ],

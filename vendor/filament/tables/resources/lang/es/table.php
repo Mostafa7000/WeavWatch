@@ -2,10 +2,23 @@
 
 return [
 
+    'column_toggle' => [
+
+        'heading' => 'Columnas',
+
+    ],
+
     'columns' => [
 
         'text' => [
+
+            'actions' => [
+                'collapse_list' => 'Mostrar :count menos',
+                'expand_list' => 'Mostrar :count más',
+            ],
+
             'more_list_items' => 'y :count más',
+
         ],
 
     ],
@@ -20,9 +33,42 @@ return [
             'label' => 'Seleccionar/deseleccionar el elemento :key para las acciones masivas.',
         ],
 
+        'bulk_select_group' => [
+            'label' => 'Seleccionar/deseleccionar grupo :title para acciones masivas.',
+        ],
+
         'search' => [
             'label' => 'Búsqueda',
             'placeholder' => 'Buscar',
+            'indicator' => 'Buscar',
+        ],
+
+    ],
+
+    'summary' => [
+
+        'heading' => 'Resumen',
+
+        'subheadings' => [
+            'all' => 'Todos :label',
+            'group' => 'resumen del :group',
+            'page' => 'Esta página',
+        ],
+
+        'summarizers' => [
+
+            'average' => [
+                'label' => 'Media',
+            ],
+
+            'count' => [
+                'label' => 'Recuento',
+            ],
+
+            'sum' => [
+                'label' => 'Suma',
+            ],
+
         ],
 
     ],
@@ -41,6 +87,10 @@ return [
             'label' => 'Filtrar',
         ],
 
+        'group' => [
+            'label' => 'Grupo',
+        ],
+
         'open_bulk_actions' => [
             'label' => 'Abrir acciones',
         ],
@@ -55,11 +105,17 @@ return [
 
         'heading' => 'No se encontraron registros',
 
+        'description' => 'Cree un :model para empezar.',
+
     ],
 
     'filters' => [
 
         'actions' => [
+
+            'apply' => [
+                'label' => 'Aplicar filtros',
+            ],
 
             'remove' => [
                 'label' => 'Quitar filtro',
@@ -75,6 +131,8 @@ return [
             ],
 
         ],
+
+        'heading' => 'Filtros',
 
         'indicator' => 'Filtros activos',
 
@@ -95,6 +153,30 @@ return [
             'with_trashed' => 'Con registros eliminados',
 
             'without_trashed' => 'Sin registros eliminados',
+
+        ],
+
+    ],
+
+    'grouping' => [
+
+        'fields' => [
+
+            'group' => [
+                'label' => 'Agrupar por',
+                'placeholder' => 'Agrupar por',
+            ],
+
+            'direction' => [
+
+                'label' => 'Dirección de grupo',
+
+                'options' => [
+                    'asc' => 'Ascendente',
+                    'desc' => 'Descendente',
+                ],
+
+            ],
 
         ],
 

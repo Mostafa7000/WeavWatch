@@ -7,6 +7,7 @@ use App\Models\NeedleDefect;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Filament\Infolists\Components\Group;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -20,7 +21,7 @@ class NeedleDefectsRelationManager extends RelationManager
     protected static ?string $modelLabel = 'عيب';
     protected static ?string $pluralModelLabel = self::PLURAL_NAME;
     protected static ?string $title = self::PLURAL_NAME;
-    private const PLURAL_NAME= 'عيوب التطريز';
+    private const PLURAL_NAME = 'عيوب التطريز';
 
     public function form(Form $form): Form
     {
@@ -31,13 +32,23 @@ class NeedleDefectsRelationManager extends RelationManager
                     ->schema([
                         Forms\Components\Select::make('dress_id')
                             ->label('الثوب')
+                            ->disableOptionWhen(function (string $value) {
+                                if (isset($this->cachedMountedTableActionRecord) && $this->cachedMountedTableActionRecord->dress_id == $value) {
+                                    return false;
+                                }
+
+                                $entered = $this->ownerRecord->needle_defects;
+                                $entered = $entered->flatMap(fn($defect) => $defect->pluck('id'))->toArray();
+
+                                return in_array($value, $entered);
+                            })
                             ->options(
                                 Dress::with('color')
                                     ->where('batch_id', $this->ownerRecord->id)
                                     ->get()
                                     ->mapWithKeys(
                                         function ($dress) {
-                                            return [$dress->id => $dress->code . "-" . $dress->color->title];
+                                            return [$dress->id => $dress->code."-".$dress->color->title];
                                         })
                                     ->toArray()
                             )
@@ -121,14 +132,20 @@ class NeedleDefectsRelationManager extends RelationManager
                             ->rules('min:0')
                             ->default(0),
                     ])->columns(5),
+                Forms\Components\Section::make('أخرى')
+                    ->schema([
+                        Forms\Components\TextInput::make('other')->label('عيوب أخرى')
+                    ]),
             ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->groups(
-                ['size.title']
+            ->groups([
+                    Tables\Grouping\Group::make('size.title')
+                    ->label('المقاس')
+                ]
             )
             ->columns([
                 Tables\Columns\TextColumn::make('dress.code')
@@ -146,6 +163,9 @@ class NeedleDefectsRelationManager extends RelationManager
                     ->label('المقاس'),
                 Tables\Columns\TextColumn::make('a1')
                     ->label('تفويت غرزة')->sortable(),
+                Tables\Columns\TextColumn::make('a2')
+                    ->label('ظهور خيط المكوك على خيط الحرير')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('a3')
                     ->label('بقع زيت')->sortable(),
                 Tables\Columns\TextColumn::make('a4')
@@ -164,8 +184,8 @@ class NeedleDefectsRelationManager extends RelationManager
                     ->label('ترحيل في مكان التطريز')->sortable(),
                 Tables\Columns\TextColumn::make('a11')
                     ->label('تشطيب أبليك سيء')->sortable(),
-                Tables\Columns\TextColumn::make('a2')
-                    ->label('ظهور خيط المكوك على خيط الحرير')->sortable(),
+                Tables\Columns\TextColumn::make('other')
+                    ->label('عيوب أخرى')
             ])
             ->filters([
                 //

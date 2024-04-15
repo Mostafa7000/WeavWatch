@@ -12,8 +12,10 @@ return new class extends Migration {
     {
         Schema::create('batch_size', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('batch_id')->constrained('batches')->cascadeOnDelete();
-            $table->foreignId('size_id')->constrained('sizes')->cascadeOnDelete();
+            $table->foreignId('batch_id')->nullable()->constrained('batches')->nullOnDelete();
+            $table->foreignId('size_id')->nullable()->constrained('sizes')->nullOnDelete();
+            $table->integer('quantity');
+            $table->timestamps();
         });
     }
 

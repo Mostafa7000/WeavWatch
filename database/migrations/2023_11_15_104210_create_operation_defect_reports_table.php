@@ -16,16 +16,9 @@ return new class extends Migration {
             $table->foreignId('dress_id')->constrained('dresses')->cascadeOnDelete();
             $table->foreignId('size_id')->constrained('sizes')->cascadeOnDelete();
             $table->foreignId('defect_id')->constrained('operation_defects')->cascadeOnDelete();
-            $table->integer('a1')->default(0)->nullable();
-            $table->integer('a2')->default(0)->nullable();
-            $table->integer('a3')->default(0)->nullable();
-            $table->integer('a4')->default(0)->nullable();
-            $table->integer('a5')->default(0)->nullable();
-            $table->integer('a6')->default(0)->nullable();
-            $table->integer('a7')->default(0)->nullable();
-            $table->integer('a8')->default(0)->nullable();
-            $table->integer('a9')->default(0)->nullable();
-            $table->integer('a10')->default(0)->nullable();
+            $table->string('quantity');
+            $table->string('worker');
+            $table->string('stage');
             $table->timestamps();
         });
     }

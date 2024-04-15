@@ -34,6 +34,28 @@ return new class extends Migration
             $table->integer('a17')->default(0)->nullable();
             $table->integer('a18')->default(0)->nullable();
             $table->integer('a19')->default(0)->nullable();
+            $table->integer('a20')->default(0)->nullable();
+            $table->integer('a21')->default(0)->nullable();
+            $table->integer('a22')->default(0)->nullable();
+            $table->integer('a23')->default(0)->nullable();
+            $table->integer('a24')->default(0)->nullable();
+            $table->integer('a25')->default(0)->nullable();
+            $table->integer('a26')->default(0)->nullable();
+            $table->integer('a27')->default(0)->nullable();
+            $table->integer('a28')->default(0)->nullable();
+            $table->integer('a29')->default(0)->nullable();
+            $table->integer('a30')->default(0)->nullable();
+            $table->integer('a31')->default(0)->nullable();
+            $table->integer('a32')->default(0)->nullable();
+            $table->integer('a33')->default(0)->nullable();
+            $table->integer('a34')->default(0)->nullable();
+            $table->integer('a35')->default(0)->nullable();
+            $table->integer('a36')->default(0)->nullable();
+            $table->integer('a37')->default(0)->nullable();
+            $table->integer('a38')->default(0)->nullable();
+            $table->integer('a39')->default(0)->nullable();
+            $table->integer('a40')->default(0)->nullable();
+            $table->string('other')->nullable();
             $table->timestamps();
         });
     }

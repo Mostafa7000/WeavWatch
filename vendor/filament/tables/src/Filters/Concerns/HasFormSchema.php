@@ -3,6 +3,7 @@
 namespace Filament\Tables\Filters\Concerns;
 
 use Closure;
+use Filament\Forms\ComponentContainer;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Field;
 
@@ -13,12 +14,21 @@ trait HasFormSchema
      */
     protected array | Closure | null $formSchema = null;
 
+    protected ?Closure $modifyFormFieldUsing = null;
+
     /**
      * @param  array<Component> | Closure | null  $schema
      */
     public function form(array | Closure | null $schema): static
     {
         $this->formSchema = $schema;
+
+        return $this;
+    }
+
+    public function modifyFormFieldUsing(?Closure $callback): static
+    {
+        $this->modifyFormFieldUsing = $callback;
 
         return $this;
     }
@@ -40,6 +50,18 @@ trait HasFormSchema
             return [];
         }
 
+        $field = $this->evaluate(
+            $this->modifyFormFieldUsing,
+            namedInjections: [
+                'field' => $field,
+            ],
+            typedInjections: [
+                Component::class => $field,
+                Field::class => $field,
+                $field::class => $field,
+            ],
+        ) ?? $field;
+
         return [$field];
     }
 
@@ -51,5 +73,13 @@ trait HasFormSchema
     public function getFormField(): ?Field
     {
         return null;
+    }
+
+    public function getForm(): ComponentContainer
+    {
+        return $this->getLivewire()
+            ->getTableFiltersForm()
+            ->getComponent($this->getName())
+            ->getChildComponentContainer();
     }
 }

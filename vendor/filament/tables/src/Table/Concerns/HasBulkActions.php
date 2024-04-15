@@ -7,8 +7,10 @@ use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Enums\RecordCheckboxPosition;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use InvalidArgumentException;
 
 trait HasBulkActions
@@ -29,10 +31,23 @@ trait HasBulkActions
 
     protected RecordCheckboxPosition | Closure | null $recordCheckboxPosition = null;
 
+    protected bool | Closure | null $isSelectable = null;
+
     /**
      * @param  array<BulkAction | ActionGroup> | ActionGroup  $actions
      */
     public function bulkActions(array | ActionGroup $actions): static
+    {
+        $this->bulkActions = [];
+        $this->pushBulkActions($actions);
+
+        return $this;
+    }
+
+    /**
+     * @param  array<BulkAction | ActionGroup> | ActionGroup  $actions
+     */
+    public function pushBulkActions(array | ActionGroup $actions): static
     {
         foreach (Arr::wrap($actions) as $action) {
             $action->table($this);
@@ -113,7 +128,7 @@ trait HasBulkActions
     public function getBulkAction(string $name): ?BulkAction
     {
         $action = $this->getFlatBulkActions()[$name] ?? null;
-        $action?->records($this->getLivewire()->getSelectedTableRecords());
+        $action?->records(fn (): EloquentCollection | Collection => $this->getLivewire()->getSelectedTableRecords($action->shouldFetchSelectedRecords()));
 
         return $action;
     }
@@ -137,12 +152,26 @@ trait HasBulkActions
         return $this->getLivewire()->getAllSelectableTableRecordsCount();
     }
 
+    public function selectable(bool | Closure | null $condition = true): static
+    {
+        $this->isSelectable = $condition;
+
+        return $this;
+    }
+
     public function isSelectionEnabled(): bool
     {
-        return (bool) count(array_filter(
-            $this->getFlatBulkActions(),
-            fn (BulkAction $action): bool => $action->isVisible(),
-        ));
+        if (is_bool($isSelectable = $this->evaluate($this->isSelectable))) {
+            return $isSelectable;
+        }
+
+        foreach ($this->getFlatBulkActions() as $bulkAction) {
+            if ($bulkAction->isVisible()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function selectsCurrentPageOnly(): bool

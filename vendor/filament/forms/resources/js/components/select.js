@@ -146,7 +146,7 @@ export default function selectFormComponent({
                         }
 
                         await this.refreshChoices({
-                            withInitialOptions: !hasDynamicOptions,
+                            withInitialOptions: false,
                         })
                     },
                 )
@@ -176,6 +176,10 @@ export default function selectFormComponent({
 
         refreshChoices: async function (config = {}) {
             const choices = await this.getChoices(config)
+
+            if (!this.select) {
+                return
+            }
 
             this.select.clearStore()
 
@@ -213,15 +217,25 @@ export default function selectFormComponent({
                 results = await getOptionsUsing()
             }
 
-            return results.map((option) =>
-                Array.isArray(this.state) && this.state.includes(option.value)
-                    ? ((option) => {
-                          option.selected = true
+            return results.map((result) => {
+                if (result.choices) {
+                    result.choices = result.choices.map((groupedOption) => {
+                        groupedOption.selected = Array.isArray(this.state)
+                            ? this.state.includes(groupedOption.value)
+                            : this.state === groupedOption.value
 
-                          return option
-                      })(option)
-                    : option,
-            )
+                        return groupedOption
+                    })
+
+                    return result
+                }
+
+                result.selected = Array.isArray(this.state)
+                    ? this.state.includes(result.value)
+                    : this.state === result.value
+
+                return result
+            })
         },
 
         refreshPlaceholder: function () {
@@ -235,11 +249,10 @@ export default function selectFormComponent({
                 return
             }
 
-            this.$el.querySelector(
-                '.choices__list--single',
-            ).innerHTML = `<div class="choices__placeholder choices__item">${
-                placeholder ?? ''
-            }</div>`
+            this.$el.querySelector('.choices__list--single').innerHTML =
+                `<div class="choices__placeholder choices__item">${
+                    placeholder ?? ''
+                }</div>`
         },
 
         formatState: function (state) {
@@ -257,11 +270,19 @@ export default function selectFormComponent({
                 return {}
             }
 
-            const existingOptionValues = new Set(
-                existingOptions.length
-                    ? existingOptions.map((option) => option.value)
-                    : [],
-            )
+            const existingOptionValues = new Set()
+
+            existingOptions.forEach((existingOption) => {
+                if (existingOption.choices) {
+                    existingOption.choices.forEach((groupedExistingOption) =>
+                        existingOptionValues.add(groupedExistingOption.value),
+                    )
+
+                    return
+                }
+
+                existingOptionValues.add(existingOption.value)
+            })
 
             if (isMultiple) {
                 if (state.every((value) => existingOptionValues.has(value))) {

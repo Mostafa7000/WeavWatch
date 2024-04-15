@@ -2,8 +2,8 @@
 
 namespace Filament\Forms\Commands\Concerns;
 
-use Doctrine\DBAL\Types;
 use Filament\Forms;
+use Illuminate\Support\Str;
 
 trait CanGenerateForms
 {
@@ -15,22 +15,20 @@ trait CanGenerateForms
             return '//';
         }
 
+        $schema = $this->getModelSchema($model);
         $table = $this->getModelTable($model);
-
-        if (blank($table)) {
-            return '//';
-        }
 
         $components = [];
 
-        foreach ($table->getColumns() as $column) {
-            if ($column->getAutoincrement()) {
+        foreach ($schema->getColumns($table) as $column) {
+            if ($column['auto_increment']) {
                 continue;
             }
 
-            $columnName = $column->getName();
+            $columnName = $column['name'];
 
             if (str($columnName)->is([
+                app($model)->getKeyName(),
                 'created_at',
                 'deleted_at',
                 'updated_at',
@@ -39,22 +37,24 @@ trait CanGenerateForms
                 continue;
             }
 
+            $type = $this->parseColumnType($column);
+
             $componentData = [];
 
             $componentData['type'] = match (true) {
-                $column->getType()::class === Types\BooleanType::class => Forms\Components\Toggle::class,
-                in_array($column->getType()::class, [Types\DateImmutableType::class, Types\DateType::class]) => Forms\Components\DatePicker::class,
-                in_array($column->getType()::class, [Types\DateTimeImmutableType::class, Types\DateTimeType::class, Types\DateTimeTzImmutableType::class, Types\DateTimeTzType::class]) => Forms\Components\DateTimePicker::class,
-                $column->getType()::class === Types\TextType::class => Forms\Components\Textarea::class,
+                $type['name'] === 'boolean' => Forms\Components\Toggle::class,
+                $type['name'] === 'date' => Forms\Components\DatePicker::class,
+                in_array($type['name'], ['datetime', 'timestamp']) => Forms\Components\DateTimePicker::class,
+                $type['name'] === 'text' => Forms\Components\Textarea::class,
                 $columnName === 'image', str($columnName)->startsWith('image_'), str($columnName)->contains('_image_'), str($columnName)->endsWith('_image') => Forms\Components\FileUpload::class,
                 default => Forms\Components\TextInput::class,
             };
 
             if (str($columnName)->endsWith('_id')) {
-                $guessedRelationshipName = $this->guessBelongsToRelationshipName($column, $model);
+                $guessedRelationshipName = $this->guessBelongsToRelationshipName($columnName, $model);
 
                 if (filled($guessedRelationshipName)) {
-                    $guessedRelationshipTitleColumnName = $this->guessBelongsToRelationshipTitleColumnName($column, app($model)->{$guessedRelationshipName}()->getModel()::class);
+                    $guessedRelationshipTitleColumnName = $this->guessBelongsToRelationshipTitleColumnName($columnName, app($model)->{$guessedRelationshipName}()->getModel()::class);
 
                     $componentData['type'] = Forms\Components\Select::class;
                     $componentData['relationship'] = [$guessedRelationshipName, $guessedRelationshipTitleColumnName];
@@ -62,10 +62,11 @@ trait CanGenerateForms
             }
 
             if (in_array($columnName, [
+                'id',
                 'sku',
                 'uuid',
             ])) {
-                $componentData['label'] = [strtoupper($columnName)];
+                $componentData['label'] = [Str::upper($columnName)];
             }
 
             if ($componentData['type'] === Forms\Components\TextInput::class) {
@@ -86,40 +87,40 @@ trait CanGenerateForms
                 $componentData['image'] = [];
             }
 
-            if ($column->getNotnull()) {
+            if (! $column['nullable']) {
                 $componentData['required'] = [];
             }
 
-            if (in_array($column->getType()::class, [
-                Types\BigIntType::class,
-                Types\DecimalType::class,
-                Types\FloatType::class,
-                Types\IntegerType::class,
-                Types\SmallIntType::class,
+            if (in_array($type['name'], [
+                'integer',
+                'decimal',
+                'float',
+                'double',
+                'money',
             ])) {
                 if ($componentData['type'] === Forms\Components\TextInput::class) {
                     $componentData['numeric'] = [];
                 }
 
-                if (filled($column->getDefault())) {
-                    $componentData['default'] = [$column->getDefault()];
+                if (filled($column['default'])) {
+                    $componentData['default'] = [$this->parseDefaultExpression($column, $model)];
                 }
 
                 if (in_array($columnName, [
                     'cost',
                     'money',
                     'price',
-                ])) {
+                ]) || $type['name'] === 'money') {
                     $componentData['prefix'] = ['$'];
                 }
             } elseif (in_array($componentData['type'], [
                 Forms\Components\TextInput::class,
                 Forms\Components\Textarea::class,
-            ]) && ($length = $column->getLength())) {
-                $componentData['maxLength'] = [$length];
+            ]) && isset($type['length'])) {
+                $componentData['maxLength'] = [$type['length']];
 
-                if (filled($column->getDefault())) {
-                    $componentData['default'] = [$column->getDefault()];
+                if (filled($column['default'])) {
+                    $componentData['default'] = [$this->parseDefaultExpression($column, $model)];
                 }
             }
 
@@ -152,6 +153,7 @@ trait CanGenerateForms
                         $parameterValue = match (true) {
                             /** @phpstan-ignore-next-line */
                             is_bool($parameterValue) => $parameterValue ? 'true' : 'false',
+                            /** @phpstan-ignore-next-line */
                             is_null($parameterValue) => 'null',
                             is_numeric($parameterValue) => $parameterValue,
                             default => "'{$parameterValue}'",

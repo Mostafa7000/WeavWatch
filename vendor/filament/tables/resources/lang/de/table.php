@@ -2,9 +2,21 @@
 
 return [
 
+    'column_toggle' => [
+
+        'heading' => 'Spalten',
+
+    ],
+
     'columns' => [
 
         'text' => [
+
+            'actions' => [
+                'collapse_list' => ':count weniger anzeigen',
+                'expand_list' => ':count weitere anzeigen',
+            ],
+
             'more_list_items' => 'und :count weitere',
         ],
 
@@ -13,16 +25,49 @@ return [
     'fields' => [
 
         'bulk_select_page' => [
-            'label' => 'Alle Einträge für Massenaktion auswählen/abwählen.',
+            'label' => 'Alle Einträge für Stapelverarbeitung auswählen/abwählen.',
         ],
 
         'bulk_select_record' => [
-            'label' => 'Eintrag :key für Massenaktion auswählen/abwählen.',
+            'label' => 'Eintrag :key für Stapelverarbeitung auswählen/abwählen.',
+        ],
+
+        'bulk_select_group' => [
+            'label' => 'Gruppe auswählen/abwählen :title für Stapelverarbeitung.',
         ],
 
         'search' => [
             'label' => 'Suche',
             'placeholder' => 'Suche',
+            'indicator' => 'Suche',
+        ],
+
+    ],
+
+    'summary' => [
+
+        'heading' => 'Zusammenfassung',
+
+        'subheadings' => [
+            'all' => 'Alle :label',
+            'group' => ':group Zusammenfassung',
+            'page' => 'Diese Seite',
+        ],
+
+        'summarizers' => [
+
+            'average' => [
+                'label' => 'Durchschnitt',
+            ],
+
+            'count' => [
+                'label' => 'Anzahl',
+            ],
+
+            'sum' => [
+                'label' => 'Summe',
+            ],
+
         ],
 
     ],
@@ -41,6 +86,10 @@ return [
             'label' => 'Filtern',
         ],
 
+        'group' => [
+            'label' => 'Gruppe',
+        ],
+
         'open_bulk_actions' => [
             'label' => 'Aktionen öffnen',
         ],
@@ -55,11 +104,17 @@ return [
 
         'heading' => 'Keine Datensätze gefunden',
 
+        'description' => 'Erstelle ein(e) :model um zu beginnen.',
+
     ],
 
     'filters' => [
 
         'actions' => [
+
+            'apply' => [
+                'label' => ' Filter anwenden',
+            ],
 
             'remove' => [
                 'label' => 'Filter löschen',
@@ -75,6 +130,8 @@ return [
             ],
 
         ],
+
+        'heading' => 'Filter',
 
         'indicator' => 'Aktive Filter',
 
@@ -95,6 +152,30 @@ return [
             'with_trashed' => 'Mit gelöschten Einträgen',
 
             'without_trashed' => 'Ohne gelöschte Einträge',
+
+        ],
+
+    ],
+
+    'grouping' => [
+
+        'fields' => [
+
+            'group' => [
+                'label' => 'Gruppieren nach',
+                'placeholder' => 'Gruppieren nach',
+            ],
+
+            'direction' => [
+
+                'label' => 'Gruppierungsrichtung',
+
+                'options' => [
+                    'asc' => 'Aufsteigend',
+                    'desc' => 'Absteigend',
+                ],
+
+            ],
 
         ],
 

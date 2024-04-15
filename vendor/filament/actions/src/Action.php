@@ -4,7 +4,6 @@ namespace Filament\Actions;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Js;
-use Livewire\Component;
 
 class Action extends MountableAction implements Contracts\Groupable, Contracts\HasRecord
 {
@@ -25,6 +24,10 @@ class Action extends MountableAction implements Contracts\Groupable, Contracts\H
 
         if (is_string($this->action)) {
             return $this->action;
+        }
+
+        if ($event = $this->getLivewireEventClickHandler()) {
+            return $event;
         }
 
         $argumentsParameter = '';
@@ -66,11 +69,6 @@ class Action extends MountableAction implements Contracts\Groupable, Contracts\H
         };
     }
 
-    public function getLivewire(): Component
-    {
-        return $this->livewire;
-    }
-
     public function shouldClearRecordAfter(): bool
     {
         return ! $this->getRecord()?->exists;
@@ -83,5 +81,10 @@ class Action extends MountableAction implements Contracts\Groupable, Contracts\H
         }
 
         $this->record(null);
+    }
+
+    public function getInfolistName(): string
+    {
+        return 'mountedActionInfolist';
     }
 }

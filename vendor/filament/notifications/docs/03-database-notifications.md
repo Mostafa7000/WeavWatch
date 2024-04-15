@@ -8,6 +8,10 @@ import AutoScreenshot from "@components/AutoScreenshot.astro"
 Before we start, make sure that the [Laravel notifications table](https://laravel.com/docs/notifications#database-prerequisites) is added to your database:
 
 ```bash
+# Laravel 11 and higher
+php artisan make:notifications-table
+
+# Laravel 10
 php artisan notifications:table
 ```
 
@@ -23,7 +27,7 @@ To add database notifications to your app, you must add a new Livewire component
 
 <AutoScreenshot name="notifications/database" alt="Database notifications" version="3.x" />
 
-Database notifications will be rendered within a modal. To open this modal, you must have a "trigger" button in your view. Create a new trigger button component in your app, for instance at `/resources/views/notifications/database-notifications-trigger.blade.php`:
+Database notifications will be rendered within a modal. To open this modal, you must have a "trigger" button in your view. Create a new trigger button component in your app, for instance at `/resources/views/filament/notifications/database-notifications-trigger.blade.php`:
 
 ```blade
 <button type="button">
@@ -31,14 +35,14 @@ Database notifications will be rendered within a modal. To open this modal, you 
 </button>
 ```
 
-`$unreadNotificationsCount` is a variable automatically passed to this view, which provides it with a real-time count of the number of unread notifications the user has.
+`$unreadNotificationsCount` is a variable automatically passed to this view, which provides it with a real-time count of unread notifications the user has.
 
 In the service provider, point to this new trigger view:
 
 ```php
 use Filament\Notifications\Livewire\DatabaseNotifications;
 
-DatabaseNotifications::trigger('filament-notifications.database-notifications-trigger');
+DatabaseNotifications::trigger('filament.notifications.database-notifications-trigger');
 ```
 
 Now, click on the trigger button that is rendered in your view. A modal should appear containing your database notifications when clicked!
@@ -134,7 +138,7 @@ event(new DatabaseNotificationsSent($recipient));
 
 ## Marking database notifications as read
 
-There is a button at the top of the modal to mark all notifications as read at once. You may also add [actions](sending-notifications#adding-actions-to-notifications) to notifications, which you can use to mark individual notifications as read. To do this, use the `markAsRead()` method on the action:
+There is a button at the top of the modal to mark all notifications as read at once. You may also add [Actions](sending-notifications#adding-actions-to-notifications) to notifications, which you can use to mark individual notifications as read. To do this, use the `markAsRead()` method on the action:
 
 ```php
 use Filament\Notifications\Actions\Action;

@@ -152,6 +152,10 @@ class PackagingDefectsRelationManager extends RelationManager
                             ->rules('min:0')
                             ->default(0),
                     ])->columns(5),
+                Forms\Components\Section::make('أخرى')
+                    ->schema([
+                        Forms\Components\TextInput::make('other')->label('عيوب أخرى')
+                    ]),
             ]);
     }
 
@@ -212,6 +216,8 @@ class PackagingDefectsRelationManager extends RelationManager
                     ->label('عدم توافق المقاسات')->sortable(),
                 Tables\Columns\TextColumn::make('a18')
                     ->label('شماعة خطأ')->sortable(),
+                Tables\Columns\TextColumn::make('other')
+                    ->label('عيوب أخرى')
             ])
             ->filters([
                 //

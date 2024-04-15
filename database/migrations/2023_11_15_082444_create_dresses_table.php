@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('code');
             $table->foreignId('color_id')->constrained('colors')->cascadeOnDelete();
             $table->foreignId('batch_id')->constrained('batches')->cascadeOnDelete();
+            $table->string('bath_code')->nullable();
+            $table->string('meters')->nullable();
             $table->timestamps();
         });
     }

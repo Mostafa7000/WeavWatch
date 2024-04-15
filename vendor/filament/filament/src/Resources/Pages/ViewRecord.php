@@ -9,22 +9,23 @@ use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\ReplicateAction;
 use Filament\Actions\RestoreAction;
 use Filament\Forms\Form;
-use Filament\Infolists\Concerns\InteractsWithInfolists;
-use Filament\Infolists\Contracts\HasInfolists;
 use Filament\Infolists\Infolist;
 use Filament\Pages\Concerns\InteractsWithFormActions;
+use Filament\Support\Facades\FilamentIcon;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 
 /**
  * @property Form $form
  */
-class ViewRecord extends Page implements HasInfolists
+class ViewRecord extends Page
 {
     use Concerns\HasRelationManagers;
-    use Concerns\InteractsWithRecord;
+    use Concerns\InteractsWithRecord {
+        configureAction as configureActionRecord;
+    }
     use InteractsWithFormActions;
-    use InteractsWithInfolists;
 
     /**
      * @var view-string
@@ -35,6 +36,13 @@ class ViewRecord extends Page implements HasInfolists
      * @var array<string, mixed> | null
      */
     public ?array $data = [];
+
+    public static function getNavigationIcon(): string | Htmlable | null
+    {
+        return static::$navigationIcon
+            ?? FilamentIcon::resolve('panels::resources.pages.view-record.navigation-item')
+            ?? 'heroicon-o-eye';
+    }
 
     public function getBreadcrumb(): string
     {
@@ -59,8 +67,6 @@ class ViewRecord extends Page implements HasInfolists
 
     protected function authorizeAccess(): void
     {
-        static::authorizeResourceAccess();
-
         abort_unless(static::getResource()::canView($this->getRecord()), 403);
     }
 
@@ -71,22 +77,23 @@ class ViewRecord extends Page implements HasInfolists
 
     protected function fillForm(): void
     {
-        $data = $this->getRecord()->attributesToArray();
-
         /** @internal Read the DocBlock above the following method. */
-        $this->fillFormWithDataAndCallHooks($data);
+        $this->fillFormWithDataAndCallHooks($this->getRecord());
     }
 
     /**
      * @internal Never override or call this method. If you completely override `fillForm()`, copy the contents of this method into your override.
      *
-     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>  $extraData
      */
-    protected function fillFormWithDataAndCallHooks(array $data): void
+    protected function fillFormWithDataAndCallHooks(Model $record, array $extraData = []): void
     {
         $this->callHook('beforeFill');
 
-        $data = $this->mutateFormDataBeforeFill($data);
+        $data = $this->mutateFormDataBeforeFill([
+            ...$record->attributesToArray(),
+            ...$extraData,
+        ]);
 
         $this->form->fill($data);
 
@@ -100,7 +107,7 @@ class ViewRecord extends Page implements HasInfolists
     {
         $this->data = [
             ...$this->data,
-            ...$this->getRecord()->only($attributes),
+            ...Arr::only($this->getRecord()->attributesToArray(), $attributes),
         ];
     }
 
@@ -115,9 +122,7 @@ class ViewRecord extends Page implements HasInfolists
 
     protected function configureAction(Action $action): void
     {
-        $action
-            ->record($this->getRecord())
-            ->recordTitle($this->getRecordTitle());
+        $this->configureActionRecord($action);
 
         match (true) {
             $action instanceof DeleteAction => $this->configureDeleteAction($action),
@@ -185,15 +190,25 @@ class ViewRecord extends Page implements HasInfolists
 
     public function form(Form $form): Form
     {
-        return static::getResource()::form(
-            $form
-                ->operation('view')
-                ->disabled()
-                ->model($this->getRecord())
-                ->statePath($this->getFormStatePath())
-                ->columns($this->hasInlineLabels() ? 1 : 2)
-                ->inlineLabel($this->hasInlineLabels()),
-        );
+        return $form;
+    }
+
+    /**
+     * @return array<int | string, string | Form>
+     */
+    protected function getForms(): array
+    {
+        return [
+            'form' => $this->form(static::getResource()::form(
+                $this->makeForm()
+                    ->operation('view')
+                    ->disabled()
+                    ->model($this->getRecord())
+                    ->statePath($this->getFormStatePath())
+                    ->columns($this->hasInlineLabels() ? 1 : 2)
+                    ->inlineLabel($this->hasInlineLabels()),
+            )),
+        ];
     }
 
     public function getFormStatePath(): ?string
@@ -203,26 +218,19 @@ class ViewRecord extends Page implements HasInfolists
 
     public function infolist(Infolist $infolist): Infolist
     {
-        return static::getResource()::infolist(
-            $infolist
-                ->record($this->getRecord())
-                ->columns($this->hasInlineLabels() ? 1 : 2)
-                ->inlineLabel($this->hasInlineLabels()),
-        );
+        return static::getResource()::infolist($infolist);
     }
 
-    protected function getMountedActionFormModel(): Model
+    protected function makeInfolist(): Infolist
     {
-        return $this->getRecord();
+        return parent::makeInfolist()
+            ->record($this->getRecord())
+            ->columns($this->hasInlineLabels() ? 1 : 2)
+            ->inlineLabel($this->hasInlineLabels());
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    public function getWidgetData(): array
+    public static function shouldRegisterNavigation(array $parameters = []): bool
     {
-        return [
-            'record' => $this->getRecord(),
-        ];
+        return parent::shouldRegisterNavigation($parameters) && static::getResource()::canView($parameters['record']);
     }
 }

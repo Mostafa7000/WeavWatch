@@ -5,14 +5,14 @@
     $profileItem = $items['profile'] ?? $items['account'] ?? null;
     $profileItemUrl = $profileItem?->getUrl();
     $profilePage = filament()->getProfilePage();
-    $hasProfile = filament()->hasProfile() || filled($profileItemUrl);
+    $hasProfileItem = filament()->hasProfile() || filled($profileItemUrl);
 
     $logoutItem = $items['logout'] ?? null;
 
     $items = \Illuminate\Support\Arr::except($items, ['account', 'logout', 'profile']);
 @endphp
 
-{{ \Filament\Support\Facades\FilamentView::renderHook('panels::user-menu.before') }}
+{{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::USER_MENU_BEFORE) }}
 
 <x-filament::dropdown
     placement="bottom-end"
@@ -26,36 +26,38 @@
         <button
             aria-label="{{ __('filament-panels::layout.actions.open_user_menu.label') }}"
             type="button"
+            class="shrink-0"
         >
             <x-filament-panels::avatar.user :user="$user" />
         </button>
     </x-slot>
 
-    {{ \Filament\Support\Facades\FilamentView::renderHook('panels::user-menu.profile.before') }}
+    @if ($profileItem?->isVisible() ?? true)
+        {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::USER_MENU_PROFILE_BEFORE) }}
 
-    @if ($hasProfile)
-        <x-filament::dropdown.list>
-            <x-filament::dropdown.list.item
+        @if ($hasProfileItem)
+            <x-filament::dropdown.list>
+                <x-filament::dropdown.list.item
+                    :color="$profileItem?->getColor()"
+                    :icon="$profileItem?->getIcon() ?? \Filament\Support\Facades\FilamentIcon::resolve('panels::user-menu.profile-item') ?? 'heroicon-m-user-circle'"
+                    :href="$profileItemUrl ?? filament()->getProfileUrl()"
+                    :target="($profileItem?->shouldOpenUrlInNewTab() ?? false) ? '_blank' : null"
+                    tag="a"
+                >
+                    {{ $profileItem?->getLabel() ?? ($profilePage ? $profilePage::getLabel() : null) ?? filament()->getUserName($user) }}
+                </x-filament::dropdown.list.item>
+            </x-filament::dropdown.list>
+        @else
+            <x-filament::dropdown.header
                 :color="$profileItem?->getColor()"
-                :icon="$profileItem?->getIcon() ?? 'heroicon-m-user-circle'"
-                :href="$profileItemUrl ?? filament()->getProfileUrl()"
-                icon-alias="panels::user-menu.profile-item"
-                tag="a"
+                :icon="$profileItem?->getIcon() ?? \Filament\Support\Facades\FilamentIcon::resolve('panels::user-menu.profile-item') ?? 'heroicon-m-user-circle'"
             >
-                {{ $profileItem?->getLabel() ?? ($profilePage ? $profilePage::getLabel() : null) ?? filament()->getUserName($user) }}
-            </x-filament::dropdown.list.item>
-        </x-filament::dropdown.list>
-    @else
-        <x-filament::dropdown.header
-            :color="$profileItem?->getColor()"
-            :icon="$profileItem?->getIcon() ?? 'heroicon-m-user-circle'"
-            icon-alias="panels::user-menu.profile-item"
-        >
-            {{ $profileItem?->getLabel() ?? filament()->getUserName($user) }}
-        </x-filament::dropdown.header>
-    @endif
+                {{ $profileItem?->getLabel() ?? filament()->getUserName($user) }}
+            </x-filament::dropdown.header>
+        @endif
 
-    {{ \Filament\Support\Facades\FilamentView::renderHook('panels::user-menu.profile.after') }}
+        {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::USER_MENU_PROFILE_AFTER) }}
+    @endif
 
     @if (filament()->hasDarkMode() && (! filament()->hasDarkModeForced()))
         <x-filament::dropdown.list>
@@ -65,11 +67,18 @@
 
     <x-filament::dropdown.list>
         @foreach ($items as $key => $item)
+            @php
+                $itemPostAction = $item->getPostAction();
+            @endphp
+
             <x-filament::dropdown.list.item
+                :action="$itemPostAction"
                 :color="$item->getColor()"
                 :href="$item->getUrl()"
                 :icon="$item->getIcon()"
-                tag="a"
+                :method="filled($itemPostAction) ? 'post' : null"
+                :tag="filled($itemPostAction) ? 'form' : 'a'"
+                :target="$item->shouldOpenUrlInNewTab() ? '_blank' : null"
             >
                 {{ $item->getLabel() }}
             </x-filament::dropdown.list.item>
@@ -78,8 +87,7 @@
         <x-filament::dropdown.list.item
             :action="$logoutItem?->getUrl() ?? filament()->getLogoutUrl()"
             :color="$logoutItem?->getColor()"
-            :icon="$logoutItem?->getIcon() ?? 'heroicon-m-arrow-left-on-rectangle'"
-            icon-alias="panels::user-menu.logout-button"
+            :icon="$logoutItem?->getIcon() ?? \Filament\Support\Facades\FilamentIcon::resolve('panels::user-menu.logout-button') ?? 'heroicon-m-arrow-left-on-rectangle'"
             method="post"
             tag="form"
         >
@@ -88,4 +96,4 @@
     </x-filament::dropdown.list>
 </x-filament::dropdown>
 
-{{ \Filament\Support\Facades\FilamentView::renderHook('panels::user-menu.after') }}
+{{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::USER_MENU_AFTER) }}

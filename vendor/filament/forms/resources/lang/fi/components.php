@@ -70,6 +70,134 @@ return [
 
     ],
 
+    'file_upload' => [
+
+        'editor' => [
+
+            'actions' => [
+
+                'cancel' => [
+                    'label' => 'Peruuta',
+                ],
+
+                'drag_crop' => [
+                    'label' => 'Siirtotila "rajaus"',
+                ],
+
+                'drag_move' => [
+                    'label' => 'Siirtotila "siirrä"',
+                ],
+
+                'flip_horizontal' => [
+                    'label' => 'Käännä kuva vaakasuunnassa',
+                ],
+
+                'flip_vertical' => [
+                    'label' => 'Käännä kuva pystysuunnassa',
+                ],
+
+                'move_down' => [
+                    'label' => 'Siirrä kuvaa alas',
+                ],
+
+                'move_left' => [
+                    'label' => 'Siirrä kuvaa vasemmalle ',
+                ],
+
+                'move_right' => [
+                    'label' => 'Siirrä kuvaa oikealle',
+                ],
+
+                'move_up' => [
+                    'label' => 'Siirrä kuvaa ylös',
+                ],
+
+                'reset' => [
+                    'label' => 'Palauta',
+                ],
+
+                'rotate_left' => [
+                    'label' => 'Käännä kuvaa vasemmalle',
+                ],
+
+                'rotate_right' => [
+                    'label' => 'Käännä kuvaa oikealle',
+                ],
+
+                'set_aspect_ratio' => [
+                    'label' => 'Aseta kuvasuhteeksi :ratio',
+                ],
+
+                'save' => [
+                    'label' => 'Tallenna',
+                ],
+
+                'zoom_100' => [
+                    'label' => 'Oikea koko',
+                ],
+
+                'zoom_in' => [
+                    'label' => 'Lähennä',
+                ],
+
+                'zoom_out' => [
+                    'label' => 'Loitonna',
+                ],
+
+            ],
+
+            'fields' => [
+
+                'height' => [
+                    'label' => 'Korkeus',
+                    'unit' => 'px',
+                ],
+
+                'rotation' => [
+                    'label' => 'Kierre',
+                    'unit' => 'deg',
+                ],
+
+                'width' => [
+                    'label' => 'Leveys',
+                    'unit' => 'px',
+                ],
+
+                'x_position' => [
+                    'label' => 'X',
+                    'unit' => 'px',
+                ],
+
+                'y_position' => [
+                    'label' => 'Y',
+                    'unit' => 'px',
+                ],
+
+            ],
+
+            'aspect_ratios' => [
+
+                'label' => 'Kuvasuhde',
+
+                'no_fixed' => [
+                    'label' => 'Vapaa',
+                ],
+
+            ],
+
+            'svg' => [
+
+                'messages' => [
+                    'confirmation' => 'SVG-tiedostojen muokkausta ei suositella, koska laatu voi heikentyä kokoa muuttaessa.\n Oletko varma että haluat jatkaa?',
+                    'disabled' => 'SVG-tiedostojen muokkaus on poissa käytöstä koska se voi johtaa laadun heikkenemiseen.',
+                ],
+
+            ],
+
+        ],
+
+    ],
+
     'key_value' => [
 
         'actions' => [
@@ -106,15 +234,27 @@ return [
 
         'toolbar_buttons' => [
             'attach_files' => 'Liitä tiedostoja',
+            'blockquote' => 'Lainaus',
             'bold' => 'Lihavointi',
             'bullet_list' => 'Lista',
             'code_block' => 'Koodialue',
-            'edit' => 'Muokkaa',
+            'heading' => 'Otsikko',
             'italic' => 'Kursivoitu',
             'link' => 'Linkki',
             'ordered_list' => 'Luettelo',
-            'preview' => 'Esikatsele',
+            'redo' => 'Toista',
             'strike' => 'Yliviivaus',
+            'table' => 'Taulukko',
+            'undo' => 'Peruuta',
+        ],
+
+    ],
+
+    'radio' => [
+
+        'boolean' => [
+            'true' => 'Kyllä',
+            'false' => 'Ei',
         ],
 
     ],
@@ -127,16 +267,20 @@ return [
                 'label' => 'Lisää :label',
             ],
 
+            'add_between' => [
+                'label' => 'Lisää väliin',
+            ],
+
             'delete' => [
                 'label' => 'Poista',
             ],
 
-            'reorder' => [
-                'label' => 'Siirrä',
-            ],
-
             'clone' => [
                 'label' => 'Kloonaa',
+            ],
+
+            'reorder' => [
+                'label' => 'Siirrä',
             ],
 
             'move_down' => [
@@ -222,6 +366,28 @@ return [
                             'label' => 'Uusi',
                         ],
 
+                        'create_another' => [
+                            'label' => 'Luo & luo toinen',
+                        ],
+
+                    ],
+
+                ],
+
+            ],
+
+            'edit_option' => [
+
+                'modal' => [
+
+                    'heading' => 'Muokkaa',
+
+                    'actions' => [
+
+                        'save' => [
+                            'label' => 'Tallenna',
+                        ],
+
                     ],
 
                 ],
@@ -251,6 +417,31 @@ return [
 
     'tags_input' => [
         'placeholder' => 'Uusi tunniste',
+    ],
+
+    'text_input' => [
+
+        'actions' => [
+
+            'hide_password' => [
+                'label' => 'Piilota salasana',
+            ],
+
+            'show_password' => [
+                'label' => 'Näytä salasana',
+            ],
+
+        ],
+
+    ],
+
+    'toggle_buttons' => [
+
+        'boolean' => [
+            'true' => 'Kyllä',
+            'false' => 'Ei',
+        ],
+
     ],
 
     'wizard' => [

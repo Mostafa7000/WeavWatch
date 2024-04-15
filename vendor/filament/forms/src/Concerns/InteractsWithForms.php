@@ -6,6 +6,7 @@ use Closure;
 use Exception;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Form;
+use Filament\Infolists\Infolist;
 use Filament\Support\Concerns\ResolvesDynamicLivewireProperties;
 use Filament\Support\Contracts\TranslatableContentDriver;
 use Illuminate\Database\Eloquent\Model;
@@ -16,9 +17,9 @@ use Livewire\WithFileUploads;
 
 trait InteractsWithForms
 {
-    use WithFileUploads;
     use HasFormComponentActions;
     use ResolvesDynamicLivewireProperties;
+    use WithFileUploads;
 
     /**
      * @var array <string, TemporaryUploadedFile | null>
@@ -171,14 +172,10 @@ trait InteractsWithForms
         } catch (ValidationException $exception) {
             $this->onValidationError($exception);
 
-            $this->dispatch('expand-concealing-component');
+            $this->dispatch('form-validation-error', livewireId: $this->getId());
 
             throw $exception;
         }
-    }
-
-    protected function onValidationError(ValidationException $exception): void
-    {
     }
 
     /**
@@ -196,10 +193,27 @@ trait InteractsWithForms
         } catch (ValidationException $exception) {
             $this->onValidationError($exception);
 
-            $this->dispatch('expand-concealing-component');
+            $this->dispatch('form-validation-error', livewireId: $this->getId());
 
             throw $exception;
         }
+    }
+
+    protected function onValidationError(ValidationException $exception): void
+    {
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     * @return array<string, mixed>
+     */
+    protected function prepareForValidation($attributes): array
+    {
+        foreach ($this->getCachedForms() as $form) {
+            $attributes = $form->mutateStateForValidation($attributes);
+        }
+
+        return $attributes;
     }
 
     /**
@@ -228,12 +242,14 @@ trait InteractsWithForms
 
     public function updatingInteractsWithForms(string $statePath): void
     {
+        $statePath = (string) str($statePath)->before('.');
+
         $this->oldFormState[$statePath] = data_get($this, $statePath);
     }
 
     public function getOldFormState(string $statePath): mixed
     {
-        return $this->oldFormState[$statePath] ?? null;
+        return data_get($this->oldFormState, $statePath);
     }
 
     public function updatedInteractsWithForms(string $statePath): void
@@ -281,7 +297,7 @@ trait InteractsWithForms
                 if (! method_exists($this, $form)) {
                     $livewireClass = $this::class;
 
-                    throw new Exception("Form configuration method [{$formName}()] is missing from Livewire component [{$livewireClass}].");
+                    throw new Exception("Form configuration method [{$form}()] is missing from Livewire component [{$livewireClass}].");
                 }
 
                 return [$form => $this->{$form}($this->makeForm())];
@@ -439,5 +455,10 @@ trait InteractsWithForms
     public function isCachingForms(): bool
     {
         return $this->isCachingForms;
+    }
+
+    public function mountedFormComponentActionInfolist(): Infolist
+    {
+        return $this->getMountedFormComponentAction()->getInfolist();
     }
 }

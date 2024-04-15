@@ -3,10 +3,12 @@
 namespace Filament\Tables\Filters\Concerns;
 
 use Closure;
+use Filament\Support\Services\RelationshipJoiner;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\JoinClause;
 
 trait HasRelationship
 {
@@ -79,21 +81,7 @@ trait HasRelationship
     {
         $relationship = Relation::noConstraints(fn () => $this->getRelationship());
 
-        $relationshipQuery = $relationship->getQuery();
-
-        // By default, `BelongsToMany` relationships use an inner join to scope the results to only
-        // those that are attached in the pivot table. We need to change this to a left join so
-        // that we can still get results when the relationship is not attached to the record.
-        if ($relationship instanceof BelongsToMany) {
-            /** @var ?JoinClause $firstRelationshipJoinClause */
-            $firstRelationshipJoinClause = $relationshipQuery->getQuery()->joins[0] ?? null;
-
-            if ($firstRelationshipJoinClause) {
-                $firstRelationshipJoinClause->type = 'left';
-            }
-
-            $relationshipQuery->select($relationshipQuery->getModel()->getTable() . '.*');
-        }
+        $relationshipQuery = app(RelationshipJoiner::class)->prepareQueryForNoConstraints($relationship);
 
         if ($this->getModifyRelationshipQueryUsing()) {
             $relationshipQuery = $this->evaluate($this->modifyRelationshipQueryUsing, [
@@ -106,5 +94,31 @@ trait HasRelationship
         }
 
         return $relationshipQuery;
+    }
+
+    public function getRelationshipKey(?Builder $query = null): ?string
+    {
+        $relationship = $this->getRelationship();
+
+        if ($relationship instanceof BelongsToMany) {
+            return $query?->getModel()->qualifyColumn($relationship->getRelatedKeyName()) ??
+                $relationship->getQualifiedRelatedKeyName();
+        }
+
+        if ($relationship instanceof HasManyThrough) {
+            return $query?->getModel()->qualifyColumn($relationship->getForeignKeyName()) ??
+                $relationship->getQualifiedForeignKeyName();
+        }
+
+        if ($relationship instanceof \Znck\Eloquent\Relations\BelongsToThrough) {
+            return $relationship->getRelated()->getQualifiedKeyName();
+        }
+
+        if ($relationship instanceof BelongsTo) {
+            return $query?->getModel()->qualifyColumn($relationship->getOwnerKeyName()) ??
+                $relationship->getQualifiedOwnerKeyName();
+        }
+
+        return null;
     }
 }
